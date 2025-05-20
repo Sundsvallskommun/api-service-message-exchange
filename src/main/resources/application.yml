@@ -10,4 +10,8 @@ openapi:
   version: '@project.version@'
 spring:
   application:
-    name: template
+    name: chat
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+  flyway:
+    enabled: false

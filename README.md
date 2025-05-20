@@ -1,4 +1,4 @@
-# Conversations
+# Chat
 
 _Under construction._
 
@@ -17,8 +17,8 @@ _Under construction._
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/Sundsvallskommun/api-service-conversations.git
-   cd api-service-conversations
+   git clone https://github.com/Sundsvallskommun/api-service-chat.git
+   cd api-service-chat
    ```
 2. **Configure the application:**
 
@@ -29,7 +29,8 @@ _Under construction._
 
 3. **Ensure dependent services are running:**
 
-   If this microservice depends on other services, make sure they are up and accessible. See [Dependencies](#dependencies) for more details.
+   If this microservice depends on other services, make sure they are up and accessible.
+   See [Dependencies](#dependencies) for more details.
 
 4. **Build and run the application:**
 
@@ -70,7 +71,8 @@ curl -X GET http://localhost:8080/api/resource
 
 ## Configuration
 
-Configuration is crucial for the application to run successfully. Ensure all necessary settings are configured in `application.yml`.
+Configuration is crucial for the application to run successfully. Ensure all necessary settings are configured in
+`application.yml`.
 
 ### Key Configuration Parameters
 
@@ -106,7 +108,8 @@ Configuration is crucial for the application to run successfully. Ensure all nec
 
 ### Database Initialization
 
-The project is set up with [Flyway](https://github.com/flyway/flyway) for database migrations. Flyway is disabled by default so you will have to enable it to automatically populate the database schema upon application startup.
+The project is set up with [Flyway](https://github.com/flyway/flyway) for database migrations. Flyway is disabled by
+default so you will have to enable it to automatically populate the database schema upon application startup.
 
 ```yaml
 spring:
@@ -114,7 +117,8 @@ spring:
     enabled: true
 ```
 
-- **No additional setup is required** for database initialization, as long as the database connection settings are correctly configured.
+- **No additional setup is required** for database initialization, as long as the database connection settings are
+  correctly configured.
 
 ### Additional Notes
 
@@ -128,7 +132,8 @@ spring:
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](https://github.com/Sundsvallskommun/.github/blob/main/.github/CONTRIBUTING.md) for guidelines.
+Contributions are welcome! Please
+see [CONTRIBUTING.md](https://github.com/Sundsvallskommun/.github/blob/main/.github/CONTRIBUTING.md) for guidelines.
 
 ## License
 
@@ -136,12 +141,12 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Code status
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-conversations&metric=alert_status)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-conversations)
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-conversations&metric=reliability_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-conversations)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-conversations&metric=security_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-conversations)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-conversations&metric=sqale_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-conversations)
-[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-conversations&metric=vulnerabilities)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-conversations)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-conversations&metric=bugs)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-conversations)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-chat&metric=alert_status)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-chat)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-chat&metric=reliability_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-chat)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-chat&metric=security_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-chat)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-chat&metric=sqale_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-chat)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-chat&metric=vulnerabilities)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-chat)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-chat&metric=bugs)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-chat)
 
 ---
 
