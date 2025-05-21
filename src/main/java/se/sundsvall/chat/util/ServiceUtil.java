@@ -19,7 +19,7 @@ public final class ServiceUtil {
 		try {
 			return DETECTOR.detect(stream, fileName);
 		} catch (final Exception e) {
-			LOGGER.warn(String.format(MIME_ERROR_MSG, fileName), e);
+			LOGGER.warn(String.format(MIME_ERROR_MSG, fileName.replaceAll("[\\r\\n]", "")), e);
 			return APPLICATION_OCTET_STREAM_VALUE; // Return mime type for arbitrary binary files
 		}
 	}
