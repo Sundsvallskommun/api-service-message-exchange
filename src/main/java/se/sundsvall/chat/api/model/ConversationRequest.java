@@ -1,5 +1,6 @@
 package se.sundsvall.chat.api.model;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Objects;
@@ -7,14 +8,14 @@ import java.util.Objects;
 @Schema(description = "Represents a conversation containing participants, messages, and metadata.")
 public class ConversationRequest {
 
-	@Schema(description = "The list of participants in the conversation.")
+	@ArraySchema(schema = @Schema(implementation = Participant.class, description = "The list of participants in the conversation."))
 	private List<Participant> participants;
 
 	@Schema(description = "A list of channel, reference, and context identifiers associated with the conversation.",
 		example = "[\"channel1-ref1-context1\", \"channel2-ref2-context2\"]")
 	private String channelId;
 
-	@Schema(description = "A list of metadata associated with the conversation.")
+	@ArraySchema(schema = @Schema(implementation = MetaData.class, description = "A list of metadata associated with the conversation."))
 	private List<MetaData> metaData;
 
 	@Schema(description = "The topic of the conversation.", example = "Customer Support")

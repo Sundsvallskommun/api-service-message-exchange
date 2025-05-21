@@ -37,13 +37,12 @@ public class ConversationEntity {
 	private String channelId;
 
 	@OneToMany(fetch = FetchType.EAGER)
-	@CollectionTable(name = "conversation_meta_data", joinColumns = @JoinColumn(name = "conversation_id", foreignKey = @ForeignKey(name = "fk_meta_data_conversation_id")))
 	private List<MetaDataEntity> metaData;
 
 	@Column(name = "topic")
 	private String topic;
 
-	@OneToMany(mappedBy = "conversation", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "conversation", fetch = FetchType.LAZY)
 	private List<MessageEntity> messages;
 
 	public static ConversationEntity create() {

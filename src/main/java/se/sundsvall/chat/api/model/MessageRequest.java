@@ -1,5 +1,6 @@
 package se.sundsvall.chat.api.model;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Objects;
@@ -19,7 +20,7 @@ public class MessageRequest {
 	@Schema(description = "The content of the message.", example = "Hello, how can I help you?")
 	private String content;
 
-	@Schema(description = "The list of participants who have read the message.")
+	@ArraySchema(schema = @Schema(implementation = Participant.class, description = "The list of participants who have read the message."))
 	private List<Participant> readBy;
 
 	public static MessageRequest create() {

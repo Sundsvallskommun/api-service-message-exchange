@@ -1,9 +1,13 @@
 package se.sundsvall.chat.api.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Objects;
 
+@Schema(description = "Represents a participant in a conversation, including their type and value.")
 public class Participant {
+	@Schema(description = "The type of the participant, e.g., 'user', 'bot', etc.", example = "user")
 	private String type;
+	@Schema(description = "The unique identifier or value of the participant.", example = "ad012ad")
 	private String value;
 
 	public static Participant create() {

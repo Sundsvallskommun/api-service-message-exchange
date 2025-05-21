@@ -69,7 +69,7 @@ public final class Mapper {
 			.withCreatedBy(toParticipant(entity.getCreatedBy()))
 			.withContent(entity.getContent())
 			.withReadBy(toParticipants(entity.getReadBy()))
-			.withAttachments(AttachmentMapper.toErrandAttachments(entity.getAttachments()));
+			.withAttachments(AttachmentMapper.toAttachments(entity.getAttachments()));
 	}
 
 	static MessageEntity toMessageEntity(final ConversationEntity entity, final MessageRequest message) {

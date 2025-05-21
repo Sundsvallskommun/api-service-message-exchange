@@ -11,7 +11,5 @@ openapi:
 spring:
   application:
     name: chat
-  datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
   flyway:
     enabled: false

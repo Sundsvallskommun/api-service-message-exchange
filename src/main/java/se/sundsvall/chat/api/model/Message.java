@@ -1,5 +1,6 @@
 package se.sundsvall.chat.api.model;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -26,10 +27,10 @@ public class Message {
 	@Schema(description = "The content of the message.", example = "Hello, how can I help you?")
 	private String content;
 
-	@Schema(description = "The list of participants who have read the message.")
+	@ArraySchema(schema = @Schema(implementation = Participant.class, description = "The list of participants who have read the message."))
 	private List<Participant> readBy;
 
-	@Schema(description = "The list of attachments associated with the message.")
+	@ArraySchema(schema = @Schema(implementation = Attachment.class, description = "The list of attachments associated with the message."))
 	private List<Attachment> attachments;
 
 	public static Message create() {

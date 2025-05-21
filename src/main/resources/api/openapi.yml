@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "1.0"
 servers:
-  - url: http://localhost:61031
+  - url: http://localhost:55322
     description: Generated server url
 tags:
   - name: Message resource
@@ -526,7 +526,6 @@ components:
       properties:
         participants:
           type: array
-          description: The list of participants in the conversation.
           items:
             $ref: "#/components/schemas/Participant"
         channelId:
@@ -536,7 +535,6 @@ components:
           example: "[\"channel1-ref1-context1\",\"channel2-ref2-context2\"]"
         metaData:
           type: array
-          description: A list of metadata associated with the conversation.
           items:
             $ref: "#/components/schemas/MetaData"
         topic:
@@ -550,19 +548,27 @@ components:
       properties:
         key:
           type: string
+          description: The key of the metadata.
+          example: key1
         values:
           type: array
           items:
             type: string
-      description: A list of metadata associated with the conversation.
+      description: "Represents metadata associated with a conversation, including\
+        \ key-value pairs."
     Participant:
       type: object
       properties:
         type:
           type: string
+          description: "The type of the participant, e.g., 'user', 'bot', etc."
+          example: user
         value:
           type: string
-      description: The list of participants in the conversation.
+          description: The unique identifier or value of the participant.
+          example: ad012ad
+      description: "Represents a participant in a conversation, including their type\
+        \ and value."
     Problem:
       type: object
       properties:
@@ -576,20 +582,20 @@ components:
           type: object
           additionalProperties:
             type: object
-        status:
-          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
+        status:
+          $ref: "#/components/schemas/StatusType"
     StatusType:
       type: object
       properties:
+        reasonPhrase:
+          type: string
         statusCode:
           type: integer
           format: int32
-        reasonPhrase:
-          type: string
     ConstraintViolationProblem:
       type: object
       properties:
@@ -711,12 +717,12 @@ components:
           type: object
           additionalProperties:
             type: object
-        status:
-          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
+        status:
+          $ref: "#/components/schemas/StatusType"
         suppressed:
           type: array
           items:
@@ -777,7 +783,6 @@ components:
           example: "Hello, how can I help you?"
         readBy:
           type: array
-          description: The list of participants who have read the message.
           items:
             $ref: "#/components/schemas/Participant"
       description: Message to be posted
@@ -802,7 +807,7 @@ components:
           description: The attachment created date
           format: date-time
           example: 2023-01-01T00:00:00Z
-      description: The list of attachments associated with the message.
+      description: Represents an attachment in a message
     Conversation:
       type: object
       properties:
@@ -812,7 +817,6 @@ components:
           example: "1234567890"
         participants:
           type: array
-          description: The list of participants in the conversation.
           items:
             $ref: "#/components/schemas/Participant"
         municipalityId:
@@ -830,7 +834,6 @@ components:
           example: "[\"channel1-ref1-context1\",\"channel2-ref2-context2\"]"
         metaData:
           type: array
-          description: A list of metadata associated with the conversation.
           items:
             $ref: "#/components/schemas/MetaData"
         topic:
@@ -872,12 +875,10 @@ components:
           example: "Hello, how can I help you?"
         readBy:
           type: array
-          description: The list of participants who have read the message.
           items:
             $ref: "#/components/schemas/Participant"
         attachments:
           type: array
-          description: The list of attachments associated with the message.
           items:
             $ref: "#/components/schemas/Attachment"
       description: "Represents a message within a conversation, including metadata\
@@ -885,12 +886,12 @@ components:
     PageMessage:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         last:
@@ -907,11 +908,11 @@ components:
           format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
     PageableObject:
@@ -922,6 +923,8 @@ components:
           format: int64
         sort:
           $ref: "#/components/schemas/SortObject"
+        unpaged:
+          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -930,15 +933,13 @@ components:
         pageSize:
           type: integer
           format: int32
-        unpaged:
-          type: boolean
     SortObject:
       type: object
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
   securitySchemes: { }

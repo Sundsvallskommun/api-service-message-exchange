@@ -1,10 +1,15 @@
 package se.sundsvall.chat.api.model;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Objects;
 
+@Schema(description = "Represents metadata associated with a conversation, including key-value pairs.")
 public class MetaData {
+	@Schema(description = "The key of the metadata.", example = "key1")
 	private String key;
+	@ArraySchema(schema = @Schema(implementation = String.class))
 	private List<String> values;
 
 	public static MetaData create() {

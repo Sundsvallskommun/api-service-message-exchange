@@ -91,9 +91,9 @@ class AttachmentMapperTest {
 	}
 
 	@Test
-	void toErrandAttachments() {
+	void toAttachments() {
 
-		final var result = AttachmentMapper.toErrandAttachments(List.of(AttachmentEntity.create()
+		final var result = AttachmentMapper.toAttachments(List.of(AttachmentEntity.create()
 			.withId(ATTACHMENT_ID)
 			.withFileName(FILE_NAME)
 			.withAttachmentData(null)
@@ -108,9 +108,9 @@ class AttachmentMapperTest {
 	}
 
 	@Test
-	void toErrandAttachmentsFromNullInput() {
+	void toAttachmentsFromNullInput() {
 
-		assertThat(AttachmentMapper.toErrandAttachments(null))
+		assertThat(AttachmentMapper.toAttachments(null))
 			.isNotNull().isEmpty();
 	}
 }

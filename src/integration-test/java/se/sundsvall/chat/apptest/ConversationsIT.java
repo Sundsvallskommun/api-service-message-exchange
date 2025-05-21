@@ -21,7 +21,7 @@ import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 	"/db/scripts/truncate.sql",
 	"/db/scripts/testdata-it.sql"
 })
-public class ConversationsIT extends AbstractAppTest {
+class ConversationsIT extends AbstractAppTest {
 
 	private static final String REQUEST_FILE = "request.json";
 	private static final String RESPONSE_FILE = "response.json";
@@ -37,7 +37,7 @@ public class ConversationsIT extends AbstractAppTest {
 			.withHttpMethod(GET)
 			.withExpectedResponseStatus(OK)
 			.withExpectedResponseHeader(CONTENT_TYPE, List.of(APPLICATION_JSON_VALUE))
-			.withExpectedResponse("response.json")
+			.withExpectedResponse(RESPONSE_FILE)
 			.sendRequestAndVerifyResponse();
 	}
 

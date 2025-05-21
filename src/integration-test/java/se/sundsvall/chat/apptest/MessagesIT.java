@@ -26,7 +26,7 @@ import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 	"/db/scripts/truncate.sql",
 	"/db/scripts/testdata-it.sql"
 })
-public class MessagesIT extends AbstractAppTest {
+class MessagesIT extends AbstractAppTest {
 
 	private static final String REQUEST_FILE = "request.json";
 	private static final String RESPONSE_FILE = "response.json";

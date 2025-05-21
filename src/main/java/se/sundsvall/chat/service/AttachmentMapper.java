@@ -45,14 +45,14 @@ public final class AttachmentMapper {
 		}
 	}
 
-	public static List<Attachment> toErrandAttachments(final List<AttachmentEntity> attachmentEntities) {
+	public static List<Attachment> toAttachments(final List<AttachmentEntity> attachmentEntities) {
 		return Optional.ofNullable(attachmentEntities).orElse(emptyList()).stream()
-			.map(AttachmentMapper::toErrandAttachment)
+			.map(AttachmentMapper::toAttachment)
 			.filter(Objects::nonNull)
 			.toList();
 	}
 
-	public static Attachment toErrandAttachment(final AttachmentEntity attachmentEntity) {
+	public static Attachment toAttachment(final AttachmentEntity attachmentEntity) {
 		return Optional.ofNullable(attachmentEntity)
 			.map(e -> Attachment.create()
 				.withFileName(e.getFileName())

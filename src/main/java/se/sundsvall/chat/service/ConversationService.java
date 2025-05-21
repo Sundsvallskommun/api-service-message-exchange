@@ -11,8 +11,6 @@ import se.sundsvall.chat.api.model.Conversation;
 import se.sundsvall.chat.api.model.ConversationRequest;
 import se.sundsvall.chat.integration.db.ConversationRepository;
 import se.sundsvall.chat.integration.db.model.ConversationEntity;
-import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
-import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 
 @Service
 public class ConversationService {
@@ -37,14 +35,14 @@ public class ConversationService {
 		return conversationRepository.save(entity).getId();
 	}
 
-	public Conversation updateConversation(final String namespace, @ValidMunicipalityId final String municipalityId, @ValidUuid final String conversationId, final ConversationRequest conversation) {
+	public Conversation updateConversation(final String namespace, final String municipalityId, final String conversationId, final ConversationRequest conversation) {
 
 		final var entity = findExistingConversation(municipalityId, namespace, conversationId);
 
 		return toConversation(conversationRepository.save(updateConversationEntity(entity, conversation)));
 	}
 
-	public void deleteConversation(final String namespace, @ValidMunicipalityId final String municipalityId, @ValidUuid final String conversationId) {
+	public void deleteConversation(final String namespace, final String municipalityId, final String conversationId) {
 
 		findExistingConversation(municipalityId, namespace, conversationId);
 
