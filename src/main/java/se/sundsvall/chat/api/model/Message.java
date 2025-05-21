@@ -29,6 +29,9 @@ public class Message {
 	@Schema(description = "The list of participants who have read the message.")
 	private List<Participant> readBy;
 
+	@Schema(description = "The list of attachments associated with the message.")
+	private List<Attachment> attachments;
+
 	public static Message create() {
 		return new Message();
 	}
@@ -124,20 +127,31 @@ public class Message {
 		return this;
 	}
 
+	public List<Attachment> getAttachments() {
+		return attachments;
+	}
+
+	public void setAttachments(final List<Attachment> attachments) {
+		this.attachments = attachments;
+	}
+
+	public Message withAttachments(final List<Attachment> attachments) {
+		this.attachments = attachments;
+		return this;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (o == null || getClass() != o.getClass())
 			return false;
 		final Message message = (Message) o;
-		return Objects.equals(id, message.id) && Objects.equals(sequenceNumber, message.sequenceNumber)
-			&& Objects.equals(inReplyTo, message.inReplyTo) && Objects.equals(created, message.created)
-			&& Objects.equals(createdBy, message.createdBy) && Objects.equals(content, message.content)
-			&& Objects.equals(readBy, message.readBy);
+		return Objects.equals(id, message.id) && Objects.equals(sequenceNumber, message.sequenceNumber) && Objects.equals(inReplyTo, message.inReplyTo) && Objects.equals(created, message.created)
+			&& Objects.equals(createdBy, message.createdBy) && Objects.equals(content, message.content) && Objects.equals(readBy, message.readBy) && Objects.equals(attachments, message.attachments);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, sequenceNumber, inReplyTo, created, createdBy, content, readBy);
+		return Objects.hash(id, sequenceNumber, inReplyTo, created, createdBy, content, readBy, attachments);
 	}
 
 	@Override
@@ -150,6 +164,7 @@ public class Message {
 			", createdBy=" + createdBy +
 			", content='" + content + '\'' +
 			", readBy=" + readBy +
+			", attachments=" + attachments +
 			'}';
 	}
 }

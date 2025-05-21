@@ -1,4 +1,4 @@
-package se.sundsvall.chat.api.model;
+package se.sundsvall.chat.integration.db.model;
 
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
@@ -8,15 +8,14 @@ import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetter
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.allOf;
 
-import java.util.List;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
-class ConversationRequestTest {
+class ParticipantEntityTest {
 
 	@Test
 	void testBean() {
-		MatcherAssert.assertThat(ConversationRequest.class, allOf(
+		MatcherAssert.assertThat(ParticipantEntity.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCode(),
@@ -26,33 +25,23 @@ class ConversationRequestTest {
 
 	@Test
 	void builder() {
-
 		// Arrange
-		final var participants = List.of(Participant.create());
-		final var channelId = "channelId";
-		final var metaData = List.of(MetaData.create());
-		final var topic = "topic";
-
+		final var type = "type";
+		final var value = "value";
 		// Act
-		final var result = ConversationRequest.create()
-			.withParticipants(participants)
-			.withChannelId(channelId)
-			.withMetaData(metaData)
-			.withTopic(topic);
+		final var result = ParticipantEntity.create()
+			.withType(type)
+			.withValue(value);
 
 		// Assert
 		assertThat(result).isNotNull().hasNoNullFieldsOrProperties();
-		assertThat(result.getParticipants()).isEqualTo(participants);
-		assertThat(result.getChannelId()).isEqualTo(channelId);
-		assertThat(result.getMetaData()).isEqualTo(metaData);
-		assertThat(result.getTopic()).isEqualTo(topic);
 
 	}
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		assertThat(ConversationRequest.create()).hasAllNullFieldsOrProperties();
-		assertThat(new ConversationRequest()).hasAllNullFieldsOrProperties();
+		assertThat(ParticipantEntity.create()).hasAllNullFieldsOrProperties();
+		assertThat(new ParticipantEntity()).hasAllNullFieldsOrProperties();
 	}
 
 }

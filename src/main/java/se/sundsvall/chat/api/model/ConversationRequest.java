@@ -20,9 +20,6 @@ public class ConversationRequest {
 	@Schema(description = "The topic of the conversation.", example = "Customer Support")
 	private String topic;
 
-	@Schema(description = "The list of messages in the conversation.")
-	private List<Message> messages;
-
 	public static ConversationRequest create() {
 		return new ConversationRequest();
 	}
@@ -79,31 +76,17 @@ public class ConversationRequest {
 		return this;
 	}
 
-	public List<Message> getMessages() {
-		return messages;
-	}
-
-	public void setMessages(final List<Message> messages) {
-		this.messages = messages;
-	}
-
-	public ConversationRequest withMessages(final List<Message> messages) {
-		this.messages = messages;
-		return this;
-	}
-
 	@Override
 	public boolean equals(final Object o) {
 		if (o == null || getClass() != o.getClass())
 			return false;
 		final ConversationRequest that = (ConversationRequest) o;
-		return Objects.equals(participants, that.participants) && Objects.equals(channelId, that.channelId) && Objects.equals(metaData, that.metaData) && Objects.equals(topic, that.topic) && Objects.equals(
-			messages, that.messages);
+		return Objects.equals(participants, that.participants) && Objects.equals(channelId, that.channelId) && Objects.equals(metaData, that.metaData) && Objects.equals(topic, that.topic);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(participants, channelId, metaData, topic, messages);
+		return Objects.hash(participants, channelId, metaData, topic);
 	}
 
 	@Override
@@ -113,7 +96,6 @@ public class ConversationRequest {
 			", channelId='" + channelId + '\'' +
 			", metaData=" + metaData +
 			", topic='" + topic + '\'' +
-			", messages=" + messages +
 			'}';
 	}
 }

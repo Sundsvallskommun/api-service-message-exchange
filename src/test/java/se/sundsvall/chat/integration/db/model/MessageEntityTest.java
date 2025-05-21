@@ -1,4 +1,4 @@
-package se.sundsvall.chat.api.model;
+package se.sundsvall.chat.integration.db.model;
 
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
@@ -7,7 +7,9 @@ import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToString;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
 import static com.google.code.beanmatchers.BeanMatchers.registerValueGenerator;
 import static java.time.OffsetDateTime.now;
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.hamcrest.CoreMatchers.allOf;
 
 import java.time.OffsetDateTime;
@@ -17,7 +19,7 @@ import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class MessageTest {
+class MessageEntityTest {
 
 	@BeforeAll
 	static void setup() {
@@ -26,7 +28,7 @@ class MessageTest {
 
 	@Test
 	void testBean() {
-		MatcherAssert.assertThat(Message.class, allOf(
+		MatcherAssert.assertThat(MessageEntity.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCode(),
@@ -42,13 +44,14 @@ class MessageTest {
 		final var sequenceNumber = "sequenceNumber";
 		final var inReplyTo = "inReplyTo";
 		final var created = now();
-		final var createdBy = Participant.create();
+		final var createdBy = ParticipantEntity.create();
 		final var content = "content";
-		final var readBy = List.of(Participant.create());
-		final var attachments = List.of(Attachment.create());
+		final var readBy = List.of(ParticipantEntity.create());
+		final var conversation = ConversationEntity.create();
+		final var attachments = List.of(AttachmentEntity.create());
 
 		// Act
-		final var result = Message.create()
+		final var result = MessageEntity.create()
 			.withId(id)
 			.withSequenceNumber(sequenceNumber)
 			.withInReplyTo(inReplyTo)
@@ -56,6 +59,7 @@ class MessageTest {
 			.withCreatedBy(createdBy)
 			.withContent(content)
 			.withReadBy(readBy)
+			.withConversation(conversation)
 			.withAttachments(attachments);
 
 		// Assert
@@ -67,12 +71,24 @@ class MessageTest {
 		assertThat(result.getCreatedBy()).isEqualTo(createdBy);
 		assertThat(result.getContent()).isEqualTo(content);
 		assertThat(result.getReadBy()).isEqualTo(readBy);
+		assertThat(result.getConversation()).isEqualTo(conversation);
+		assertThat(result.getAttachments()).isEqualTo(attachments);
 
 	}
 
 	@Test
-	void testNoDirtOnCreatedBean() {
-		assertThat(Message.create()).hasAllNullFieldsOrProperties();
-		assertThat(new Message()).hasAllNullFieldsOrProperties();
+	void testOnCreate() {
+		final var entity = new MessageEntity();
+		entity.onCreate();
+
+		assertThat(entity.getCreated()).isCloseTo(now(), within(1, SECONDS));
+		assertThat(entity).hasAllNullFieldsOrPropertiesExcept("created");
 	}
+
+	@Test
+	void testNoDirtOnCreatedBean() {
+		assertThat(MessageEntity.create()).hasAllNullFieldsOrProperties();
+		assertThat(new MessageEntity()).hasAllNullFieldsOrProperties();
+	}
+
 }

@@ -73,7 +73,7 @@ class ConversationResource {
 		@Parameter(name = "conversation", description = "Conversation to be created") final ConversationRequest conversation) {
 
 		final var id = service.createConversation(namespace, municipalityId, conversation);
-		return created(fromPath("/{municipalityId}/{namespace}/{id}")
+		return created(fromPath("/{municipalityId}/{namespace}/conversations/{id}")
 			.buildAndExpand(municipalityId, namespace, id).toUri())
 			.header(CONTENT_TYPE, ALL_VALUE)
 			.build();

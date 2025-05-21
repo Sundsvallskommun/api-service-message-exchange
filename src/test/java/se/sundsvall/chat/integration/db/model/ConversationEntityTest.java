@@ -1,4 +1,4 @@
-package se.sundsvall.chat.api.model;
+package se.sundsvall.chat.integration.db.model;
 
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
@@ -12,11 +12,11 @@ import java.util.List;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
-class ConversationRequestTest {
+class ConversationEntityTest {
 
 	@Test
 	void testBean() {
-		MatcherAssert.assertThat(ConversationRequest.class, allOf(
+		MatcherAssert.assertThat(ConversationEntity.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCode(),
@@ -28,31 +28,43 @@ class ConversationRequestTest {
 	void builder() {
 
 		// Arrange
-		final var participants = List.of(Participant.create());
+		final var id = "id";
+		final var participants = List.of(ParticipantEntity.create());
+		final var municipalityId = "municipalityId";
+		final var namespace = "namespace";
 		final var channelId = "channelId";
-		final var metaData = List.of(MetaData.create());
+		final var metaData = List.of(MetaDataEntity.create());
 		final var topic = "topic";
+		final var messages = List.of(MessageEntity.create());
 
 		// Act
-		final var result = ConversationRequest.create()
+		final var result = ConversationEntity.create()
+			.withId(id)
 			.withParticipants(participants)
+			.withMunicipalityId(municipalityId)
+			.withNamespace(namespace)
 			.withChannelId(channelId)
 			.withMetaData(metaData)
-			.withTopic(topic);
+			.withTopic(topic)
+			.withMessages(messages);
 
 		// Assert
 		assertThat(result).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(result.getId()).isEqualTo(id);
 		assertThat(result.getParticipants()).isEqualTo(participants);
+		assertThat(result.getMunicipalityId()).isEqualTo(municipalityId);
+		assertThat(result.getNamespace()).isEqualTo(namespace);
 		assertThat(result.getChannelId()).isEqualTo(channelId);
 		assertThat(result.getMetaData()).isEqualTo(metaData);
 		assertThat(result.getTopic()).isEqualTo(topic);
+		assertThat(result.getMessages()).isEqualTo(messages);
 
 	}
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		assertThat(ConversationRequest.create()).hasAllNullFieldsOrProperties();
-		assertThat(new ConversationRequest()).hasAllNullFieldsOrProperties();
+		assertThat(ConversationEntity.create()).hasAllNullFieldsOrProperties();
+		assertThat(new ConversationEntity()).hasAllNullFieldsOrProperties();
 	}
 
 }
