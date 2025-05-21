@@ -17,6 +17,10 @@ import se.sundsvall.chat.integration.db.model.ParticipantEntity;
 
 public final class Mapper {
 
+	private Mapper() {
+		// Prevent instantiation
+	}
+
 	static ConversationEntity toConversationEntity(final String municipalityId, final String namespace, final ConversationRequest conversation) {
 
 		return ConversationEntity.create()
