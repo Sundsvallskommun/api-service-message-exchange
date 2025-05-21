@@ -15,11 +15,16 @@ public final class ServiceUtil {
 
 	private ServiceUtil() {}
 
+	private static String sanitizeFileName(String fileName) {
+		// Allow only alphanumeric characters, underscores, hyphens, and dots
+		return fileName == null ? "unknown" : fileName.replaceAll("[^a-zA-Z0-9._-]", "_");
+	}
+
 	public static String detectMimeTypeFromStream(final String fileName, final InputStream stream) {
 		try {
 			return DETECTOR.detect(stream, fileName);
 		} catch (final Exception e) {
-			LOGGER.warn(String.format(MIME_ERROR_MSG, fileName.replaceAll("[\\r\\n]", "")), e);
+			LOGGER.warn(String.format(MIME_ERROR_MSG, sanitizeFileName(fileName)), e);
 			return APPLICATION_OCTET_STREAM_VALUE; // Return mime type for arbitrary binary files
 		}
 	}
