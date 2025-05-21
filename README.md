@@ -1,4 +1,4 @@
-# Conversations
+# MessageExchange
 
 _Under construction._
 
@@ -17,7 +17,7 @@ _Under construction._
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/Sundsvallskommun/api-service-conversations.git
+   git clone https://github.com/Sundsvallskommun/api-service-message-exchange.git
    cd api-service-conversations
    ```
 2. **Configure the application:**
@@ -136,12 +136,12 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Code status
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-conversations&metric=alert_status)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-conversations)
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-conversations&metric=reliability_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-conversations)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-conversations&metric=security_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-conversations)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-conversations&metric=sqale_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-conversations)
-[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-conversations&metric=vulnerabilities)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-conversations)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-conversations&metric=bugs)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-conversations)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-message-exchange&metric=alert_status)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-message-exchange)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-message-exchange&metric=reliability_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-message-exchange)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-message-exchange&metric=security_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-message-exchange)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-message-exchange&metric=sqale_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-message-exchange)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-message-exchange&metric=vulnerabilities)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-message-exchange)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-message-exchange&metric=bugs)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-message-exchange)
 
 ---
 
