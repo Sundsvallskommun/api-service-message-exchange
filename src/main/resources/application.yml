@@ -10,6 +10,6 @@ openapi:
   version: '@project.version@'
 spring:
   application:
-    name: chat
+    name: message-exchange
   flyway:
     enabled: false

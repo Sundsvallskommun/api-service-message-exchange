@@ -1,24 +1,22 @@
 {
-	"participants": [
-		{
-			"type": "new_user",
-			"value": "user1"
-		},
-		{
-			"type": "new_user2",
-			"value": "user2"
-		}
-	],
-	"channelId": "channel-1",
-	"metaData": [
-		{
-			"key": "meta-key-1",
-			"values": [
-				"meta-value-1",
-				"meta-value-1",
-				"meta-value-1"
-			]
-		}
-	],
-	"topic": "Topic 1"
+  "participants": [
+	{
+	  "type": "new_user",
+	  "value": "user1"
+	},
+	{
+	  "type": "new_user2",
+	  "value": "user2"
+	}
+  ],
+  "channelId": "channel-1",
+  "metadata": [
+	{
+	  "key": "new-meta-key-1",
+	  "values": [
+		"new-meta-value-1"
+	  ]
+	}
+  ],
+  "topic": "Topic 1"
 }

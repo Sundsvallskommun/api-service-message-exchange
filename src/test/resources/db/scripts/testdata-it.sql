@@ -12,12 +12,12 @@ VALUES ('c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', 'channel-1', '2281', 'NAMESPACE-
        ('c2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', 'channel-2', '2282', 'NAMESPACE-2', 'Topic 2');
 
 -- Insert data into `conversation_meta_data`
-INSERT INTO conversation_meta_data (id, conversation_id, `key`, meta_data_id)
-VALUES ('meta1', 'c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', 'meta-key-1', 'meta1'),
-       ('meta2', 'c2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', 'meta-key-2', 'meta2');
+INSERT INTO conversation_metadata (id, conversation_id, `key`)
+VALUES ('meta1', 'c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', 'meta-key-1'),
+       ('meta2', 'c2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', 'meta-key-2');
 
 -- Insert data into `conversation_meta_data_values`
-INSERT INTO conversation_meta_data_values (conversation_meta_data_id, `values`)
+INSERT INTO conversation_metadata_values (conversation_metadata_id, `values`)
 VALUES ('meta1', 'meta-value-1'),
        ('meta2', 'meta-value-2');
 

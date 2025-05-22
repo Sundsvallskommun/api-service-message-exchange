@@ -25,17 +25,16 @@
         primary key (id)
     ) engine=InnoDB;
 
-    create table conversation_meta_data (
+    create table conversation_metadata (
         conversation_id varchar(255) not null,
         id varchar(255) not null,
         `key` varchar(255),
-        meta_data_id varchar(255) not null,
         primary key (id)
     ) engine=InnoDB;
 
-    create table conversation_meta_data_values (
-        conversation_meta_data_id varchar(255) not null,
-        values varchar(255)
+    create table conversation_metadata_values (
+        conversation_metadata_id varchar(255) not null,
+        `values` varchar(255)
     ) engine=InnoDB;
 
     create table conversation_participants (
@@ -46,13 +45,13 @@
 
     create table message (
         created datetime(6),
-        content varchar(255),
         conversation_id varchar(255) not null,
         id varchar(255) not null,
         in_reply_to varchar(255),
         sequence_number varchar(255),
         type varchar(255),
         value varchar(255),
+        content longtext,
         primary key (id)
     ) engine=InnoDB;
 
@@ -61,9 +60,6 @@
         type varchar(255),
         value varchar(255)
     ) engine=InnoDB;
-
-    alter table if exists conversation_meta_data 
-       add constraint UK9u5nrrqfv1mgdu83joxidqs2x unique (meta_data_id);
 
     alter table if exists attachment 
        add constraint fk_attachment_data_attachment 
@@ -75,20 +71,15 @@
        foreign key (message_id) 
        references message (id);
 
-    alter table if exists conversation_meta_data 
-       add constraint FK5safa7b94n8qocs41ltj494g 
-       foreign key (meta_data_id) 
-       references conversation_meta_data (id);
-
-    alter table if exists conversation_meta_data 
+    alter table if exists conversation_metadata 
        add constraint fk_meta_data_conversation_id 
        foreign key (conversation_id) 
        references conversation (id);
 
-    alter table if exists conversation_meta_data_values 
-       add constraint fk_meta_data_values 
-       foreign key (conversation_meta_data_id) 
-       references conversation_meta_data (id);
+    alter table if exists conversation_metadata_values 
+       add constraint fk_metadata_values 
+       foreign key (conversation_metadata_id) 
+       references conversation_metadata (id);
 
     alter table if exists conversation_participants 
        add constraint fk_participants_conversation_id 
