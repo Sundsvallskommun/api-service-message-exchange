@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "1.0"
 servers:
-  - url: http://localhost:57404
+  - url: http://localhost:64912
     description: Generated server url
 tags:
   - name: Message resource
@@ -560,6 +560,12 @@ components:
           type: string
           description: The topic of the conversation.
           example: Customer Support
+        latestSequenceNumber:
+          type: integer
+          description: The latest sequence number of the conversation.
+          format: int64
+          readOnly: true
+          example: 1
       description: "Represents a conversation containing identifiers, messages, and\
         \ metadata."
     Identifier:
@@ -600,12 +606,12 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
     StatusType:
       type: object
       properties:
@@ -735,12 +741,12 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
         suppressed:
           type: array
           items:
@@ -820,10 +826,11 @@ components:
           readOnly: true
           example: 7f77f9fd-d01d-4742-974a-714b911e3496
         sequenceNumber:
-          type: string
+          type: integer
           description: The sequence number of the message in the conversation.
+          format: int64
           readOnly: true
-          example: "1"
+          example: 1
         inReplyToMessageId:
           type: string
           description: "The identifier of the message this message is replying to,\

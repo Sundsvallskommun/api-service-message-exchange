@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -33,25 +31,27 @@ import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 @Service
 public class MessageService {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MessageService.class);
-
 	private final MessageRepository messageRepository;
 	private final ConversationRepository conversationRepository;
 	private final EntityManager entityManager;
 	private final AttachmentRepository attachmentRepository;
+	private final MessageSequenceGenerator messageSequenceGenerator;
 
-	public MessageService(final MessageRepository messageRepository, final ConversationRepository conversationRepository, final EntityManager entityManager, final AttachmentRepository attachmentRepository) {
+	public MessageService(final MessageRepository messageRepository, final ConversationRepository conversationRepository, final EntityManager entityManager, final AttachmentRepository attachmentRepository,
+		final MessageSequenceGenerator messageSequenceGenerator) {
 		this.messageRepository = messageRepository;
 		this.conversationRepository = conversationRepository;
 		this.entityManager = entityManager;
 		this.attachmentRepository = attachmentRepository;
+		this.messageSequenceGenerator = messageSequenceGenerator;
 	}
 
 	public String createMessage(final String municipalityId, final String namespace, final String conversationId, final Message message, final List<MultipartFile> attachments) {
 
 		final var conversationEntity = findExistingConversation(municipalityId, namespace, conversationId);
 
-		final var entity = toMessageEntity(conversationEntity, message);
+		final var entity = toMessageEntity(conversationEntity, message)
+			.withSequenceNumber(messageSequenceGenerator.generateSequence(namespace, municipalityId));
 		entity.setAttachments(AttachmentMapper.toAttachmentEntities(attachments, entityManager, entity));
 		return messageRepository.saveAndFlush(entity).getId();
 	}

@@ -35,6 +35,7 @@ class ConversationTest {
 		final var metaData = List.of(KeyValues.create());
 		final var externalReferences = List.of(KeyValues.create());
 		final var topic = "topic";
+		final var latestSequenceNumber = 123L;
 
 		// Act
 		final var result = Conversation.create()
@@ -44,7 +45,9 @@ class ConversationTest {
 			.withNamespace(namespace)
 			.withMetadata(metaData)
 			.withExternalReferences(externalReferences)
-			.withTopic(topic);
+			.withTopic(topic)
+			.withLatestSequenceNumber(latestSequenceNumber);
+
 		// Assert
 		assertThat(result).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(result.getId()).isEqualTo(id);
@@ -54,6 +57,7 @@ class ConversationTest {
 		assertThat(result.getMetadata()).isEqualTo(metaData);
 		assertThat(result.getExternalReferences()).isEqualTo(externalReferences);
 		assertThat(result.getTopic()).isEqualTo(topic);
+		assertThat(result.getLatestSequenceNumber()).isEqualTo(latestSequenceNumber);
 
 	}
 

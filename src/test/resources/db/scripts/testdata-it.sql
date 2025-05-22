@@ -64,3 +64,8 @@ VALUES ('a1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', 5068, '2023-01-01 10:05:00', 'ec
         'file1.txt', 'd82bd8ac-1507-4d9a-958d-369261eecc15', 'image/jpeg'),
        ('a2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', 2048, '2023-01-01 11:05:00', 'd1f2c8d4-d234-4504-a483-b74570a7941d',
         'file2.txt', 'm2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', 'text/plain');
+
+-- Insert data into `message_sequence`
+INSERT INTO message_sequence (last_sequence_number, municipality_id, namespace)
+VALUES (2, '2281', 'NAMESPACE-1'),
+       (3, '2282', 'NAMESPACE-2');

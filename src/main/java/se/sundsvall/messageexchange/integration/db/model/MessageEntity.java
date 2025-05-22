@@ -37,7 +37,7 @@ public class MessageEntity {
 	private String id;
 
 	@Column(name = "sequence_number")
-	private String sequenceNumber;
+	private Long sequenceNumber;
 
 	@Column(name = "in_reply_to_message_id")
 	private String inReplyToMessageId;
@@ -85,15 +85,15 @@ public class MessageEntity {
 		return this;
 	}
 
-	public String getSequenceNumber() {
+	public Long getSequenceNumber() {
 		return sequenceNumber;
 	}
 
-	public void setSequenceNumber(final String sequenceNumber) {
+	public void setSequenceNumber(final Long sequenceNumber) {
 		this.sequenceNumber = sequenceNumber;
 	}
 
-	public MessageEntity withSequenceNumber(final String sequenceNumber) {
+	public MessageEntity withSequenceNumber(final Long sequenceNumber) {
 		this.sequenceNumber = sequenceNumber;
 		return this;
 	}

@@ -62,11 +62,11 @@
 
     create table message (
         created datetime(6),
+        sequence_number bigint,
         conversation_id varchar(255) not null,
         created_by varchar(255),
         id varchar(255) not null,
         in_reply_to_message_id varchar(255),
-        sequence_number varchar(255),
         content longtext,
         primary key (id)
     ) engine=InnoDB;
@@ -77,6 +77,13 @@
         identifier_id varchar(255) not null,
         message_id varchar(255) not null,
         primary key (id)
+    ) engine=InnoDB;
+
+    create table message_sequence (
+        last_sequence_number bigint,
+        municipality_id varchar(255),
+        namespace varchar(255) not null,
+        primary key (namespace)
     ) engine=InnoDB;
 
     create index idx_conversation_municipality_id 
@@ -102,6 +109,9 @@
 
     alter table if exists message_read_by 
        add constraint UKjpqp7o76hskthbsgupe9xhjyg unique (identifier_id);
+
+    create index idx_message_sequence_namespace_municipality_id 
+       on message_sequence (namespace, municipality_id);
 
     alter table if exists attachment 
        add constraint fk_attachment_data_attachment 

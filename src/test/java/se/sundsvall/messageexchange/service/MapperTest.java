@@ -89,7 +89,7 @@ class MapperTest {
 		final var result = Mapper.toConversation(entity);
 
 		// Assert
-		assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("messages");
+		assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("messages", "latestSequenceNumber");
 		assertThat(result.getId()).isEqualTo(id);
 		assertThat(result.getMunicipalityId()).isEqualTo(municipalityId);
 		assertThat(result.getNamespace()).isEqualTo(namespace);
@@ -135,7 +135,7 @@ class MapperTest {
 	void toMessages() {
 		// Arrange
 		final var id = "id";
-		final var sequenceNumber = "222";
+		final var sequenceNumber = 222L;
 		final var inReplyTo = "inReplyTo";
 		final var createdByType = "type";
 		final var createdByValue = "value";
@@ -165,7 +165,7 @@ class MapperTest {
 	void toMessage() {
 		// Arrange
 		final var id = "id";
-		final var sequenceNumber = "222";
+		final var sequenceNumber = 222L;
 		final var inReplyTo = "inReplyTo";
 		final var createdByType = "type";
 		final var createdByValue = "value";

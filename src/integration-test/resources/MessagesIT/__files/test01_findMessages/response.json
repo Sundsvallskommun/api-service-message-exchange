@@ -2,7 +2,7 @@
 	"content": [
 		{
 			"id": "d82bd8ac-1507-4d9a-958d-369261eecc15",
-			"sequenceNumber": "1",
+			"sequenceNumber": 1,
 			"created": "2023-01-01T10:00:00Z",
 			"createdBy": {
 				"type": "user",
@@ -30,7 +30,7 @@
 		},
 		{
 			"id": "m2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6",
-			"sequenceNumber": "2",
+			"sequenceNumber": 2,
 			"inReplyToMessageId": "d82bd8ac-1507-4d9a-958d-369261eecc15",
 			"created": "2023-01-01T11:00:00Z",
 			"createdBy": {
@@ -63,12 +63,12 @@
 		"pageSize": 20,
 		"sort": [],
 		"offset": 0,
-		"paged": true,
-		"unpaged": false
+		"unpaged": false,
+		"paged": true
 	},
 	"last": true,
-	"totalPages": 1,
 	"totalElements": 2,
+	"totalPages": 1,
 	"first": true,
 	"size": 20,
 	"number": 0,

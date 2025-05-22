@@ -39,7 +39,7 @@ class MessageTest {
 
 		// Arrange
 		final var id = "id";
-		final var sequenceNumber = "sequenceNumber";
+		final var sequenceNumber = 1L;
 		final var inReplyTo = "inReplyTo";
 		final var created = now();
 		final var createdBy = Identifier.create();

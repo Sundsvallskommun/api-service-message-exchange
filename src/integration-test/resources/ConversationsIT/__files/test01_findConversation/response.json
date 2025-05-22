@@ -24,5 +24,6 @@
 			]
 		}
 	],
-	"topic": "Topic 1"
+	"topic": "Topic 1",
+	"latestSequenceNumber": 2
 }

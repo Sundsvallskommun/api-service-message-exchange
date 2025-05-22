@@ -31,6 +31,9 @@ public class Conversation {
 	@Schema(description = "The topic of the conversation.", example = "Customer Support")
 	private String topic;
 
+	@Schema(description = "The latest sequence number of the conversation.", example = "1", accessMode = READ_ONLY)
+	private Long latestSequenceNumber;
+
 	public static Conversation create() {
 		return new Conversation();
 	}
@@ -126,18 +129,32 @@ public class Conversation {
 		return this;
 	}
 
+	public Long getLatestSequenceNumber() {
+		return latestSequenceNumber;
+	}
+
+	public void setLatestSequenceNumber(final Long latestSequenceNumber) {
+		this.latestSequenceNumber = latestSequenceNumber;
+	}
+
+	public Conversation withLatestSequenceNumber(final Long latestSequenceNumber) {
+		this.latestSequenceNumber = latestSequenceNumber;
+		return this;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (o == null || getClass() != o.getClass())
 			return false;
 		final Conversation that = (Conversation) o;
 		return Objects.equals(id, that.id) && Objects.equals(participants, that.participants) && Objects.equals(municipalityId, that.municipalityId) && Objects.equals(namespace, that.namespace)
-			&& Objects.equals(externalReferences, that.externalReferences) && Objects.equals(metadata, that.metadata) && Objects.equals(topic, that.topic);
+			&& Objects.equals(externalReferences, that.externalReferences) && Objects.equals(metadata, that.metadata) && Objects.equals(topic, that.topic) && Objects.equals(latestSequenceNumber,
+				that.latestSequenceNumber);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, participants, municipalityId, namespace, externalReferences, metadata, topic);
+		return Objects.hash(id, participants, municipalityId, namespace, externalReferences, metadata, topic, latestSequenceNumber);
 	}
 
 	@Override
@@ -150,6 +167,7 @@ public class Conversation {
 			", externalReferences=" + externalReferences +
 			", metadata=" + metadata +
 			", topic='" + topic + '\'' +
+			", latestSequenceNumber='" + latestSequenceNumber + '\'' +
 			'}';
 	}
 }

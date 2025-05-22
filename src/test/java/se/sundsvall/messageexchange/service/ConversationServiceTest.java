@@ -16,10 +16,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.zalando.problem.Problem;
 import se.sundsvall.messageexchange.api.model.Conversation;
 import se.sundsvall.messageexchange.integration.db.ConversationRepository;
+import se.sundsvall.messageexchange.integration.db.MessageSequenceRepository;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
+import se.sundsvall.messageexchange.integration.db.model.MessageSequenceEntity;
 
 @ExtendWith(MockitoExtension.class)
 class ConversationServiceTest {
+
+	@Mock
+	private MessageSequenceRepository messageSequenceRepositoryMock;
 
 	@Mock
 	private ConversationRepository conversationRepositoryMock;
@@ -37,12 +42,15 @@ class ConversationServiceTest {
 
 		when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
 			.thenReturn(Optional.of(entity));
+		when(messageSequenceRepositoryMock.findByNamespaceAndMunicipalityId(namespace, municipalityId))
+			.thenReturn(Optional.of(MessageSequenceEntity.create().withLastSequenceNumber(123L)));
 
 		// Act
 		final var result = conversationService.readConversation(namespace, municipalityId, conversationId);
 
 		// Assert
 		assertThat(result).isNotNull();
+		assertThat(result.getLatestSequenceNumber()).isEqualTo(123L);
 		verify(conversationRepositoryMock).findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId);
 	}
 
@@ -60,6 +68,28 @@ class ConversationServiceTest {
 			.isInstanceOf(Problem.class)
 			.hasMessageContaining("Not Found: Conversation with id conversationId not found")
 			.extracting("status").isEqualTo(NOT_FOUND);
+	}
+
+	@Test
+	void readConversationWithNoSequenceNumber() {
+		// Arrange
+		final var namespace = "namespace";
+		final var municipalityId = "2281";
+		final var conversationId = "conversationId";
+		final var entity = new ConversationEntity();
+
+		when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
+			.thenReturn(Optional.of(entity));
+		when(messageSequenceRepositoryMock.findByNamespaceAndMunicipalityId(namespace, municipalityId))
+			.thenReturn(Optional.empty());
+
+		// Act
+		final var result = conversationService.readConversation(namespace, municipalityId, conversationId);
+
+		// Assert
+		assertThat(result).isNotNull();
+		assertThat(result.getLatestSequenceNumber()).isZero();
+		verify(conversationRepositoryMock).findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId);
 	}
 
 	@Test

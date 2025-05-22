@@ -14,7 +14,7 @@ public class Message {
 	private String id;
 
 	@Schema(description = "The sequence number of the message in the conversation.", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
-	private String sequenceNumber;
+	private Long sequenceNumber;
 
 	@Schema(description = "The identifier of the message this message is replying to, if any.", example = "2af1002e-008f-4bdc-924b-daaae31f1118")
 	@ValidUuid(nullable = true)
@@ -52,15 +52,15 @@ public class Message {
 		return this;
 	}
 
-	public String getSequenceNumber() {
+	public Long getSequenceNumber() {
 		return sequenceNumber;
 	}
 
-	public void setSequenceNumber(final String sequenceNumber) {
+	public void setSequenceNumber(final Long sequenceNumber) {
 		this.sequenceNumber = sequenceNumber;
 	}
 
-	public Message withSequenceNumber(final String sequenceNumber) {
+	public Message withSequenceNumber(final Long sequenceNumber) {
 		this.sequenceNumber = sequenceNumber;
 		return this;
 	}

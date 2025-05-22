@@ -9,22 +9,27 @@ import org.springframework.stereotype.Service;
 import org.zalando.problem.Problem;
 import se.sundsvall.messageexchange.api.model.Conversation;
 import se.sundsvall.messageexchange.integration.db.ConversationRepository;
+import se.sundsvall.messageexchange.integration.db.MessageSequenceRepository;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
+import se.sundsvall.messageexchange.integration.db.model.MessageSequenceEntity;
 
 @Service
 public class ConversationService {
 
 	private final ConversationRepository conversationRepository;
+	private final MessageSequenceRepository messageSequenceRepository;
 
-	public ConversationService(final ConversationRepository conversationRepository) {
+	public ConversationService(final ConversationRepository conversationRepository, final MessageSequenceRepository messageSequenceRepository) {
 		this.conversationRepository = conversationRepository;
+		this.messageSequenceRepository = messageSequenceRepository;
 	}
 
 	public Conversation readConversation(final String namespace, final String municipalityId, final String conversationId) {
 
 		final var entity = findExistingConversation(municipalityId, namespace, conversationId);
+		final var latestSequence = messageSequenceRepository.findByNamespaceAndMunicipalityId(namespace, municipalityId);
 
-		return toConversation(entity);
+		return toConversation(entity).withLatestSequenceNumber(latestSequence.map(MessageSequenceEntity::getLastSequenceNumber).orElse(0L));
 	}
 
 	public String createConversation(final String namespace, final String municipalityId, final Conversation conversation) {
