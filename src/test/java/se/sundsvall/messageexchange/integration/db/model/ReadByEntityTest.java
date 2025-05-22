@@ -1,4 +1,4 @@
-package se.sundsvall.messageexchange.api.model;
+package se.sundsvall.messageexchange.integration.db.model;
 
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
@@ -11,13 +11,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.allOf;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Random;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class MessageTest {
+class ReadByEntityTest {
 
 	@BeforeAll
 	static void setup() {
@@ -26,7 +25,7 @@ class MessageTest {
 
 	@Test
 	void testBean() {
-		MatcherAssert.assertThat(Message.class, allOf(
+		MatcherAssert.assertThat(ReadByEntity.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCode(),
@@ -36,43 +35,26 @@ class MessageTest {
 
 	@Test
 	void builder() {
-
 		// Arrange
 		final var id = "id";
-		final var sequenceNumber = "sequenceNumber";
-		final var inReplyTo = "inReplyTo";
+		final var identifier = IdentifierEntity.create();
 		final var created = now();
-		final var createdBy = Identifier.create();
-		final var content = "content";
-		final var readBy = List.of(ReadBy.create());
-		final var attachments = List.of(Attachment.create());
 
 		// Act
-		final var result = Message.create()
+		final var result = ReadByEntity.create()
 			.withId(id)
-			.withSequenceNumber(sequenceNumber)
-			.withInReplyToMessageId(inReplyTo)
-			.withCreated(created)
-			.withCreatedBy(createdBy)
-			.withContent(content)
-			.withReadBy(readBy)
-			.withAttachments(attachments);
-
+			.withIdentifier(identifier)
+			.withReadAt(created);
 		// Assert
 		assertThat(result).isNotNull().hasNoNullFieldsOrProperties();
-		assertThat(result.getId()).isEqualTo(id);
-		assertThat(result.getSequenceNumber()).isEqualTo(sequenceNumber);
-		assertThat(result.getInReplyToMessageId()).isEqualTo(inReplyTo);
-		assertThat(result.getCreated()).isEqualTo(created);
-		assertThat(result.getCreatedBy()).isEqualTo(createdBy);
-		assertThat(result.getContent()).isEqualTo(content);
-		assertThat(result.getReadBy()).isEqualTo(readBy);
+		assertThat(result.getIdentifier()).isEqualTo(identifier);
+		assertThat(result.getReadAt()).isEqualTo(created);
 
 	}
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		assertThat(Message.create()).hasAllNullFieldsOrProperties();
-		assertThat(new Message()).hasAllNullFieldsOrProperties();
+		assertThat(ReadByEntity.create()).hasAllNullFieldsOrProperties();
+		assertThat(new ReadByEntity()).hasAllNullFieldsOrProperties();
 	}
 }

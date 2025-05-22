@@ -7,36 +7,56 @@ VALUES ('ec677eb3-604c-4935-bff7-f8f0b500c8f4',
         '89504E470D0A1A0A0000000D494844520000001000000010080200000090916836000000017352474200AECE1CE90000000467414D410000B18F0BFC6105000000097048597300000EC300000EC301C76FA8640000001E49444154384F6350DAE843126220493550F1A80662426C349406472801006AC91F1040F796BD0000000049454E44AE426082');
 
 -- Insert data into `conversation`
-INSERT INTO conversation (id, channel_id, municipality_id, namespace, topic)
-VALUES ('c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', 'channel-1', '2281', 'NAMESPACE-1', 'Topic 1'),
-       ('c2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', 'channel-2', '2282', 'NAMESPACE-2', 'Topic 2');
+INSERT INTO conversation (id, municipality_id, namespace, topic)
+VALUES ('c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', '2281', 'NAMESPACE-1', 'Topic 1'),
+       ('c2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', '2282', 'NAMESPACE-2', 'Topic 2');
 
--- Insert data into `conversation_meta_data`
+-- Insert data into `conversation_metadata`
 INSERT INTO conversation_metadata (id, conversation_id, `key`)
 VALUES ('meta1', 'c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', 'meta-key-1'),
        ('meta2', 'c2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', 'meta-key-2');
 
--- Insert data into `conversation_meta_data_values`
+-- Insert data into `conversation_metadata_values`
 INSERT INTO conversation_metadata_values (conversation_metadata_id, `values`)
 VALUES ('meta1', 'meta-value-1'),
        ('meta2', 'meta-value-2');
 
+-- Insert data into `conversation_external_references`
+INSERT INTO conversation_external_references (id, conversation_id, `key`)
+VALUES ('ext1', 'c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', 'external-key-1'),
+       ('ext2', 'c2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', 'external-key-2');
+
+-- Insert data into `conversation_external_references_values`
+INSERT INTO conversation_external_references_values (conversation_external_references_id, value)
+VALUES ('ext1', 'external-value-1'),
+       ('ext2', 'external-value-2');
+
+-- Insert data into `identifier`
+INSERT INTO identifier (id, type, value)
+VALUES ('user1', 'user', 'user1@example.com'),
+       ('user2', 'user', 'user2@example.com'),
+       ('user3', 'user', 'user3@example.com'),
+       ('user4', 'user', 'user4@example.com'),
+       ('user5', 'user', 'user5@example.com'),
+       ('user6', 'user', 'user6@example.com');
+
+
 -- Insert data into `conversation_participants`
-INSERT INTO conversation_participants (conversation_id, type, value)
-VALUES ('c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', 'user', 'user1@example.com'),
-       ('c2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', 'user', 'user2@example.com');
+INSERT INTO conversation_participants (conversation_id, identifier_id)
+VALUES ('c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', 'user3'),
+       ('c2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', 'user4');
 
 -- Insert data into `message`
-INSERT INTO message (id, created, content, conversation_id, in_reply_to, sequence_number, type, value)
-VALUES ('d82bd8ac-1507-4d9a-958d-369261eecc15', '2023-01-01 10:00:00', 'Message 1 content',
-        'c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', NULL, '1', 'text', 'value1'),
-       ('m2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', '2023-01-01 11:00:00', 'Message 2 content',
-        'c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', 'd82bd8ac-1507-4d9a-958d-369261eecc15', '2', 'text', 'value2');
+INSERT INTO message (id, created, conversation_id, created_by, in_reply_to_message_id, sequence_number, content)
+VALUES ('d82bd8ac-1507-4d9a-958d-369261eecc15', '2023-01-01 10:00:00', 'c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', 'user1',
+        NULL, '1', 'Message 1 content'),
+       ('m2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', '2023-01-01 11:00:00', 'c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', 'user2',
+        'd82bd8ac-1507-4d9a-958d-369261eecc15', '2', 'Message 2 content');
 
 -- Insert data into `message_read_by`
-INSERT INTO message_read_by (message_id, type, value)
-VALUES ('d82bd8ac-1507-4d9a-958d-369261eecc15', 'user', 'user1@example.com'),
-       ('m2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', 'user', 'user2@example.com');
+INSERT INTO message_read_by (id, read_at, identifier_id, message_id)
+VALUES ('read1', '2023-01-01 10:30:00', 'user5', 'd82bd8ac-1507-4d9a-958d-369261eecc15'),
+       ('read2', '2023-01-01 11:30:00', 'user6', 'm2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6');
 
 -- Insert data into `attachment`
 INSERT INTO attachment (id, file_size, created, attachment_data_id, file_name, message_id, mime_type)

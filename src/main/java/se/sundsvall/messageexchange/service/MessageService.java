@@ -10,7 +10,10 @@ import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -18,15 +21,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.zalando.problem.Problem;
+import se.sundsvall.dept44.support.Identifier;
 import se.sundsvall.messageexchange.api.model.Message;
 import se.sundsvall.messageexchange.integration.db.AttachmentRepository;
 import se.sundsvall.messageexchange.integration.db.ConversationRepository;
 import se.sundsvall.messageexchange.integration.db.MessageRepository;
 import se.sundsvall.messageexchange.integration.db.model.AttachmentEntity;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
+import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 
 @Service
 public class MessageService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(MessageService.class);
 
 	private final MessageRepository messageRepository;
 	private final ConversationRepository conversationRepository;
@@ -46,14 +53,17 @@ public class MessageService {
 
 		final var entity = toMessageEntity(conversationEntity, message);
 		entity.setAttachments(AttachmentMapper.toAttachmentEntities(attachments, entityManager, entity));
-
 		return messageRepository.saveAndFlush(entity).getId();
 	}
 
 	public Page<Message> getMessages(final String municipalityId, final String namespace, final String conversationId, final Pageable pageable) {
 		final var conversationEntity = findExistingConversation(municipalityId, namespace, conversationId);
 		final var matches = messageRepository.findByConversation(conversationEntity, pageable);
-		return new PageImpl<>(Mapper.toMessages(matches.getContent()), pageable, matches.getTotalElements());
+
+		final var messages = Mapper.toMessages(matches.getContent());
+		updateReadBy(matches);
+		messageRepository.saveAll(matches);
+		return new PageImpl<>(messages, pageable, matches.getTotalElements());
 	}
 
 	public void deleteMessage(final String municipalityId, final String namespace, final String conversationId, final String messageId) {
@@ -87,5 +97,26 @@ public class MessageService {
 		return conversationRepository.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId)
 			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Conversation with id %s not found".formatted(conversationId)));
 
+	}
+
+	private void updateReadBy(final Page<MessageEntity> matches) {
+		if (matches == null || matches.isEmpty()) {
+			return;
+		}
+
+		final var readByEntity = Mapper.toReadByEntity(Identifier.get());
+
+		if (readByEntity.getIdentifier() == null) {
+			throw new IllegalArgumentException("Identifier ID cannot be null");
+		}
+
+		for (final var message : matches) {
+			var readByList = message.getReadBy();
+			if (readByList == null) {
+				readByList = new ArrayList<>();
+				message.setReadBy(readByList);
+			}
+			readByList.add(readByEntity);
+		}
 	}
 }

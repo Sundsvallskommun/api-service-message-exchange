@@ -6,12 +6,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.zalando.problem.Status.NOT_FOUND;
+import static se.sundsvall.dept44.support.Identifier.Type.PARTY_ID;
 
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
@@ -124,18 +126,27 @@ class MessageServiceTest {
 		final var messageEntity = new MessageEntity();
 		final var messagePage = new PageImpl<>(List.of(messageEntity), pageable, 1);
 
-		when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
-			.thenReturn(Optional.of(conversationEntity));
-		when(messageRepositoryMock.findByConversation(conversationEntity, pageable)).thenReturn(messagePage);
+		final var dept44Identifier = se.sundsvall.dept44.support.Identifier.create()
+			.withType(PARTY_ID)
+			.withValue("value");
 
-		// Act
-		final var result = messageService.getMessages(municipalityId, namespace, conversationId, pageable);
+		try (final var mockedStatic = mockStatic(se.sundsvall.dept44.support.Identifier.class)) {
+			mockedStatic.when(se.sundsvall.dept44.support.Identifier::get).thenReturn(dept44Identifier);
 
-		// Assert
-		assertThat(result).isNotNull();
-		assertThat(result.getContent()).hasSize(1);
-		verify(conversationRepositoryMock).findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId);
-		verify(messageRepositoryMock).findByConversation(conversationEntity, pageable);
+			when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
+				.thenReturn(Optional.of(conversationEntity));
+			when(messageRepositoryMock.findByConversation(conversationEntity, pageable)).thenReturn(messagePage);
+
+			// Act
+			final var result = messageService.getMessages(municipalityId, namespace, conversationId, pageable);
+
+			// Assert
+			assertThat(result).isNotNull();
+			assertThat(result.getContent()).hasSize(1);
+			verify(conversationRepositoryMock).findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId);
+			verify(messageRepositoryMock).findByConversation(conversationEntity, pageable);
+
+		}
 	}
 
 	@Test

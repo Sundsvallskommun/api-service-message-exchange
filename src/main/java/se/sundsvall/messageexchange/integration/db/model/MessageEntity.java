@@ -1,20 +1,19 @@
 package se.sundsvall.messageexchange.integration.db.model;
 
+import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.EAGER;
-import static jakarta.persistence.FetchType.LAZY;
 import static java.time.OffsetDateTime.now;
 import static java.time.temporal.ChronoUnit.MILLIS;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
@@ -25,7 +24,11 @@ import org.hibernate.Length;
 import org.hibernate.annotations.UuidGenerator;
 
 @Entity
-@Table(name = "message")
+@Table(name = "message",
+	indexes = {
+		@Index(name = "idx_message_conversation_id", columnList = "conversation_id"),
+		@Index(name = "idx_message_sequence_number", columnList = "sequence_number")
+	})
 public class MessageEntity {
 
 	@Id
@@ -36,27 +39,28 @@ public class MessageEntity {
 	@Column(name = "sequence_number")
 	private String sequenceNumber;
 
-	@Column(name = "in_reply_to")
-	private String inReplyTo;
+	@Column(name = "in_reply_to_message_id")
+	private String inReplyToMessageId;
 
 	@Column(name = "created")
 	private OffsetDateTime created;
 
-	@Column(name = "created_by")
+	@OneToOne(fetch = EAGER, cascade = ALL, orphanRemoval = true)
+	@JoinColumn(name = "created_by", nullable = true, foreignKey = @ForeignKey(name = "fk_message_created_by"))
 	private IdentifierEntity createdBy;
 
 	@Column(name = "content", length = Length.LONG32)
 	private String content;
 
-	@ElementCollection(fetch = EAGER)
-	@CollectionTable(name = "message_read_by", joinColumns = @JoinColumn(name = "message_id", foreignKey = @ForeignKey(name = "fk_read_by_message_id")))
-	private List<IdentifierEntity> readBy;
+	@OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
+	@JoinColumn(name = "message_id", nullable = false, foreignKey = @ForeignKey(name = "fk_message_read_by"))
+	private List<ReadByEntity> readBy;
 
-	@ManyToOne(fetch = LAZY)
+	@ManyToOne(fetch = EAGER)
 	@JoinColumn(name = "conversation_id", nullable = false, foreignKey = @ForeignKey(name = "fk_message_conversation_id"))
 	private ConversationEntity conversation;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "messageEntity")
+	@OneToMany(cascade = ALL, orphanRemoval = true, mappedBy = "messageEntity")
 	private List<AttachmentEntity> attachments;
 
 	public static MessageEntity create() {
@@ -94,16 +98,16 @@ public class MessageEntity {
 		return this;
 	}
 
-	public String getInReplyTo() {
-		return inReplyTo;
+	public String getInReplyToMessageId() {
+		return inReplyToMessageId;
 	}
 
-	public void setInReplyTo(final String inReplyTo) {
-		this.inReplyTo = inReplyTo;
+	public void setInReplyToMessageId(final String inReplyToMessageId) {
+		this.inReplyToMessageId = inReplyToMessageId;
 	}
 
-	public MessageEntity withInReplyTo(final String inReplyTo) {
-		this.inReplyTo = inReplyTo;
+	public MessageEntity withInReplyToMessageId(final String inReplyTo) {
+		this.inReplyToMessageId = inReplyTo;
 		return this;
 	}
 
@@ -146,15 +150,15 @@ public class MessageEntity {
 		return this;
 	}
 
-	public List<IdentifierEntity> getReadBy() {
+	public List<ReadByEntity> getReadBy() {
 		return readBy;
 	}
 
-	public void setReadBy(final List<IdentifierEntity> readBy) {
+	public void setReadBy(final List<ReadByEntity> readBy) {
 		this.readBy = readBy;
 	}
 
-	public MessageEntity withReadBy(final List<IdentifierEntity> readBy) {
+	public MessageEntity withReadBy(final List<ReadByEntity> readBy) {
 		this.readBy = readBy;
 		return this;
 	}
@@ -190,13 +194,13 @@ public class MessageEntity {
 		if (o == null || getClass() != o.getClass())
 			return false;
 		final MessageEntity that = (MessageEntity) o;
-		return Objects.equals(id, that.id) && Objects.equals(sequenceNumber, that.sequenceNumber) && Objects.equals(inReplyTo, that.inReplyTo) && Objects.equals(created, that.created) && Objects.equals(
+		return Objects.equals(id, that.id) && Objects.equals(sequenceNumber, that.sequenceNumber) && Objects.equals(inReplyToMessageId, that.inReplyToMessageId) && Objects.equals(created, that.created) && Objects.equals(
 			createdBy, that.createdBy) && Objects.equals(content, that.content) && Objects.equals(readBy, that.readBy) && Objects.equals(conversation, that.conversation) && Objects.equals(attachments, that.attachments);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, sequenceNumber, inReplyTo, created, createdBy, content, readBy, conversation, attachments);
+		return Objects.hash(id, sequenceNumber, inReplyToMessageId, created, createdBy, content, readBy, conversation, attachments);
 	}
 
 	@Override
@@ -204,7 +208,7 @@ public class MessageEntity {
 		return "MessageEntity{" +
 			"id='" + id + '\'' +
 			", sequenceNumber='" + sequenceNumber + '\'' +
-			", inReplyTo='" + inReplyTo + '\'' +
+			", inReplyToMessageId='" + inReplyToMessageId + '\'' +
 			", created=" + created +
 			", createdBy=" + createdBy +
 			", content='" + content + '\'' +

@@ -17,12 +17,23 @@
     ) engine=InnoDB;
 
     create table conversation (
-        channel_id varchar(255),
         id varchar(255) not null,
         municipality_id varchar(255),
         namespace varchar(255),
         topic varchar(255),
         primary key (id)
+    ) engine=InnoDB;
+
+    create table conversation_external_references (
+        conversation_id varchar(255) not null,
+        id varchar(255) not null,
+        `key` varchar(255),
+        primary key (id)
+    ) engine=InnoDB;
+
+    create table conversation_external_references_values (
+        conversation_external_references_id varchar(255) not null,
+        value varchar(255)
     ) engine=InnoDB;
 
     create table conversation_metadata (
@@ -39,27 +50,58 @@
 
     create table conversation_participants (
         conversation_id varchar(255) not null,
+        identifier_id varchar(255) not null
+    ) engine=InnoDB;
+
+    create table identifier (
+        id varchar(255) not null,
         type varchar(255),
-        value varchar(255)
+        value varchar(255),
+        primary key (id)
     ) engine=InnoDB;
 
     create table message (
         created datetime(6),
         conversation_id varchar(255) not null,
+        created_by varchar(255),
         id varchar(255) not null,
-        in_reply_to varchar(255),
+        in_reply_to_message_id varchar(255),
         sequence_number varchar(255),
-        type varchar(255),
-        value varchar(255),
         content longtext,
         primary key (id)
     ) engine=InnoDB;
 
     create table message_read_by (
+        read_at datetime(6) not null,
+        id varchar(255) not null,
+        identifier_id varchar(255) not null,
         message_id varchar(255) not null,
-        type varchar(255),
-        value varchar(255)
+        primary key (id)
     ) engine=InnoDB;
+
+    create index idx_conversation_municipality_id 
+       on conversation (municipality_id);
+
+    create index idx_conversation_namespace 
+       on conversation (namespace);
+
+    create index idx_conversation_namespace_municipality_id_id 
+       on conversation (namespace, municipality_id, id);
+
+    alter table if exists conversation_participants 
+       add constraint UK1qmyen32rb1319xn0qgfk3myr unique (identifier_id);
+
+    create index idx_message_conversation_id 
+       on message (conversation_id);
+
+    create index idx_message_sequence_number 
+       on message (sequence_number);
+
+    alter table if exists message 
+       add constraint UKc4ndh9kdooko8xlpu15c93viu unique (created_by);
+
+    alter table if exists message_read_by 
+       add constraint UKjpqp7o76hskthbsgupe9xhjyg unique (identifier_id);
 
     alter table if exists attachment 
        add constraint fk_attachment_data_attachment 
@@ -71,8 +113,18 @@
        foreign key (message_id) 
        references message (id);
 
+    alter table if exists conversation_external_references 
+       add constraint fk_external_references_conversation_id 
+       foreign key (conversation_id) 
+       references conversation (id);
+
+    alter table if exists conversation_external_references_values 
+       add constraint fk_external_references_value 
+       foreign key (conversation_external_references_id) 
+       references conversation_external_references (id);
+
     alter table if exists conversation_metadata 
-       add constraint fk_meta_data_conversation_id 
+       add constraint fk_metadata_conversation_id 
        foreign key (conversation_id) 
        references conversation (id);
 
@@ -82,7 +134,12 @@
        references conversation_metadata (id);
 
     alter table if exists conversation_participants 
-       add constraint fk_participants_conversation_id 
+       add constraint FKmbt2l7fpaaev65p8pqesd3aja 
+       foreign key (identifier_id) 
+       references identifier (id);
+
+    alter table if exists conversation_participants 
+       add constraint fk_conversation_participants_conversation_id 
        foreign key (conversation_id) 
        references conversation (id);
 
@@ -91,7 +148,17 @@
        foreign key (conversation_id) 
        references conversation (id);
 
+    alter table if exists message 
+       add constraint fk_message_created_by 
+       foreign key (created_by) 
+       references identifier (id);
+
     alter table if exists message_read_by 
-       add constraint fk_read_by_message_id 
+       add constraint fk_read_by_identifier_id 
+       foreign key (identifier_id) 
+       references identifier (id);
+
+    alter table if exists message_read_by 
+       add constraint fk_message_read_by 
        foreign key (message_id) 
        references message (id);

@@ -23,10 +23,10 @@ public class Conversation {
 	private String namespace;
 
 	@Schema(description = "The ID of the channel used for the conversation.", example = "12345")
-	private String channelId;
+	private List<KeyValues> externalReferences;
 
-	@ArraySchema(schema = @Schema(implementation = Metadata.class, description = "A list of metadata associated with the conversation."))
-	private List<Metadata> metadata;
+	@ArraySchema(schema = @Schema(implementation = KeyValues.class, description = "A list of metadata associated with the conversation."))
+	private List<KeyValues> metadata;
 
 	@Schema(description = "The topic of the conversation.", example = "Customer Support")
 	private String topic;
@@ -87,28 +87,28 @@ public class Conversation {
 		return this;
 	}
 
-	public String getChannelId() {
-		return channelId;
+	public List<KeyValues> getExternalReferences() {
+		return externalReferences;
 	}
 
-	public void setChannelId(final String channelId) {
-		this.channelId = channelId;
+	public void setExternalReferences(final List<KeyValues> externalReferences) {
+		this.externalReferences = externalReferences;
 	}
 
-	public Conversation withChannelId(final String channelId) {
-		this.channelId = channelId;
+	public Conversation withExternalReferences(final List<KeyValues> externalReferences) {
+		this.externalReferences = externalReferences;
 		return this;
 	}
 
-	public List<Metadata> getMetadata() {
+	public List<KeyValues> getMetadata() {
 		return metadata;
 	}
 
-	public void setMetadata(final List<Metadata> metadata) {
+	public void setMetadata(final List<KeyValues> metadata) {
 		this.metadata = metadata;
 	}
 
-	public Conversation withMetadata(final List<Metadata> metadata) {
+	public Conversation withMetadata(final List<KeyValues> metadata) {
 		this.metadata = metadata;
 		return this;
 	}
@@ -132,12 +132,12 @@ public class Conversation {
 			return false;
 		final Conversation that = (Conversation) o;
 		return Objects.equals(id, that.id) && Objects.equals(participants, that.participants) && Objects.equals(municipalityId, that.municipalityId) && Objects.equals(namespace, that.namespace)
-			&& Objects.equals(channelId, that.channelId) && Objects.equals(metadata, that.metadata) && Objects.equals(topic, that.topic);
+			&& Objects.equals(externalReferences, that.externalReferences) && Objects.equals(metadata, that.metadata) && Objects.equals(topic, that.topic);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, participants, municipalityId, namespace, channelId, metadata, topic);
+		return Objects.hash(id, participants, municipalityId, namespace, externalReferences, metadata, topic);
 	}
 
 	@Override
@@ -147,7 +147,7 @@ public class Conversation {
 			", participants=" + participants +
 			", municipalityId='" + municipalityId + '\'' +
 			", namespace='" + namespace + '\'' +
-			", channelId='" + channelId + '\'' +
+			", externalReferences=" + externalReferences +
 			", metadata=" + metadata +
 			", topic='" + topic + '\'' +
 			'}';

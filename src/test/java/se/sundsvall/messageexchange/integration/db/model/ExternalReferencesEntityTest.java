@@ -8,14 +8,15 @@ import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetter
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.allOf;
 
+import java.util.List;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
-class IdentifierEntityTest {
+class ExternalReferencesEntityTest {
 
 	@Test
 	void testBean() {
-		MatcherAssert.assertThat(IdentifierEntity.class, allOf(
+		MatcherAssert.assertThat(ExternalReferencesEntity.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCode(),
@@ -27,25 +28,27 @@ class IdentifierEntityTest {
 	void builder() {
 		// Arrange
 		final var id = "id";
-		final var type = "type";
-		final var value = "value";
+		final var key = "key";
+		final var values = List.of("value1", "value2");
+
 		// Act
-		final var result = IdentifierEntity.create()
+		final var result = ExternalReferencesEntity.create()
 			.withId(id)
-			.withType(type)
-			.withValue(value);
+			.withKey(key)
+			.withValues(values);
 
 		// Assert
 		assertThat(result).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(result.getId()).isEqualTo(id);
-		assertThat(result.getType()).isEqualTo(type);
-		assertThat(result.getValue()).isEqualTo(value);
+		assertThat(result.getKey()).isEqualTo(key);
+		assertThat(result.getValues()).isEqualTo(values);
+
 	}
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		assertThat(IdentifierEntity.create()).hasAllNullFieldsOrProperties();
-		assertThat(new IdentifierEntity()).hasAllNullFieldsOrProperties();
+		assertThat(ExternalReferencesEntity.create()).hasAllNullFieldsOrProperties();
+		assertThat(new ExternalReferencesEntity()).hasAllNullFieldsOrProperties();
 	}
 
 }

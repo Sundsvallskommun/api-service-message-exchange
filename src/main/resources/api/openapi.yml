@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "1.0"
 servers:
-  - url: http://localhost:61544
+  - url: http://localhost:57404
     description: Generated server url
 tags:
   - name: Message resource
@@ -546,14 +546,16 @@ components:
           description: The namespace of the conversation.
           readOnly: true
           example: namespace-abc
-        channelId:
-          type: string
+        externalReferences:
+          type: array
           description: The ID of the channel used for the conversation.
-          example: "12345"
+          example: 12345
+          items:
+            $ref: "#/components/schemas/KeyValues"
         metadata:
           type: array
           items:
-            $ref: "#/components/schemas/Metadata"
+            $ref: "#/components/schemas/KeyValues"
         topic:
           type: string
           description: The topic of the conversation.
@@ -573,19 +575,18 @@ components:
           example: ad012ad
       description: "Represents a participant in a conversation, including their type\
         \ and value."
-    Metadata:
+    KeyValues:
       type: object
       properties:
         key:
           type: string
-          description: The key of the metadata.
+          description: The key of the data
           example: key1
         values:
           type: array
           items:
             type: string
-      description: "Represents metadata associated with a conversation, including\
-        \ key-value pairs."
+      description: Represents a key-value pair of metadata.
     Problem:
       type: object
       properties:
@@ -599,20 +600,20 @@ components:
           type: object
           additionalProperties:
             type: object
-        status:
-          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
+        status:
+          $ref: "#/components/schemas/StatusType"
     StatusType:
       type: object
       properties:
+        reasonPhrase:
+          type: string
         statusCode:
           type: integer
           format: int32
-        reasonPhrase:
-          type: string
     ConstraintViolationProblem:
       type: object
       properties:
@@ -734,12 +735,12 @@ components:
           type: object
           additionalProperties:
             type: object
-        status:
-          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
+        status:
+          $ref: "#/components/schemas/StatusType"
         suppressed:
           type: array
           items:
@@ -823,7 +824,7 @@ components:
           description: The sequence number of the message in the conversation.
           readOnly: true
           example: "1"
-        inReplyTo:
+        inReplyToMessageId:
           type: string
           description: "The identifier of the message this message is replying to,\
             \ if any."
@@ -852,12 +853,12 @@ components:
     PageMessage:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         last:
@@ -874,11 +875,11 @@ components:
           format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
     PageableObject:

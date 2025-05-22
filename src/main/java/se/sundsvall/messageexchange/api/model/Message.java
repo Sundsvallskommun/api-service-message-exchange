@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
+import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 
 @Schema(description = "Represents a message within a conversation, including metadata and content.")
 public class Message {
@@ -16,7 +17,8 @@ public class Message {
 	private String sequenceNumber;
 
 	@Schema(description = "The identifier of the message this message is replying to, if any.", example = "2af1002e-008f-4bdc-924b-daaae31f1118")
-	private String inReplyTo;
+	@ValidUuid(nullable = true)
+	private String inReplyToMessageId;
 
 	@Schema(description = "The timestamp when the message was created.", example = "2023-01-01T12:00:00", accessMode = Schema.AccessMode.READ_ONLY)
 	private OffsetDateTime created;
@@ -27,8 +29,8 @@ public class Message {
 	@Schema(description = "The content of the message.", example = "Hello, how can I help you?")
 	private String content;
 
-	@ArraySchema(schema = @Schema(implementation = Identifier.class, description = "The list of participants who have read the message."))
-	private List<Identifier> readBy;
+	@ArraySchema(schema = @Schema(implementation = Identifier.class, description = "The list of people who have read the message."))
+	private List<ReadBy> readBy;
 
 	@ArraySchema(schema = @Schema(implementation = Attachment.class, description = "The list of attachments associated with the message."))
 	private List<Attachment> attachments;
@@ -63,16 +65,16 @@ public class Message {
 		return this;
 	}
 
-	public String getInReplyTo() {
-		return inReplyTo;
+	public String getInReplyToMessageId() {
+		return inReplyToMessageId;
 	}
 
-	public void setInReplyTo(final String inReplyTo) {
-		this.inReplyTo = inReplyTo;
+	public void setInReplyToMessageId(final String inReplyToMessageId) {
+		this.inReplyToMessageId = inReplyToMessageId;
 	}
 
-	public Message withInReplyTo(final String inReplyTo) {
-		this.inReplyTo = inReplyTo;
+	public Message withInReplyToMessageId(final String inReplyTo) {
+		this.inReplyToMessageId = inReplyTo;
 		return this;
 	}
 
@@ -115,15 +117,15 @@ public class Message {
 		return this;
 	}
 
-	public List<Identifier> getReadBy() {
+	public List<ReadBy> getReadBy() {
 		return readBy;
 	}
 
-	public void setReadBy(final List<Identifier> readBy) {
+	public void setReadBy(final List<ReadBy> readBy) {
 		this.readBy = readBy;
 	}
 
-	public Message withReadBy(final List<Identifier> readBy) {
+	public Message withReadBy(final List<ReadBy> readBy) {
 		this.readBy = readBy;
 		return this;
 	}
@@ -146,13 +148,13 @@ public class Message {
 		if (o == null || getClass() != o.getClass())
 			return false;
 		final Message message = (Message) o;
-		return Objects.equals(id, message.id) && Objects.equals(sequenceNumber, message.sequenceNumber) && Objects.equals(inReplyTo, message.inReplyTo) && Objects.equals(created, message.created)
+		return Objects.equals(id, message.id) && Objects.equals(sequenceNumber, message.sequenceNumber) && Objects.equals(inReplyToMessageId, message.inReplyToMessageId) && Objects.equals(created, message.created)
 			&& Objects.equals(createdBy, message.createdBy) && Objects.equals(content, message.content) && Objects.equals(readBy, message.readBy) && Objects.equals(attachments, message.attachments);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, sequenceNumber, inReplyTo, created, createdBy, content, readBy, attachments);
+		return Objects.hash(id, sequenceNumber, inReplyToMessageId, created, createdBy, content, readBy, attachments);
 	}
 
 	@Override
@@ -160,7 +162,7 @@ public class Message {
 		return "Message{" +
 			"id='" + id + '\'' +
 			", sequenceNumber='" + sequenceNumber + '\'' +
-			", inReplyTo='" + inReplyTo + '\'' +
+			", inReplyToMessageId='" + inReplyToMessageId + '\'' +
 			", created=" + created +
 			", createdBy=" + createdBy +
 			", content='" + content + '\'' +

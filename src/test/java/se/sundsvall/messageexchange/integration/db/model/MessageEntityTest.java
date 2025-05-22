@@ -46,7 +46,7 @@ class MessageEntityTest {
 		final var created = now();
 		final var createdBy = IdentifierEntity.create();
 		final var content = "content";
-		final var readBy = List.of(IdentifierEntity.create());
+		final var readBy = List.of(ReadByEntity.create());
 		final var conversation = ConversationEntity.create();
 		final var attachments = List.of(AttachmentEntity.create());
 
@@ -54,7 +54,7 @@ class MessageEntityTest {
 		final var result = MessageEntity.create()
 			.withId(id)
 			.withSequenceNumber(sequenceNumber)
-			.withInReplyTo(inReplyTo)
+			.withInReplyToMessageId(inReplyTo)
 			.withCreated(created)
 			.withCreatedBy(createdBy)
 			.withContent(content)
@@ -66,7 +66,7 @@ class MessageEntityTest {
 		assertThat(result).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(result.getId()).isEqualTo(id);
 		assertThat(result.getSequenceNumber()).isEqualTo(sequenceNumber);
-		assertThat(result.getInReplyTo()).isEqualTo(inReplyTo);
+		assertThat(result.getInReplyToMessageId()).isEqualTo(inReplyTo);
 		assertThat(result.getCreated()).isEqualTo(created);
 		assertThat(result.getCreatedBy()).isEqualTo(createdBy);
 		assertThat(result.getContent()).isEqualTo(content);

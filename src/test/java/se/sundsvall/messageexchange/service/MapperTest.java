@@ -1,46 +1,50 @@
 package se.sundsvall.messageexchange.service;
 
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
+import static org.mockito.Mockito.mockStatic;
+import static se.sundsvall.dept44.support.Identifier.Type.PARTY_ID;
 
-import jakarta.persistence.EntityManager;
+import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.messageexchange.api.model.Conversation;
 import se.sundsvall.messageexchange.api.model.Identifier;
+import se.sundsvall.messageexchange.api.model.KeyValues;
 import se.sundsvall.messageexchange.api.model.Message;
-import se.sundsvall.messageexchange.api.model.Metadata;
+import se.sundsvall.messageexchange.api.model.ReadBy;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
+import se.sundsvall.messageexchange.integration.db.model.ExternalReferencesEntity;
 import se.sundsvall.messageexchange.integration.db.model.IdentifierEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 import se.sundsvall.messageexchange.integration.db.model.MetadataEntity;
+import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
 
 @ExtendWith(MockitoExtension.class)
 class MapperTest {
-
-	@Mock
-	private EntityManager entityManagerMock;
 
 	@Test
 	void toConversationEntity() {
 		// Arrange
 		final var municipalityId = "municipalityId";
 		final var namespace = "namespace";
-		final var channelId = "channelId";
 		final var topic = "topic";
 		final var key = "key";
 		final var value1 = "value1";
 		final var value2 = "value2";
 		final var type = "type";
 		final var value = "value";
+		final var externalReferenceId = "externalReferenceId";
+		final var externalReferenceType = "externalReferenceType";
 
 		final var conversationRequest = Conversation.create()
-			.withChannelId(channelId)
 			.withTopic(topic)
 			.withParticipants(List.of(Identifier.create().withType(type).withValue(value)))
-			.withMetadata(List.of(Metadata.create().withKey(key).withValues(List.of(value1, value2))));
+			.withMetadata(List.of(KeyValues.create().withKey(key).withValues(List.of(value1, value2))))
+			.withExternalReferences(List.of(KeyValues.create().withKey(externalReferenceId).withValues(List.of(externalReferenceType))));
 
 		// Act
 		final var result = Mapper.toConversationEntity(municipalityId, namespace, conversationRequest);
@@ -49,10 +53,12 @@ class MapperTest {
 		assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("id", "messages");
 		assertThat(result.getMunicipalityId()).isEqualTo(municipalityId);
 		assertThat(result.getNamespace()).isEqualTo(namespace);
-		assertThat(result.getChannelId()).isEqualTo(channelId);
 		assertThat(result.getTopic()).isEqualTo(topic);
 		assertThat(result.getParticipants()).hasSize(1);
 		assertThat(result.getMetadata()).hasSize(1);
+		assertThat(result.getExternalReferences()).hasSize(1);
+		assertThat(result.getExternalReferences().getFirst().getKey()).isEqualTo(externalReferenceId);
+		assertThat(result.getExternalReferences().getFirst().getValues()).containsExactly(externalReferenceType);
 	}
 
 	@Test
@@ -61,22 +67,23 @@ class MapperTest {
 		final var id = "id";
 		final var municipalityId = "municipalityId";
 		final var namespace = "namespace";
-		final var channelId = "channelId";
 		final var topic = "topic";
 		final var key = "key";
 		final var value1 = "value1";
 		final var value2 = "value2";
 		final var type = "type";
 		final var value = "value";
+		final var externalReferenceId = "externalReferenceId";
+		final var externalReferenceType = "externalReferenceType";
 
 		final var entity = ConversationEntity.create()
 			.withId(id)
 			.withMunicipalityId(municipalityId)
 			.withNamespace(namespace)
-			.withChannelId(channelId)
 			.withTopic(topic)
 			.withParticipants(List.of(IdentifierEntity.create().withType(type).withValue(value)))
-			.withMetadata(List.of(MetadataEntity.create().withKey(key).withValues(List.of(value1, value2))));
+			.withMetadata(List.of(MetadataEntity.create().withKey(key).withValues(List.of(value1, value2))))
+			.withExternalReferences(List.of(ExternalReferencesEntity.create().withKey(externalReferenceId).withValues(List.of(externalReferenceType))));
 
 		// Act
 		final var result = Mapper.toConversation(entity);
@@ -86,28 +93,31 @@ class MapperTest {
 		assertThat(result.getId()).isEqualTo(id);
 		assertThat(result.getMunicipalityId()).isEqualTo(municipalityId);
 		assertThat(result.getNamespace()).isEqualTo(namespace);
-		assertThat(result.getChannelId()).isEqualTo(channelId);
 		assertThat(result.getTopic()).isEqualTo(topic);
 		assertThat(result.getParticipants()).hasSize(1);
 		assertThat(result.getMetadata()).hasSize(1);
+		assertThat(result.getExternalReferences()).hasSize(1);
+		assertThat(result.getExternalReferences().getFirst().getKey()).isEqualTo(externalReferenceId);
+		assertThat(result.getExternalReferences().getFirst().getValues()).containsExactly(externalReferenceType);
 	}
 
 	@Test
 	void updateConversationEntity() {
 		// Arrange
-		final var channelId = "channelId";
 		final var topic = "topic";
 		final var type = "type";
 		final var value = "value";
 		final var key = "key";
 		final var value1 = "value1";
 		final var value2 = "value2";
+		final var externalReferenceId = "externalReferenceId";
+		final var externalReferenceType = "externalReferenceType";
 
 		final var conversationRequest = Conversation.create()
-			.withChannelId(channelId)
 			.withTopic(topic)
 			.withParticipants(List.of(Identifier.create().withType(type).withValue(value)))
-			.withMetadata(List.of(Metadata.create().withKey(key).withValues(List.of(value1, value2))));
+			.withMetadata(List.of(KeyValues.create().withKey(key).withValues(List.of(value1, value2))))
+			.withExternalReferences(List.of(KeyValues.create().withKey(externalReferenceId).withValues(List.of(externalReferenceType))));
 
 		final var entity = ConversationEntity.create();
 
@@ -115,10 +125,10 @@ class MapperTest {
 		final var result = Mapper.updateConversationEntity(entity, conversationRequest);
 
 		// Assert
-		assertThat(result.getChannelId()).isEqualTo(channelId);
 		assertThat(result.getTopic()).isEqualTo(topic);
 		assertThat(result.getParticipants()).hasSize(1);
 		assertThat(result.getMetadata()).hasSize(1);
+		assertThat(result.getExternalReferences()).hasSize(1);
 	}
 
 	@Test
@@ -134,7 +144,7 @@ class MapperTest {
 		final var entities = List.of(MessageEntity.create()
 			.withId(id)
 			.withSequenceNumber(sequenceNumber)
-			.withInReplyTo(inReplyTo)
+			.withInReplyToMessageId(inReplyTo)
 			.withCreatedBy(IdentifierEntity.create().withType(createdByType).withValue(createdByValue))
 			.withContent(content));
 
@@ -145,7 +155,7 @@ class MapperTest {
 		assertThat(result).hasSize(1);
 		assertThat(result.getFirst().getId()).isEqualTo(id);
 		assertThat(result.getFirst().getSequenceNumber()).isEqualTo(sequenceNumber);
-		assertThat(result.getFirst().getInReplyTo()).isEqualTo(inReplyTo);
+		assertThat(result.getFirst().getInReplyToMessageId()).isEqualTo(inReplyTo);
 		assertThat(result.getFirst().getCreatedBy().getType()).isEqualTo(createdByType);
 		assertThat(result.getFirst().getCreatedBy().getValue()).isEqualTo(createdByValue);
 		assertThat(result.getFirst().getContent()).isEqualTo(content);
@@ -164,7 +174,7 @@ class MapperTest {
 		final var entity = MessageEntity.create()
 			.withId(id)
 			.withSequenceNumber(sequenceNumber)
-			.withInReplyTo(inReplyTo)
+			.withInReplyToMessageId(inReplyTo)
 			.withCreatedBy(IdentifierEntity.create().withType(createdByType).withValue(createdByValue))
 			.withContent(content);
 
@@ -175,7 +185,7 @@ class MapperTest {
 		assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("created");
 		assertThat(result.getId()).isEqualTo(id);
 		assertThat(result.getSequenceNumber()).isEqualTo(sequenceNumber);
-		assertThat(result.getInReplyTo()).isEqualTo(inReplyTo);
+		assertThat(result.getInReplyToMessageId()).isEqualTo(inReplyTo);
 		assertThat(result.getCreatedBy().getType()).isEqualTo(createdByType);
 		assertThat(result.getCreatedBy().getValue()).isEqualTo(createdByValue);
 		assertThat(result.getContent()).isEqualTo(content);
@@ -184,32 +194,39 @@ class MapperTest {
 	@Test
 	void toMessageEntity() {
 		// Arrange
-		final var sequenceNumber = "222";
 		final var inReplyTo = "inReplyTo";
-		final var createdByType = "type";
+		final var createdByType = "PARTY_ID";
 		final var createdByValue = "value";
 		final var content = "content";
+		final var dept44Identifier = se.sundsvall.dept44.support.Identifier.create()
+			.withType(PARTY_ID)
+			.withValue(createdByValue);
 
-		final var conversationEntity = ConversationEntity.create().withId("conversationId");
-		final var message = Message.create()
-			.withInReplyTo(inReplyTo)
-			.withCreatedBy(Identifier.create().withType(createdByType).withValue(createdByValue))
-			.withContent(content);
+		try (final var mockedStatic = mockStatic(se.sundsvall.dept44.support.Identifier.class)) {
+			mockedStatic.when(se.sundsvall.dept44.support.Identifier::get).thenReturn(dept44Identifier);
 
-		// Act
-		final var result = Mapper.toMessageEntity(conversationEntity, message);
+			final var conversationEntity = ConversationEntity.create().withId("conversationId");
+			final var message = Message.create()
+				.withInReplyToMessageId(inReplyTo)
+				.withCreatedBy(Identifier.create().withType(createdByType).withValue(createdByValue))
+				.withContent(content);
 
-		// Assert
-		assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("id", "created", "attachments", "sequenceNumber");
-		assertThat(result.getInReplyTo()).isEqualTo(inReplyTo);
-		assertThat(result.getCreatedBy().getType()).isEqualTo(createdByType);
-		assertThat(result.getCreatedBy().getValue()).isEqualTo(createdByValue);
-		assertThat(result.getContent()).isEqualTo(content);
-		assertThat(result.getConversation()).isEqualTo(conversationEntity);
+			// Act
+			final var result = Mapper.toMessageEntity(conversationEntity, message);
+
+			// Assert
+			assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("id", "created", "attachments", "sequenceNumber");
+			assertThat(result.getInReplyToMessageId()).isEqualTo(inReplyTo);
+			assertThat(result.getCreatedBy().getType()).isEqualTo(createdByType);
+			assertThat(result.getCreatedBy().getValue()).isEqualTo(createdByValue);
+			assertThat(result.getContent()).isEqualTo(content);
+			assertThat(result.getConversation()).isEqualTo(conversationEntity);
+
+		}
 	}
 
 	@Test
-	void toParticipants() {
+	void toIdentifiers() {
 		// Arrange
 		final var type = "type";
 		final var value = "value";
@@ -217,7 +234,7 @@ class MapperTest {
 		final var entities = List.of(IdentifierEntity.create().withType(type).withValue(value));
 
 		// Act
-		final var result = Mapper.toParticipants(entities);
+		final var result = Mapper.toIdentifiers(entities);
 
 		// Assert
 		assertThat(result).hasSize(1);
@@ -226,25 +243,25 @@ class MapperTest {
 	}
 
 	@Test
-	void toParticipantsEmpty() {
+	void toIdentifiersEmpty() {
 		// Act
-		final var result = Mapper.toParticipants(List.of());
+		final var result = Mapper.toIdentifiers(List.of());
 
 		// Assert
 		assertThat(result).isEmpty();
 	}
 
 	@Test
-	void toParticipantsNull() {
+	void toIdentifiersNull() {
 		// Act
-		final var result = Mapper.toParticipants(null);
+		final var result = Mapper.toIdentifiers(null);
 
 		// Assert
 		assertThat(result).isEmpty();
 	}
 
 	@Test
-	void toParticipant() {
+	void toIdentifier() {
 		// Arrange
 		final var type = "type";
 		final var value = "value";
@@ -252,7 +269,7 @@ class MapperTest {
 		final var entity = IdentifierEntity.create().withType(type).withValue(value);
 
 		// Act
-		final var result = Mapper.toParticipant(entity);
+		final var result = Mapper.toIdentifier(entity);
 
 		// Assert
 		assertThat(result).isNotNull().hasNoNullFieldsOrProperties();
@@ -261,16 +278,16 @@ class MapperTest {
 	}
 
 	@Test
-	void toParticipantEmpty() {
+	void toIdentifierEmpty() {
 		// Act
-		final var result = Mapper.toParticipant(null);
+		final var result = Mapper.toIdentifier(null);
 
 		// Assert
 		assertThat(result).isNull();
 	}
 
 	@Test
-	void toParticipantEntities() {
+	void toIdentifierEntities() {
 		// Arrange
 		final var type = "type";
 		final var value = "value";
@@ -278,7 +295,7 @@ class MapperTest {
 		final var participants = List.of(Identifier.create().withType(type).withValue(value));
 
 		// Act
-		final var result = Mapper.toParticipantEntities(participants);
+		final var result = Mapper.toIdentifierEntities(participants);
 
 		// Assert
 		assertThat(result).hasSize(1);
@@ -287,25 +304,25 @@ class MapperTest {
 	}
 
 	@Test
-	void toParticipantEntitiesEmpty() {
+	void toIdentifierEntitiesEmpty() {
 		// Act
-		final var result = Mapper.toParticipantEntities(List.of());
+		final var result = Mapper.toIdentifierEntities(List.of());
 
 		// Assert
 		assertThat(result).isEmpty();
 	}
 
 	@Test
-	void toParticipantEntitiesNull() {
+	void toIdentifierEntitiesNull() {
 		// Act
-		final var result = Mapper.toParticipantEntities(null);
+		final var result = Mapper.toIdentifierEntities(null);
 
 		// Assert
 		assertThat(result).isEmpty();
 	}
 
 	@Test
-	void toParticipantEntity() {
+	void toIdentifierEntity() {
 		// Arrange
 		final var type = "type";
 		final var value = "value";
@@ -313,18 +330,18 @@ class MapperTest {
 		final var participant = Identifier.create().withType(type).withValue(value);
 
 		// Act
-		final var result = Mapper.toParticipantEntity(participant);
+		final var result = Mapper.toIdentifierEntity(participant);
 
 		// Assert
-		assertThat(result).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
 		assertThat(result.getType()).isEqualTo(type);
 		assertThat(result.getValue()).isEqualTo(value);
 	}
 
 	@Test
-	void toParticipantEntityEmpty() {
+	void toIdentifierEntityEmpty() {
 		// Act
-		final var result = Mapper.toParticipantEntity(null);
+		final var result = Mapper.toIdentifierEntity((Identifier) null);
 
 		// Assert
 		assertThat(result).isNull();
@@ -373,7 +390,7 @@ class MapperTest {
 		final var value1 = "value1";
 		final var value2 = "value2";
 
-		final var metadata = Metadata.create().withKey(key).withValues(List.of(value1, value2));
+		final var metadata = KeyValues.create().withKey(key).withValues(List.of(value1, value2));
 
 		// Act
 		final var result = Mapper.toMetadataEntity(metadata);
@@ -391,13 +408,14 @@ class MapperTest {
 		final var value1 = "value1";
 		final var value2 = "value2";
 
-		final var metadataList = List.of(Metadata.create().withKey(key).withValues(List.of(value1, value2)));
+		final var metadataList = List.of(KeyValues.create().withKey(key).withValues(List.of(value1, value2)));
 
 		// Act
 		final var result = Mapper.toMetadataEntities(metadataList);
 
 		// Assert
 		assertThat(result).hasSize(1);
+		assertThat(result.getFirst()).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
 		assertThat(result.getFirst().getKey()).isEqualTo(key);
 		assertThat(result.getFirst().getValues()).containsExactly(value1, value2);
 	}
@@ -419,4 +437,383 @@ class MapperTest {
 		// Assert
 		assertThat(result).isEmpty();
 	}
+
+	@Test
+	void toReadByEntitiesFromDept44Identifier() {
+
+		// Arrange
+		final var type = "PARTY_ID";
+		final var value = "value";
+		final var identifier = se.sundsvall.dept44.support.Identifier.create()
+			.withType(PARTY_ID)
+			.withValue(value);
+
+		// Act
+		final var result = Mapper.toReadByEntities(identifier);
+
+		// Assert
+		assertThat(result).hasSize(1);
+		assertThat(result.getFirst()).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
+		assertThat(result.getFirst().getIdentifier().getType()).isEqualTo(type);
+		assertThat(result.getFirst().getIdentifier().getValue()).isEqualTo(value);
+	}
+
+	@Test
+	void toIdentifierEntityFromDept44Identifier() {
+		// Arrange
+		final var type = "PARTY_ID";
+		final var value = "value";
+
+		final var identifier = se.sundsvall.dept44.support.Identifier.create()
+			.withType(PARTY_ID)
+			.withValue(value);
+
+		// Act
+		final var result = Mapper.toIdentifierEntity(identifier);
+
+		// Assert
+		assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
+		assertThat(result.getType()).isEqualTo(type);
+		assertThat(result.getValue()).isEqualTo(value);
+	}
+
+	@Test
+	void toIdentifierEntityFromDept44IdentifierButNull() {
+		// Act
+		final var result = Mapper.toIdentifierEntity((se.sundsvall.dept44.support.Identifier) null);
+
+		// Assert
+		assertThat(result).isNull();
+
+	}
+
+	@Test
+	void toReadByEntityFromDept44Identifier() {
+		// Arrange
+		final var type = "PARTY_ID";
+		final var value = "value";
+
+		final var identifier = se.sundsvall.dept44.support.Identifier.create()
+			.withType(PARTY_ID)
+			.withValue(value);
+
+		// Act
+		final var result = Mapper.toReadByEntity(identifier);
+
+		// Assert
+		assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
+		assertThat(result.getIdentifier().getType()).isEqualTo(type);
+		assertThat(result.getIdentifier().getValue()).isEqualTo(value);
+		assertThat(result.getReadAt()).isCloseTo(OffsetDateTime.now(), within(5, SECONDS));
+	}
+
+	@Test
+	void toReadByListEntityFromDept44IdentifierButNull() {
+		// Act
+		final var result = Mapper.toReadByEntity((se.sundsvall.dept44.support.Identifier) null);
+
+		// Assert
+		assertThat(result).isNull();
+	}
+
+	@Test
+	void toReadByListEntityFromReadByList() {
+		// Arrange
+		final var type = "PARTY_ID";
+		final var value = "value";
+
+		final var readBy = ReadBy.create()
+			.withIdentifier(Identifier.create()
+				.withType(type)
+				.withValue(value))
+			.withReadAt(OffsetDateTime.now());
+
+		// Act
+		final var result = Mapper.toReadByEntities(List.of(readBy));
+
+		// Assert
+		assertThat(result).hasSize(1);
+		assertThat(result.getFirst()).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
+		assertThat(result.getFirst().getIdentifier().getType()).isEqualTo(type);
+		assertThat(result.getFirst().getIdentifier().getValue()).isEqualTo(value);
+		assertThat(result.getFirst().getReadAt()).isCloseTo(OffsetDateTime.now(), within(5, SECONDS));
+	}
+
+	@Test
+	void toReadByListEntityFromReadByListButNull() {
+		// Act
+		final var result = Mapper.toReadByEntities((List<ReadBy>) null);
+
+		// Assert
+		assertThat(result).isEmpty();
+	}
+
+	@Test
+	void toReadByEntitiesEmpty() {
+		// Act
+		final var result = Mapper.toReadByEntities(List.of());
+
+		// Assert
+		assertThat(result).isEmpty();
+	}
+
+	@Test
+	void toReadByEntityFromReadByList() {
+		// Arrange
+		final var type = "PARTY_ID";
+		final var value = "value";
+
+		final var readBy = ReadBy.create()
+			.withIdentifier(Identifier.create()
+				.withType(type)
+				.withValue(value))
+			.withReadAt(OffsetDateTime.now());
+
+		// Act
+		final var result = Mapper.toReadByEntity(readBy);
+
+		// Assert
+		assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
+		assertThat(result.getIdentifier().getType()).isEqualTo(type);
+		assertThat(result.getIdentifier().getValue()).isEqualTo(value);
+		assertThat(result.getReadAt()).isCloseTo(OffsetDateTime.now(), within(5, SECONDS));
+	}
+
+	@Test
+	void toReadByEntitiesNull() {
+		// Act
+		final var result = Mapper.toReadByEntity((ReadBy) null);
+
+		// Assert
+		assertThat(result).isNull();
+	}
+
+	@Test
+	void toReadByList() {
+		// Arrange
+		final var type = "PARTY_ID";
+		final var value = "value";
+
+		final var readByEntity = ReadByEntity.create()
+			.withIdentifier(IdentifierEntity.create()
+				.withType(type)
+				.withValue(value))
+			.withReadAt(OffsetDateTime.now());
+
+		// Act
+		final var result = Mapper.toReadByList(List.of(readByEntity));
+
+		// Assert
+		assertThat(result).isNotNull().hasSize(1);
+		assertThat(result.getFirst()).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(result.getFirst().getIdentifier().getType()).isEqualTo(type);
+		assertThat(result.getFirst().getIdentifier().getValue()).isEqualTo(value);
+		assertThat(result.getFirst().getReadAt()).isCloseTo(OffsetDateTime.now(), within(5, SECONDS));
+	}
+
+	@Test
+	void toReadByListNull() {
+		// Act
+		final var result = Mapper.toReadByList(null);
+
+		// Assert
+		assertThat(result).isEmpty();
+	}
+
+	@Test
+	void toReadByListEmpty() {
+		// Act
+		final var result = Mapper.toReadByList(List.of());
+
+		// Assert
+		assertThat(result).isEmpty();
+	}
+
+	@Test
+	void toReadBy() {
+		// Arrange
+		final var type = "PARTY_ID";
+		final var value = "value";
+
+		final var readByEntity = ReadByEntity.create()
+			.withIdentifier(IdentifierEntity.create()
+				.withType(type)
+				.withValue(value))
+			.withReadAt(OffsetDateTime.now());
+
+		// Act
+		final var result = Mapper.toReadBy(readByEntity);
+
+		// Assert
+		assertThat(result).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(result.getIdentifier().getType()).isEqualTo(type);
+		assertThat(result.getIdentifier().getValue()).isEqualTo(value);
+		assertThat(result.getReadAt()).isCloseTo(OffsetDateTime.now(), within(5, SECONDS));
+	}
+
+	@Test
+	void toReadByNull() {
+		// Act
+		final var result = Mapper.toReadBy(null);
+
+		// Assert
+		assertThat(result).isNull();
+	}
+
+	@Test
+	void toExternalReferencesEntities() {
+
+		// Arrange
+		final var key = "key";
+		final var value1 = "value1";
+		final var value2 = "value2";
+		final var externalReferences = KeyValues.create().withKey(key).withValues(List.of(value1, value2));
+
+		// Act
+		final var result = Mapper.toExternalReferencesEntities(List.of(externalReferences));
+
+		// Assert
+		assertThat(result).hasSize(1);
+		assertThat(result.getFirst()).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
+		assertThat(result.getFirst().getKey()).isEqualTo(key);
+		assertThat(result.getFirst().getValues()).containsExactly(value1, value2);
+
+	}
+
+	@Test
+	void toExternalReferencesEntitiesNull() {
+
+		// Act
+		final var result = Mapper.toExternalReferencesEntities(null);
+
+		// Assert
+		assertThat(result).isEmpty();
+
+	}
+
+	@Test
+	void toExternalReferencesEntitiesEmpty() {
+
+		// Act
+		final var result = Mapper.toExternalReferencesEntities(List.of());
+
+		// Assert
+		assertThat(result).isEmpty();
+
+	}
+
+	@Test
+	void toExternalReferencesEntity() {
+
+		// Arrange
+		final var key = "key";
+		final var value1 = "value1";
+		final var value2 = "value2";
+		final var externalReferences = KeyValues.create().withKey(key).withValues(List.of(value1, value2));
+
+		// Act
+		final var result = Mapper.toExternalReferencesEntity(externalReferences);
+
+		// Assert
+		assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
+		assertThat(result.getKey()).isEqualTo(key);
+		assertThat(result.getValues()).containsExactly(value1, value2);
+
+	}
+
+	@Test
+	void toExternalReferencesEntityNull() {
+
+		// Act
+		final var result = Mapper.toExternalReferencesEntity(null);
+
+		// Assert
+		assertThat(result).isNull();
+
+	}
+
+	@Test
+	void toExternalReferences() {
+
+		// Arrange
+		final var key = "key";
+		final var value1 = "value1";
+		final var value2 = "value2";
+		final var externalReferencesEntities = List.of(ExternalReferencesEntity.create().withKey(key).withValues(List.of(value1, value2)));
+
+		// Act
+		final var result = Mapper.toExternalReferences(externalReferencesEntities);
+
+		// Assert
+		assertThat(result).hasSize(1);
+		assertThat(result.getFirst()).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(result.getFirst().getKey()).isEqualTo(key);
+		assertThat(result.getFirst().getValues()).containsExactly(value1, value2);
+
+	}
+
+	@Test
+	void toExternalReferencesNull() {
+
+		// Act
+		final var result = Mapper.toExternalReferences(null);
+
+		// Assert
+		assertThat(result).isEmpty();
+
+	}
+
+	@Test
+	void toExternalReferencesEmpty() {
+
+		// Act
+		final var result = Mapper.toExternalReferences(List.of());
+
+		// Assert
+		assertThat(result).isEmpty();
+
+	}
+
+	@Test
+	void toExternalReference() {
+
+		// Arrange
+		final var key = "key";
+		final var value1 = "value1";
+		final var value2 = "value2";
+		final var externalReferencesEntity = ExternalReferencesEntity.create().withKey(key).withValues(List.of(value1, value2));
+
+		// Act
+		final var result = Mapper.toExternalReference(externalReferencesEntity);
+
+		// // Assert
+		assertThat(result).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(result.getKey()).isEqualTo(key);
+		assertThat(result.getValues()).containsExactly(value1, value2);
+
+	}
+
+	@Test
+	void toExternalReferenceNull() {
+
+		// Act
+		final var result = Mapper.toExternalReference(null);
+
+		// Assert
+		assertThat(result).isNull();
+
+	}
+
+	@Test
+	void toExternalReferenceEmpty() {
+
+		// Act
+		final var result = Mapper.toExternalReference(ExternalReferencesEntity.create());
+
+		// Assert
+		assertThat(result.getKey()).isNull();
+		assertThat(result.getValues()).isNull();
+
+	}
+
 }

@@ -140,6 +140,7 @@ see [CONTRIBUTING.md](https://github.com/Sundsvallskommun/.github/blob/main/.git
 This project is licensed under the [MIT License](LICENSE).
 
 ## Code status
+
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-message-exchange&metric=alert_status)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-message-exchange)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-message-exchange&metric=reliability_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-message-exchange)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-message-exchange&metric=security_rating)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-message-exchange)

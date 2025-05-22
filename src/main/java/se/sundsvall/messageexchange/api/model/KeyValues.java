@@ -5,15 +5,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Objects;
 
-@Schema(description = "Represents metadata associated with a conversation, including key-value pairs.")
-public class Metadata {
-	@Schema(description = "The key of the metadata.", example = "key1")
+@Schema(description = "Represents a key-value pair of metadata.")
+public class KeyValues {
+	@Schema(description = "The key of the data", example = "key1")
 	private String key;
 	@ArraySchema(schema = @Schema(implementation = String.class))
 	private List<String> values;
 
-	public static Metadata create() {
-		return new Metadata();
+	public static KeyValues create() {
+		return new KeyValues();
 	}
 
 	public String getKey() {
@@ -24,7 +24,7 @@ public class Metadata {
 		this.key = key;
 	}
 
-	public Metadata withKey(final String key) {
+	public KeyValues withKey(final String key) {
 		this.key = key;
 		return this;
 	}
@@ -37,7 +37,7 @@ public class Metadata {
 		this.values = values;
 	}
 
-	public Metadata withValues(final List<String> values) {
+	public KeyValues withValues(final List<String> values) {
 		this.values = values;
 		return this;
 	}
@@ -46,7 +46,7 @@ public class Metadata {
 	public boolean equals(final Object o) {
 		if (o == null || getClass() != o.getClass())
 			return false;
-		final Metadata metaData = (Metadata) o;
+		final KeyValues metaData = (KeyValues) o;
 		return Objects.equals(key, metaData.key) && Objects.equals(values, metaData.values);
 	}
 
@@ -57,7 +57,7 @@ public class Metadata {
 
 	@Override
 	public String toString() {
-		return "Metadata{" +
+		return "KeyValues{" +
 			"key='" + key + '\'' +
 			", values=" + values +
 			'}';

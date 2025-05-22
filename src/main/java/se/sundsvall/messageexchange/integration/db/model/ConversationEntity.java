@@ -4,13 +4,13 @@ import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.FetchType.LAZY;
 
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.List;
@@ -18,7 +18,12 @@ import java.util.Objects;
 import org.hibernate.annotations.UuidGenerator;
 
 @Entity
-@Table(name = "conversation")
+@Table(name = "conversation",
+	indexes = {
+		@Index(name = "idx_conversation_municipality_id", columnList = "municipality_id"),
+		@Index(name = "idx_conversation_namespace", columnList = "namespace"),
+		@Index(name = "idx_conversation_namespace_municipality_id_id", columnList = "namespace,municipality_id,id")
+	})
 public class ConversationEntity {
 
 	@Id
@@ -26,8 +31,12 @@ public class ConversationEntity {
 	@Column(name = "id")
 	private String id;
 
-	@ElementCollection(fetch = EAGER)
-	@CollectionTable(name = "conversation_participants", joinColumns = @JoinColumn(name = "conversation_id", foreignKey = @ForeignKey(name = "fk_participants_conversation_id")))
+	@OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
+	@JoinTable(
+		name = "conversation_participants",
+		joinColumns = @JoinColumn(name = "conversation_id"),
+		inverseJoinColumns = @JoinColumn(name = "identifier_id"),
+		foreignKey = @ForeignKey(name = "fk_conversation_participants_conversation_id"))
 	private List<IdentifierEntity> participants;
 
 	@Column(name = "municipality_id")
@@ -36,17 +45,18 @@ public class ConversationEntity {
 	@Column(name = "namespace")
 	private String namespace;
 
-	@Column(name = "channel_id")
-	private String channelId;
+	@OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
+	@JoinColumn(name = "conversation_id", nullable = false, foreignKey = @ForeignKey(name = "fk_external_references_conversation_id"))
+	private List<ExternalReferencesEntity> externalReferences;
 
 	@OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
-	@JoinColumn(name = "conversation_id", nullable = false, foreignKey = @ForeignKey(name = "fk_meta_data_conversation_id"))
+	@JoinColumn(name = "conversation_id", nullable = false, foreignKey = @ForeignKey(name = "fk_metadata_conversation_id"))
 	private List<MetadataEntity> metadata;
 
 	@Column(name = "topic")
 	private String topic;
 
-	@OneToMany(mappedBy = "conversation", fetch = LAZY)
+	@OneToMany(mappedBy = "conversation", fetch = LAZY, cascade = ALL, orphanRemoval = true)
 	private List<MessageEntity> messages;
 
 	public static ConversationEntity create() {
@@ -105,16 +115,16 @@ public class ConversationEntity {
 		return this;
 	}
 
-	public String getChannelId() {
-		return channelId;
+	public List<ExternalReferencesEntity> getExternalReferences() {
+		return externalReferences;
 	}
 
-	public void setChannelId(final String channelId) {
-		this.channelId = channelId;
+	public void setExternalReferences(final List<ExternalReferencesEntity> externalReferences) {
+		this.externalReferences = externalReferences;
 	}
 
-	public ConversationEntity withChannelId(final String channelId) {
-		this.channelId = channelId;
+	public ConversationEntity withExternalReferences(final List<ExternalReferencesEntity> externalReferences) {
+		this.externalReferences = externalReferences;
 		return this;
 	}
 
@@ -163,12 +173,12 @@ public class ConversationEntity {
 			return false;
 		final ConversationEntity that = (ConversationEntity) o;
 		return Objects.equals(id, that.id) && Objects.equals(participants, that.participants) && Objects.equals(municipalityId, that.municipalityId) && Objects.equals(namespace, that.namespace)
-			&& Objects.equals(channelId, that.channelId) && Objects.equals(metadata, that.metadata) && Objects.equals(topic, that.topic) && Objects.equals(messages, that.messages);
+			&& Objects.equals(externalReferences, that.externalReferences) && Objects.equals(metadata, that.metadata) && Objects.equals(topic, that.topic) && Objects.equals(messages, that.messages);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, participants, municipalityId, namespace, channelId, metadata, topic, messages);
+		return Objects.hash(id, participants, municipalityId, namespace, externalReferences, metadata, topic, messages);
 	}
 
 	@Override
@@ -178,7 +188,7 @@ public class ConversationEntity {
 			", participants=" + participants +
 			", municipalityId='" + municipalityId + '\'' +
 			", namespace='" + namespace + '\'' +
-			", channelId='" + channelId + '\'' +
+			", externalReferences=" + externalReferences +
 			", metadata=" + metadata +
 			", topic='" + topic + '\'' +
 			", messages=" + messages +

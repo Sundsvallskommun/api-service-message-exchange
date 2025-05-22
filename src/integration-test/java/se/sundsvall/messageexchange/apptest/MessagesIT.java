@@ -17,9 +17,9 @@ import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
-import se.sundsvall.messageexchange.Application;
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
+import se.sundsvall.messageexchange.Application;
 
 @WireMockAppTestSuite(files = "classpath:/MessagesIT/", classes = Application.class)
 @Sql({
@@ -35,11 +35,13 @@ class MessagesIT extends AbstractAppTest {
 	private static final String CONVERSATION_ID = "c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5";
 	private static final String MESSAGE_ID = "d82bd8ac-1507-4d9a-958d-369261eecc15";
 	private static final String PATH = "/" + MUNICIPALITY_ID + "/" + NAMESPACE_1 + "/conversations/" + CONVERSATION_ID + "/messages";
+	private static final String SENT_BY_HEADER = "X-Sent-By";
 
 	@Test
 	void test01_findMessages() {
 		setupCall()
 			.withServicePath(PATH)
+			.withHeader(SENT_BY_HEADER, "joe01doe; type=adAccount")
 			.withHttpMethod(GET)
 			.withExpectedResponseStatus(OK)
 			.withExpectedResponseHeader(CONTENT_TYPE, List.of(APPLICATION_JSON_VALUE))
@@ -51,6 +53,7 @@ class MessagesIT extends AbstractAppTest {
 	void test02_createMessage() throws FileNotFoundException {
 		setupCall()
 			.withServicePath(PATH)
+			.withHeader(SENT_BY_HEADER, "joe01doe; type=adAccount")
 			.withHttpMethod(POST)
 			.withContentType(MULTIPART_FORM_DATA)
 			.withRequestFile("message", REQUEST_FILE)
@@ -63,6 +66,7 @@ class MessagesIT extends AbstractAppTest {
 	void test03_deleteMessage() {
 		setupCall()
 			.withServicePath(PATH + "/" + MESSAGE_ID)
+			.withHeader(SENT_BY_HEADER, "joe01doe; type=adAccount")
 			.withHttpMethod(DELETE)
 			.withExpectedResponseStatus(NO_CONTENT)
 			.sendRequestAndVerifyResponse();

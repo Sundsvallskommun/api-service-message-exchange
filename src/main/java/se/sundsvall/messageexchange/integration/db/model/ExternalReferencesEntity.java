@@ -13,8 +13,8 @@ import java.util.Objects;
 import org.hibernate.annotations.UuidGenerator;
 
 @Entity
-@Table(name = "conversation_metadata")
-public class MetadataEntity {
+@Table(name = "conversation_external_references")
+public class ExternalReferencesEntity {
 
 	@Id
 	@UuidGenerator
@@ -26,14 +26,14 @@ public class MetadataEntity {
 
 	@ElementCollection
 	@CollectionTable(
-		name = "conversation_metadata_values",
-		joinColumns = @JoinColumn(name = "conversation_metadata_id"),
-		foreignKey = @ForeignKey(name = "fk_metadata_values"))
-	@Column(name = "\"values\"")
+		name = "conversation_external_references_values",
+		joinColumns = @JoinColumn(name = "conversation_external_references_id"),
+		foreignKey = @ForeignKey(name = "fk_external_references_value"))
+	@Column(name = "value")
 	private List<String> values;
 
-	public static MetadataEntity create() {
-		return new MetadataEntity();
+	public static ExternalReferencesEntity create() {
+		return new ExternalReferencesEntity();
 	}
 
 	public String getId() {
@@ -44,7 +44,7 @@ public class MetadataEntity {
 		this.id = id;
 	}
 
-	public MetadataEntity withId(final String id) {
+	public ExternalReferencesEntity withId(final String id) {
 		this.id = id;
 		return this;
 	}
@@ -57,7 +57,7 @@ public class MetadataEntity {
 		this.key = key;
 	}
 
-	public MetadataEntity withKey(final String key) {
+	public ExternalReferencesEntity withKey(final String key) {
 		this.key = key;
 		return this;
 	}
@@ -70,7 +70,7 @@ public class MetadataEntity {
 		this.values = values;
 	}
 
-	public MetadataEntity withValues(final List<String> values) {
+	public ExternalReferencesEntity withValues(final List<String> values) {
 		this.values = values;
 		return this;
 	}
@@ -79,7 +79,7 @@ public class MetadataEntity {
 	public boolean equals(final Object o) {
 		if (o == null || getClass() != o.getClass())
 			return false;
-		final MetadataEntity that = (MetadataEntity) o;
+		final ExternalReferencesEntity that = (ExternalReferencesEntity) o;
 		return Objects.equals(id, that.id) && Objects.equals(key, that.key) && Objects.equals(values, that.values);
 	}
 
@@ -90,7 +90,7 @@ public class MetadataEntity {
 
 	@Override
 	public String toString() {
-		return "MetadataEntity{" +
+		return "ExternalReferencesEntity{" +
 			"id='" + id + '\'' +
 			", key='" + key + '\'' +
 			", values=" + values +

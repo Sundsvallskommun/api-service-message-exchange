@@ -32,8 +32,8 @@ class ConversationTest {
 		final var participants = List.of(Identifier.create());
 		final var municipalityId = "municipalityId";
 		final var namespace = "namespace";
-		final var channelId = "channelId";
-		final var metaData = List.of(Metadata.create());
+		final var metaData = List.of(KeyValues.create());
+		final var externalReferences = List.of(KeyValues.create());
 		final var topic = "topic";
 
 		// Act
@@ -42,8 +42,8 @@ class ConversationTest {
 			.withParticipants(participants)
 			.withMunicipalityId(municipalityId)
 			.withNamespace(namespace)
-			.withChannelId(channelId)
 			.withMetadata(metaData)
+			.withExternalReferences(externalReferences)
 			.withTopic(topic);
 		// Assert
 		assertThat(result).isNotNull().hasNoNullFieldsOrProperties();
@@ -51,8 +51,8 @@ class ConversationTest {
 		assertThat(result.getParticipants()).isEqualTo(participants);
 		assertThat(result.getMunicipalityId()).isEqualTo(municipalityId);
 		assertThat(result.getNamespace()).isEqualTo(namespace);
-		assertThat(result.getChannelId()).isEqualTo(channelId);
 		assertThat(result.getMetadata()).isEqualTo(metaData);
+		assertThat(result.getExternalReferences()).isEqualTo(externalReferences);
 		assertThat(result.getTopic()).isEqualTo(topic);
 
 	}
