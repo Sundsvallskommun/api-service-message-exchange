@@ -11,7 +11,7 @@ public class SequenceService {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	@Transactional
+	@Transactional(Transactional.TxType.REQUIRES_NEW)
 	public Long nextMessageSequence() {
 		return ((Number) entityManager
 			.createNativeQuery("SELECT NEXT VALUE FOR message_sequence_id_generator")

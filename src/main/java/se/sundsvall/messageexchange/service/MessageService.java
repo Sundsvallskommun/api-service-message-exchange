@@ -125,6 +125,7 @@ public class MessageService {
 	}
 
 	private boolean identifierNotPresent(final List<ReadByEntity> list) {
-		return list.stream().noneMatch(readByEntity -> readByEntity.getIdentifier().getValue().equals(Identifier.get().getValue()));
+		return list.stream().map(ReadByEntity::getIdentifier).noneMatch(identifier -> identifier.getType().equals(Identifier.get().getType().name()) &&
+			identifier.getValue().equals(Identifier.get().getValue()));
 	}
 }

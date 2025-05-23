@@ -88,7 +88,7 @@ class ConversationServiceTest {
 
 		// Assert
 		assertThat(result).isNotNull();
-		assertThat(result.getLatestSequenceNumber()).isZero();
+		assertThat(result.getLatestSequenceNumber()).isNull();
 		verify(messageRepositoryMock).findTopByConversationIdOrderBySequenceNumberDesc(conversationId);
 		verify(conversationRepositoryMock).findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId);
 	}

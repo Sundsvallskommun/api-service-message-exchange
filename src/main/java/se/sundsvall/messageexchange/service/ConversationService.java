@@ -47,7 +47,7 @@ public class ConversationService {
 		final var entity = findExistingConversation(municipalityId, namespace, conversationId);
 		final var latestSequence = messageRepository.findTopByConversationIdOrderBySequenceNumberDesc(conversationId);
 
-		return toConversation(entity).withLatestSequenceNumber(latestSequence.map(MessageEntity::getSequenceNumber).orElse(0L));
+		return toConversation(entity).withLatestSequenceNumber(latestSequence.map(MessageEntity::getSequenceNumber).orElse(null));
 	}
 
 	public String createConversation(final String namespace, final String municipalityId, final Conversation conversation) {

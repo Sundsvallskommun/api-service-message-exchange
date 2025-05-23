@@ -140,7 +140,7 @@ class MessageServiceTest {
 		final var conversationId = "conversationId";
 		final var pageable = PageRequest.of(0, 10);
 		final var conversationEntity = new ConversationEntity();
-		final var messageEntity = new MessageEntity().withReadBy(new ArrayList<>(List.of(ReadByEntity.create().withIdentifier(IdentifierEntity.create().withValue("ad012ad")))));
+		final var messageEntity = new MessageEntity().withReadBy(new ArrayList<>(List.of(ReadByEntity.create().withIdentifier(IdentifierEntity.create().withType(PARTY_ID.name()).withValue("ad012ad")))));
 		final var messagePage = new PageImpl<>(List.of(messageEntity), pageable, 1);
 
 		final var dept44Identifier = se.sundsvall.dept44.support.Identifier.create()
@@ -177,7 +177,7 @@ class MessageServiceTest {
 		final var conversationId = "conversationId";
 		final var pageable = PageRequest.of(0, 10);
 		final var conversationEntity = new ConversationEntity();
-		final var messageEntity = new MessageEntity().withReadBy(new ArrayList<>(List.of(ReadByEntity.create().withIdentifier(IdentifierEntity.create().withValue("value")))));
+		final var messageEntity = new MessageEntity().withReadBy(new ArrayList<>(List.of(ReadByEntity.create().withIdentifier(IdentifierEntity.create().withType(PARTY_ID.name()).withValue("value")))));
 		final var messagePage = new PageImpl<>(List.of(messageEntity), pageable, 1);
 
 		final var dept44Identifier = se.sundsvall.dept44.support.Identifier.create()
