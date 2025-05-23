@@ -1,5 +1,6 @@
 package se.sundsvall.messageexchange.service;
 
+import static java.util.Optional.ofNullable;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
@@ -27,6 +28,7 @@ import se.sundsvall.messageexchange.integration.db.MessageRepository;
 import se.sundsvall.messageexchange.integration.db.model.AttachmentEntity;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
+import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
 
 @Service
 public class MessageService {
@@ -35,23 +37,21 @@ public class MessageService {
 	private final ConversationRepository conversationRepository;
 	private final EntityManager entityManager;
 	private final AttachmentRepository attachmentRepository;
-	private final MessageSequenceGenerator messageSequenceGenerator;
+	private final SequenceService sequenceService;
 
-	public MessageService(final MessageRepository messageRepository, final ConversationRepository conversationRepository, final EntityManager entityManager, final AttachmentRepository attachmentRepository,
-		final MessageSequenceGenerator messageSequenceGenerator) {
+	public MessageService(final MessageRepository messageRepository, final ConversationRepository conversationRepository, final EntityManager entityManager, final AttachmentRepository attachmentRepository, final SequenceService sequenceService) {
 		this.messageRepository = messageRepository;
 		this.conversationRepository = conversationRepository;
 		this.entityManager = entityManager;
 		this.attachmentRepository = attachmentRepository;
-		this.messageSequenceGenerator = messageSequenceGenerator;
+		this.sequenceService = sequenceService;
 	}
 
 	public String createMessage(final String municipalityId, final String namespace, final String conversationId, final Message message, final List<MultipartFile> attachments) {
 
 		final var conversationEntity = findExistingConversation(municipalityId, namespace, conversationId);
-
 		final var entity = toMessageEntity(conversationEntity, message)
-			.withSequenceNumber(messageSequenceGenerator.generateSequence(namespace, municipalityId));
+			.withSequenceNumber(sequenceService.nextMessageSequence());
 		entity.setAttachments(AttachmentMapper.toAttachmentEntities(attachments, entityManager, entity));
 		return messageRepository.saveAndFlush(entity).getId();
 	}
@@ -99,24 +99,32 @@ public class MessageService {
 
 	}
 
-	private void updateReadBy(final Page<MessageEntity> matches) {
+	void updateReadBy(final Page<MessageEntity> matches) {
 		if (matches == null || matches.isEmpty()) {
 			return;
 		}
 
 		final var readByEntity = Mapper.toReadByEntity(Identifier.get());
 
-		if (readByEntity.getIdentifier() == null) {
+		if (readByEntity == null || readByEntity.getIdentifier() == null) {
 			throw new IllegalArgumentException("Identifier ID cannot be null");
 		}
 
-		for (final var message : matches) {
-			var readByList = message.getReadBy();
-			if (readByList == null) {
-				readByList = new ArrayList<>();
-				message.setReadBy(readByList);
-			}
-			readByList.add(readByEntity);
+		matches.stream().forEach(message -> message.setReadBy(updateReadBy(message, readByEntity)));
+	}
+
+	private List<ReadByEntity> updateReadBy(final MessageEntity message, final ReadByEntity readByEntity) {
+
+		final var list = ofNullable(message.getReadBy())
+			.orElseGet(ArrayList::new);
+
+		if (identifierNotPresent(list)) {
+			list.add(readByEntity);
 		}
+		return list;
+	}
+
+	private boolean identifierNotPresent(final List<ReadByEntity> list) {
+		return list.stream().noneMatch(readByEntity -> readByEntity.getIdentifier().getValue().equals(Identifier.get().getValue()));
 	}
 }

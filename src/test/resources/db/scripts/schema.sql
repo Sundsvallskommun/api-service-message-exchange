@@ -79,13 +79,6 @@
         primary key (id)
     ) engine=InnoDB;
 
-    create table message_sequence (
-        last_sequence_number bigint,
-        municipality_id varchar(255),
-        namespace varchar(255) not null,
-        primary key (namespace)
-    ) engine=InnoDB;
-
     create index idx_conversation_municipality_id 
        on conversation (municipality_id);
 
@@ -109,9 +102,6 @@
 
     alter table if exists message_read_by 
        add constraint UKjpqp7o76hskthbsgupe9xhjyg unique (identifier_id);
-
-    create index idx_message_sequence_namespace_municipality_id 
-       on message_sequence (namespace, municipality_id);
 
     alter table if exists attachment 
        add constraint fk_attachment_data_attachment 

@@ -26,7 +26,8 @@
 					]
 				}
 			],
-			"topic": "Topic 1"
+			"topic": "Topic 1",
+			"latestSequenceNumber": 2
 		}
 	],
 	"pageable": {
@@ -34,8 +35,8 @@
 		"pageSize": 20,
 		"sort": [],
 		"offset": 0,
-		"paged": true,
-		"unpaged": false
+		"unpaged": false,
+		"paged": true
 	},
 	"last": true,
 	"totalPages": 1,

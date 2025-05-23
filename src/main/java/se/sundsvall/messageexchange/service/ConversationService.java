@@ -16,35 +16,38 @@ import org.springframework.stereotype.Service;
 import org.zalando.problem.Problem;
 import se.sundsvall.messageexchange.api.model.Conversation;
 import se.sundsvall.messageexchange.integration.db.ConversationRepository;
-import se.sundsvall.messageexchange.integration.db.MessageSequenceRepository;
+import se.sundsvall.messageexchange.integration.db.MessageRepository;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
-import se.sundsvall.messageexchange.integration.db.model.MessageSequenceEntity;
+import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 
 @Service
 public class ConversationService {
 
 	private final ConversationRepository conversationRepository;
-	private final MessageSequenceRepository messageSequenceRepository;
+	private final MessageRepository messageRepository;
 
-	public ConversationService(final ConversationRepository conversationRepository, final MessageSequenceRepository messageSequenceRepository) {
+	public ConversationService(final ConversationRepository conversationRepository, final MessageRepository messageRepository) {
 		this.conversationRepository = conversationRepository;
-		this.messageSequenceRepository = messageSequenceRepository;
+		this.messageRepository = messageRepository;
 	}
 
 	public Page<Conversation> readConversations(final String namespace, final String municipalityId, final Specification<ConversationEntity> filter, final Pageable pageable) {
 
 		final var fullFilter = withNamespace(namespace).and(withMunicipalityId(municipalityId)).and(filter);
 		final var matches = conversationRepository.findAll(fullFilter, pageable);
+		final var conversations = toConversations(matches.getContent());
+		conversations.forEach(conversation -> messageRepository.findTopByConversationIdOrderBySequenceNumberDesc(conversation.getId())
+			.ifPresent(message -> conversation.setLatestSequenceNumber(message.getSequenceNumber())));
 
-		return new PageImpl<>(toConversations(matches.getContent()), pageable, matches.getTotalElements());
+		return new PageImpl<>(conversations, pageable, matches.getTotalElements());
 	}
 
 	public Conversation readConversation(final String namespace, final String municipalityId, final String conversationId) {
 
 		final var entity = findExistingConversation(municipalityId, namespace, conversationId);
-		final var latestSequence = messageSequenceRepository.findByNamespaceAndMunicipalityId(namespace, municipalityId);
+		final var latestSequence = messageRepository.findTopByConversationIdOrderBySequenceNumberDesc(conversationId);
 
-		return toConversation(entity).withLatestSequenceNumber(latestSequence.map(MessageSequenceEntity::getLastSequenceNumber).orElse(0L));
+		return toConversation(entity).withLatestSequenceNumber(latestSequence.map(MessageEntity::getSequenceNumber).orElse(0L));
 	}
 
 	public String createConversation(final String namespace, final String municipalityId, final Conversation conversation) {

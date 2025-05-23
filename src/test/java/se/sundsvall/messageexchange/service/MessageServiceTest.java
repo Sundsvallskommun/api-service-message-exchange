@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.zalando.problem.Status.NOT_FOUND;
+import static se.sundsvall.dept44.support.Identifier.Type.AD_ACCOUNT;
 import static se.sundsvall.dept44.support.Identifier.Type.PARTY_ID;
 
 import jakarta.servlet.ServletOutputStream;
@@ -21,17 +22,22 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.multipart.MultipartFile;
 import org.zalando.problem.Problem;
+import se.sundsvall.dept44.support.Identifier;
 import se.sundsvall.messageexchange.api.model.Message;
 import se.sundsvall.messageexchange.integration.db.AttachmentRepository;
 import se.sundsvall.messageexchange.integration.db.ConversationRepository;
@@ -39,13 +45,15 @@ import se.sundsvall.messageexchange.integration.db.MessageRepository;
 import se.sundsvall.messageexchange.integration.db.model.AttachmentDataEntity;
 import se.sundsvall.messageexchange.integration.db.model.AttachmentEntity;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
+import se.sundsvall.messageexchange.integration.db.model.IdentifierEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
+import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
 
 @ExtendWith(MockitoExtension.class)
 class MessageServiceTest {
 
 	@Mock
-	private MessageSequenceGenerator messageSequenceGeneratorMock;
+	private SequenceService sequenceService;
 
 	@Mock
 	private AttachmentEntity attachmentMock;
@@ -74,6 +82,9 @@ class MessageServiceTest {
 	@InjectMocks
 	private MessageService messageService;
 
+	@Captor
+	private ArgumentCaptor<Page<MessageEntity>> messageEntityCaptor;
+
 	@Test
 	void createMessage() {
 		// Arrange
@@ -90,14 +101,14 @@ class MessageServiceTest {
 			.thenReturn(Optional.of(conversationEntity));
 		when(messageRepositoryMock.saveAndFlush(any(MessageEntity.class))).thenReturn(messageEntity);
 
-		when(messageSequenceGeneratorMock.generateSequence(namespace, municipalityId)).thenReturn(1L);
+		when(sequenceService.nextMessageSequence()).thenReturn(1L);
 
 		// Act
 		final var result = messageService.createMessage(municipalityId, namespace, conversationId, messageRequest, attachments);
 
 		// Assert
 		assertThat(result).isEqualTo("newMessageId");
-		verify(messageSequenceGeneratorMock).generateSequence(namespace, municipalityId);
+		verify(sequenceService).nextMessageSequence();
 		verify(conversationRepositoryMock).findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId);
 		verify(messageRepositoryMock).saveAndFlush(any(MessageEntity.class));
 	}
@@ -129,7 +140,44 @@ class MessageServiceTest {
 		final var conversationId = "conversationId";
 		final var pageable = PageRequest.of(0, 10);
 		final var conversationEntity = new ConversationEntity();
-		final var messageEntity = new MessageEntity();
+		final var messageEntity = new MessageEntity().withReadBy(new ArrayList<>(List.of(ReadByEntity.create().withIdentifier(IdentifierEntity.create().withValue("ad012ad")))));
+		final var messagePage = new PageImpl<>(List.of(messageEntity), pageable, 1);
+
+		final var dept44Identifier = se.sundsvall.dept44.support.Identifier.create()
+			.withType(PARTY_ID)
+			.withValue("da012da");
+
+		try (final var mockedStatic = mockStatic(se.sundsvall.dept44.support.Identifier.class)) {
+			mockedStatic.when(se.sundsvall.dept44.support.Identifier::get).thenReturn(dept44Identifier);
+
+			when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
+				.thenReturn(Optional.of(conversationEntity));
+			when(messageRepositoryMock.findByConversation(conversationEntity, pageable)).thenReturn(messagePage);
+
+			// Act
+			final var result = messageService.getMessages(municipalityId, namespace, conversationId, pageable);
+
+			// Assert
+			assertThat(result).isNotNull();
+			assertThat(result.getContent()).hasSize(1);
+			assertThat(result.getContent().getFirst().getReadBy()).hasSize(1);
+			verify(conversationRepositoryMock).findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId);
+			verify(messageRepositoryMock).findByConversation(conversationEntity, pageable);
+			verify(messageRepositoryMock).saveAll(messageEntityCaptor.capture());
+			assertThat(messageEntityCaptor.getValue().getContent().getFirst().getReadBy()).hasSize(2);
+
+		}
+	}
+
+	@Test
+	void getMessagesAlreadyRead() {
+		// Arrange
+		final var municipalityId = "2281";
+		final var namespace = "namespace";
+		final var conversationId = "conversationId";
+		final var pageable = PageRequest.of(0, 10);
+		final var conversationEntity = new ConversationEntity();
+		final var messageEntity = new MessageEntity().withReadBy(new ArrayList<>(List.of(ReadByEntity.create().withIdentifier(IdentifierEntity.create().withValue("value")))));
 		final var messagePage = new PageImpl<>(List.of(messageEntity), pageable, 1);
 
 		final var dept44Identifier = se.sundsvall.dept44.support.Identifier.create()
@@ -149,8 +197,11 @@ class MessageServiceTest {
 			// Assert
 			assertThat(result).isNotNull();
 			assertThat(result.getContent()).hasSize(1);
+			assertThat(result.getContent().getFirst().getReadBy()).hasSize(1);
 			verify(conversationRepositoryMock).findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId);
 			verify(messageRepositoryMock).findByConversation(conversationEntity, pageable);
+			verify(messageRepositoryMock).saveAll(messageEntityCaptor.capture());
+			assertThat(messageEntityCaptor.getValue().getContent().getFirst().getReadBy()).hasSize(1);
 
 		}
 	}
@@ -291,6 +342,59 @@ class MessageServiceTest {
 		verify(httpServletResponseMock, never()).addHeader(eq(CONTENT_TYPE), anyString());
 		verify(httpServletResponseMock, never()).addHeader(eq(CONTENT_DISPOSITION), anyString());
 		verify(httpServletResponseMock, never()).setContentLength(anyInt());
+	}
+
+	@Test
+	void updateReadByAddsReadByEntity() {
+		// Arrange
+		final var identifier = Identifier.create().withValue("testIdentifier").withType(PARTY_ID);
+
+		final var messageEntity = new MessageEntity().withReadBy(new ArrayList<>(List.of(ReadByEntity.create().withIdentifier(IdentifierEntity.create().withType(AD_ACCOUNT.name()).withValue("existingIdentifier")))));
+		final var messagePage = new PageImpl<>(List.of(messageEntity));
+
+		try (final var mockedStatic = mockStatic(Identifier.class)) {
+			mockedStatic.when(Identifier::get).thenReturn(identifier);
+
+			// Act
+			messageService.updateReadBy(messagePage);
+
+			// Assert
+			assertThat(messageEntity.getReadBy()).isNotNull();
+			assertThat(messageEntity.getReadBy()).hasSize(2);
+			assertThat(messageEntity.getReadBy().getFirst().getIdentifier().getValue()).isEqualTo("existingIdentifier");
+			assertThat(messageEntity.getReadBy().getFirst().getIdentifier().getType()).isEqualTo(AD_ACCOUNT.name());
+			assertThat(messageEntity.getReadBy().getLast().getIdentifier().getValue()).isEqualTo("testIdentifier");
+			assertThat(messageEntity.getReadBy().getLast().getIdentifier().getType()).isEqualTo(PARTY_ID.name());
+		}
+	}
+
+	@Test
+	void updateReadByDoesNothingForEmptyPage() {
+		// Arrange
+		final var emptyPage = new PageImpl<MessageEntity>(List.of());
+
+		// Act
+		messageService.updateReadBy(emptyPage);
+
+		// Assert
+		// No exception should be thrown, and no changes should occur
+		assertThat(emptyPage.getContent()).isEmpty();
+	}
+
+	@Test
+	void updateReadByThrowsExceptionWhenIdentifierIsNull() {
+		// Arrange
+		final var messageEntity = new MessageEntity();
+		final var messagePage = new PageImpl<>(List.of(messageEntity));
+
+		try (final var mockedStatic = mockStatic(Identifier.class)) {
+			mockedStatic.when(Identifier::get).thenReturn(null);
+
+			// Act & Assert
+			assertThatThrownBy(() -> messageService.updateReadBy(messagePage))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("Identifier ID cannot be null");
+		}
 	}
 
 }

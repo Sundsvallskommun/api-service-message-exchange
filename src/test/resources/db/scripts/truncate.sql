@@ -11,6 +11,5 @@ truncate table conversation_participants;
 truncate table identifier;
 truncate table message;
 truncate table message_read_by;
-truncate table message_sequence;
 
 SET FOREIGN_KEY_CHECKS = 1;
