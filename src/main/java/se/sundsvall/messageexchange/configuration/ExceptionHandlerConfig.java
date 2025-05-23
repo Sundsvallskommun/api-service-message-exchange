@@ -22,6 +22,8 @@ public class ExceptionHandlerConfig {
 	private static final String LOG_MESSAGE = "Mapping exception into Problem";
 	private static final String TITLE = "Invalid Filter Content";
 
+	private ExceptionHandlerConfig() {}
+
 	@ControllerAdvice
 	public static class ControllerExceptionHandler {
 
