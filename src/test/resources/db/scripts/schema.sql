@@ -24,15 +24,15 @@
         primary key (id)
     ) engine=InnoDB;
 
-    create table conversation_external_references (
+    create table conversation_external_reference (
         conversation_id varchar(255) not null,
         id varchar(255) not null,
         `key` varchar(255),
         primary key (id)
     ) engine=InnoDB;
 
-    create table conversation_external_references_values (
-        conversation_external_references_id varchar(255) not null,
+    create table conversation_external_reference_values (
+        conversation_external_reference_id varchar(255) not null,
         value varchar(255)
     ) engine=InnoDB;
 
@@ -123,15 +123,15 @@
        foreign key (message_id) 
        references message (id);
 
-    alter table if exists conversation_external_references 
+    alter table if exists conversation_external_reference 
        add constraint fk_external_references_conversation_id 
        foreign key (conversation_id) 
        references conversation (id);
 
-    alter table if exists conversation_external_references_values 
-       add constraint fk_external_references_value 
-       foreign key (conversation_external_references_id) 
-       references conversation_external_references (id);
+    alter table if exists conversation_external_reference_values 
+       add constraint fk_external_reference_value 
+       foreign key (conversation_external_reference_id) 
+       references conversation_external_reference (id);
 
     alter table if exists conversation_metadata 
        add constraint fk_metadata_conversation_id 

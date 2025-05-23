@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "1.0"
 servers:
-  - url: http://localhost:60353
+  - url: http://localhost:64308
     description: Generated server url
 tags:
   - name: Message resource
@@ -34,7 +34,6 @@ paths:
           description: Namespace
           required: true
           schema:
-            pattern: "[\\w|\\-]+"
             type: string
           example: MY_NAMESPACE
         - name: filter
@@ -108,7 +107,6 @@ paths:
           description: Namespace
           required: true
           schema:
-            pattern: "[\\w|\\-]+"
             type: string
           example: MY_NAMESPACE
       requestBody:
@@ -142,14 +140,6 @@ paths:
       description: "Get messages (lazy load, pageable, sortable)"
       operationId: getMessages
       parameters:
-        - name: namespace
-          in: path
-          description: Namespace
-          required: true
-          schema:
-            pattern: "[\\w|\\-]+"
-            type: string
-          example: MY_NAMESPACE
         - name: municipalityId
           in: path
           description: Municipality ID
@@ -157,6 +147,13 @@ paths:
           schema:
             type: string
           example: 2281
+        - name: namespace
+          in: path
+          description: Namespace
+          required: true
+          schema:
+            type: string
+          example: MY_NAMESPACE
         - name: conversationId
           in: path
           description: Conversation ID
@@ -222,14 +219,6 @@ paths:
       description: Post a message with attachment
       operationId: postMessage
       parameters:
-        - name: namespace
-          in: path
-          description: Namespace
-          required: true
-          schema:
-            pattern: "[\\w|\\-]+"
-            type: string
-          example: MY_NAMESPACE
         - name: municipalityId
           in: path
           description: Municipality ID
@@ -237,6 +226,13 @@ paths:
           schema:
             type: string
           example: 2281
+        - name: namespace
+          in: path
+          description: Namespace
+          required: true
+          schema:
+            type: string
+          example: MY_NAMESPACE
         - name: conversationId
           in: path
           description: Conversation ID
@@ -303,7 +299,6 @@ paths:
           description: Namespace
           required: true
           schema:
-            pattern: "[\\w|\\-]+"
             type: string
           example: MY_NAMESPACE
         - name: conversationId
@@ -358,7 +353,6 @@ paths:
           description: Namespace
           required: true
           schema:
-            pattern: "[\\w|\\-]+"
             type: string
           example: MY_NAMESPACE
         - name: conversationId
@@ -409,7 +403,6 @@ paths:
           description: Namespace
           required: true
           schema:
-            pattern: "[\\w|\\-]+"
             type: string
           example: MY_NAMESPACE
         - name: conversationId
@@ -462,14 +455,6 @@ paths:
         attachment id
       operationId: readErrandAttachment
       parameters:
-        - name: namespace
-          in: path
-          description: Namespace
-          required: true
-          schema:
-            pattern: "[\\w|\\-]+"
-            type: string
-          example: MY_NAMESPACE
         - name: municipalityId
           in: path
           description: Municipality id
@@ -477,6 +462,13 @@ paths:
           schema:
             type: string
           example: 2281
+        - name: namespace
+          in: path
+          description: Namespace
+          required: true
+          schema:
+            type: string
+          example: MY_NAMESPACE
         - name: conversationId
           in: path
           description: Conversation ID
@@ -544,14 +536,6 @@ paths:
       description: Delete a message
       operationId: deleteMessage
       parameters:
-        - name: namespace
-          in: path
-          description: Namespace
-          required: true
-          schema:
-            pattern: "[\\w|\\-]+"
-            type: string
-          example: MY_NAMESPACE
         - name: municipalityId
           in: path
           description: Municipality ID
@@ -559,6 +543,13 @@ paths:
           schema:
             type: string
           example: 2281
+        - name: namespace
+          in: path
+          description: Namespace
+          required: true
+          schema:
+            type: string
+          example: MY_NAMESPACE
         - name: conversationId
           in: path
           description: Conversation ID
@@ -689,11 +680,11 @@ components:
     StatusType:
       type: object
       properties:
-        reasonPhrase:
-          type: string
         statusCode:
           type: integer
           format: int32
+        reasonPhrase:
+          type: string
     ConstraintViolationProblem:
       type: object
       properties:
@@ -924,22 +915,33 @@ components:
         readBy:
           type: array
           items:
-            $ref: "#/components/schemas/Identifier"
+            $ref: "#/components/schemas/ReadBy"
         attachments:
           type: array
           items:
             $ref: "#/components/schemas/Attachment"
       description: "Represents a message within a conversation, including metadata\
         \ and content."
+    ReadBy:
+      type: object
+      properties:
+        identifier:
+          $ref: "#/components/schemas/Identifier"
+        readAt:
+          type: string
+          description: The timestamp when the message was read.
+          format: date-time
+      description: "Represents a person who has read a message, including their identifier\
+        \ and the timestamp of when they read it."
     PageConversation:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         last:
@@ -956,11 +958,11 @@ components:
           format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         numberOfElements:
           type: integer
           format: int32
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
     PageableObject:
@@ -986,19 +988,19 @@ components:
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
     PageMessage:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         last:
@@ -1015,11 +1017,11 @@ components:
           format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         numberOfElements:
           type: integer
           format: int32
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
   securitySchemes: { }

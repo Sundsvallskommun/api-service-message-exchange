@@ -13,7 +13,7 @@ import java.util.Objects;
 import org.hibernate.annotations.UuidGenerator;
 
 @Entity
-@Table(name = "conversation_external_references")
+@Table(name = "conversation_external_reference")
 public class ExternalReferencesEntity {
 
 	@Id
@@ -26,9 +26,9 @@ public class ExternalReferencesEntity {
 
 	@ElementCollection
 	@CollectionTable(
-		name = "conversation_external_references_values",
-		joinColumns = @JoinColumn(name = "conversation_external_references_id"),
-		foreignKey = @ForeignKey(name = "fk_external_references_value"))
+		name = "conversation_external_reference_values",
+		joinColumns = @JoinColumn(name = "conversation_external_reference_id"),
+		foreignKey = @ForeignKey(name = "fk_external_reference_value"))
 	@Column(name = "value")
 	private List<String> values;
 

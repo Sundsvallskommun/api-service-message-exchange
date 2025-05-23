@@ -22,12 +22,12 @@ VALUES ('meta1', 'meta-value-1'),
        ('meta2', 'meta-value-2');
 
 -- Insert data into `conversation_external_references`
-INSERT INTO conversation_external_references (id, conversation_id, `key`)
+INSERT INTO conversation_external_reference (id, conversation_id, `key`)
 VALUES ('ext1', 'c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', 'external-key-1'),
        ('ext2', 'c2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', 'external-key-2');
 
 -- Insert data into `conversation_external_references_values`
-INSERT INTO conversation_external_references_values (conversation_external_references_id, value)
+INSERT INTO conversation_external_reference_values (conversation_external_reference_id, value)
 VALUES ('ext1', 'external-value-1'),
        ('ext2', 'external-value-2');
 

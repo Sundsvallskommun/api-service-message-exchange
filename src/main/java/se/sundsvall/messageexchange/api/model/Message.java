@@ -29,7 +29,7 @@ public class Message {
 	@Schema(description = "The content of the message.", example = "Hello, how can I help you?")
 	private String content;
 
-	@ArraySchema(schema = @Schema(implementation = Identifier.class, description = "The list of people who have read the message."))
+	@ArraySchema(schema = @Schema(implementation = ReadBy.class, description = "The list of people who have read the message."))
 	private List<ReadBy> readBy;
 
 	@ArraySchema(schema = @Schema(implementation = Attachment.class, description = "The list of attachments associated with the message."))
