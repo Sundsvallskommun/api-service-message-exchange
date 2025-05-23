@@ -3,8 +3,15 @@ package se.sundsvall.messageexchange.service;
 import static org.zalando.problem.Status.NOT_FOUND;
 import static se.sundsvall.messageexchange.service.Mapper.toConversation;
 import static se.sundsvall.messageexchange.service.Mapper.toConversationEntity;
+import static se.sundsvall.messageexchange.service.Mapper.toConversations;
 import static se.sundsvall.messageexchange.service.Mapper.updateConversationEntity;
+import static se.sundsvall.messageexchange.util.SpecificationBuilder.withMunicipalityId;
+import static se.sundsvall.messageexchange.util.SpecificationBuilder.withNamespace;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.zalando.problem.Problem;
 import se.sundsvall.messageexchange.api.model.Conversation;
@@ -22,6 +29,14 @@ public class ConversationService {
 	public ConversationService(final ConversationRepository conversationRepository, final MessageSequenceRepository messageSequenceRepository) {
 		this.conversationRepository = conversationRepository;
 		this.messageSequenceRepository = messageSequenceRepository;
+	}
+
+	public Page<Conversation> readConversations(final String namespace, final String municipalityId, final Specification<ConversationEntity> filter, final Pageable pageable) {
+
+		final var fullFilter = withNamespace(namespace).and(withMunicipalityId(municipalityId)).and(filter);
+		final var matches = conversationRepository.findAll(fullFilter, pageable);
+
+		return new PageImpl<>(toConversations(matches.getContent()), pageable, matches.getTotalElements());
 	}
 
 	public Conversation readConversation(final String namespace, final String municipalityId, final String conversationId) {

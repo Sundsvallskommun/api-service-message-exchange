@@ -1,12 +1,14 @@
 package se.sundsvall.messageexchange.api;
 
 import static java.util.UUID.randomUUID;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.zalando.problem.Status.BAD_REQUEST;
 import static org.zalando.problem.Status.NOT_FOUND;
 
 import java.util.Map;
@@ -59,6 +61,49 @@ class ConversationFailureTest {
 
 		verifyNoInteractions(conversationServiceMock);
 
+	}
+
+	@Test
+	void getConversationsWithInvalidMunicipalityId() {
+		webTestClient.get()
+			.uri(PATH, Map.of("municipalityId", "invalidMunicipalityId", "namespace", NAMESPACE))
+			.accept(APPLICATION_JSON)
+			.exchange()
+			.expectStatus().isBadRequest();
+
+		verifyNoInteractions(conversationServiceMock);
+	}
+
+	@Test
+	void getConversationsWithInvalidNamespace() {
+		webTestClient.get()
+			.uri(PATH, Map.of("municipalityId", MUNICIPALITY_ID, "namespace", "#invalidNamespace"))
+			.accept(APPLICATION_JSON)
+			.exchange()
+			.expectStatus().isBadRequest();
+
+		verifyNoInteractions(conversationServiceMock);
+
+	}
+
+	@Test
+	void getConversationsWithInvalidFilter() {
+		// Call
+		final var response = webTestClient.get()
+			.uri(builder -> builder.path(PATH).queryParam("filter", "topic:'My topic' and").build(Map.of("namespace", NAMESPACE, "municipalityId", MUNICIPALITY_ID)))
+			.exchange()
+			.expectStatus().isBadRequest()
+			.expectBody(Problem.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).isNotNull();
+		assertThat(response.getTitle()).isEqualTo("Invalid Filter Content");
+		assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+		assertThat(response.getDetail()).isEqualTo("mismatched input '<EOF>' expecting {PREFIX_OPERATOR, TRUE, FALSE, '(', '[', '`', ID, NUMBER, STRING}");
+
+		// Verification
+		verifyNoInteractions(conversationServiceMock);
 	}
 
 	@Test

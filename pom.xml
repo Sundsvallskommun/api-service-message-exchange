@@ -13,6 +13,7 @@
 	<version>1.0</version>
 	<name>api-service-message-exchange</name>
 	<properties>
+		<spring-filter.version>3.2.0</spring-filter.version>
 		<tika-core.version>3.1.0</tika-core.version>
 	</properties>
 	<dependencies>
@@ -41,6 +42,11 @@
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-mysql</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.turkraft.springfilter</groupId>
+			<artifactId>jpa</artifactId>
+			<version>${spring-filter.version}</version>
 		</dependency>
 		<dependency>
 			<!-- Necessary for the mime-type detection in ServiceUtil -->

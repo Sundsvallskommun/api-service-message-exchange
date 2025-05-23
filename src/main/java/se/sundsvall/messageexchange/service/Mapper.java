@@ -21,8 +21,6 @@ import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
 
 public final class Mapper {
 
-	private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(Mapper.class);
-
 	private Mapper() {
 		// Prevent instantiation
 	}
@@ -36,6 +34,14 @@ public final class Mapper {
 			.withMetadata(toMetadataEntities(conversation.getMetadata()))
 			.withExternalReferences(toExternalReferencesEntities(conversation.getExternalReferences()))
 			.withTopic(conversation.getTopic());
+	}
+
+	static List<Conversation> toConversations(final List<ConversationEntity> entities) {
+		return Optional.ofNullable(entities)
+			.orElse(emptyList())
+			.stream()
+			.map(Mapper::toConversation)
+			.toList();
 	}
 
 	static Conversation toConversation(final ConversationEntity entity) {

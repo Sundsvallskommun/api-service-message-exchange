@@ -27,6 +27,66 @@ import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
 class MapperTest {
 
 	@Test
+	void toConversations() {
+
+		// Arrange
+		final var id = "id";
+		final var municipalityId = "municipalityId";
+		final var namespace = "namespace";
+		final var topic = "topic";
+		final var key = "key";
+		final var value1 = "value1";
+		final var value2 = "value2";
+		final var type = "type";
+		final var value = "value";
+		final var externalReferenceId = "externalReferenceId";
+		final var externalReferenceType = "externalReferenceType";
+
+		final var entity = ConversationEntity.create()
+			.withId(id)
+			.withMunicipalityId(municipalityId)
+			.withNamespace(namespace)
+			.withTopic(topic)
+			.withParticipants(List.of(IdentifierEntity.create().withType(type).withValue(value)))
+			.withMetadata(List.of(MetadataEntity.create().withKey(key).withValues(List.of(value1, value2))))
+			.withExternalReferences(List.of(ExternalReferencesEntity.create().withKey(externalReferenceId).withValues(List.of(externalReferenceType))));
+
+		// Act
+		final var result = Mapper.toConversations(List.of(entity));
+
+		// Assert
+		assertThat(result).hasSize(1);
+		assertThat(result.getFirst()).isNotNull().hasNoNullFieldsOrPropertiesExcept("messages", "latestSequenceNumber");
+		assertThat(result.getFirst().getId()).isEqualTo(id);
+		assertThat(result.getFirst().getMunicipalityId()).isEqualTo(municipalityId);
+		assertThat(result.getFirst().getNamespace()).isEqualTo(namespace);
+		assertThat(result.getFirst().getTopic()).isEqualTo(topic);
+		assertThat(result.getFirst().getParticipants()).hasSize(1);
+		assertThat(result.getFirst().getMetadata()).hasSize(1);
+		assertThat(result.getFirst().getExternalReferences()).hasSize(1);
+		assertThat(result.getFirst().getExternalReferences().getFirst().getKey()).isEqualTo(externalReferenceId);
+		assertThat(result.getFirst().getExternalReferences().getFirst().getValues()).containsExactly(externalReferenceType);
+	}
+
+	@Test
+	void toConversationsEmpty() {
+		// Act
+		final var result = Mapper.toConversations(List.of());
+
+		// Assert
+		assertThat(result).isEmpty();
+	}
+
+	@Test
+	void toConversationsNull() {
+		// Act
+		final var result = Mapper.toConversations(null);
+
+		// Assert
+		assertThat(result).isEmpty();
+	}
+
+	@Test
 	void toConversationEntity() {
 		// Arrange
 		final var municipalityId = "municipalityId";

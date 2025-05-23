@@ -1,0 +1,49 @@
+{
+	"content": [
+		{
+			"id": "c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5",
+			"participants": [
+				{
+					"type": "user",
+					"value": "user3@example.com"
+				}
+			],
+			"municipalityId": "2281",
+			"namespace": "NAMESPACE-1",
+			"externalReferences": [
+				{
+					"key": "external-key-1",
+					"values": [
+						"external-value-1"
+					]
+				}
+			],
+			"metadata": [
+				{
+					"key": "meta-key-1",
+					"values": [
+						"meta-value-1"
+					]
+				}
+			],
+			"topic": "Topic 1"
+		}
+	],
+	"pageable": {
+		"pageNumber": 0,
+		"pageSize": 20,
+		"sort": [],
+		"offset": 0,
+		"paged": true,
+		"unpaged": false
+	},
+	"last": true,
+	"totalPages": 1,
+	"totalElements": 1,
+	"first": true,
+	"size": 20,
+	"number": 0,
+	"sort": [],
+	"numberOfElements": 1,
+	"empty": false
+}
