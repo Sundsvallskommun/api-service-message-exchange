@@ -23,7 +23,7 @@ public class Message {
 	@Schema(description = "The timestamp when the message was created.", example = "2023-01-01T12:00:00", accessMode = Schema.AccessMode.READ_ONLY)
 	private OffsetDateTime created;
 
-	@Schema(description = "The participant who created the message.", accessMode = Schema.AccessMode.READ_ONLY)
+	@Schema(description = "Identifier for the person that created the message", accessMode = Schema.AccessMode.READ_ONLY)
 	private Identifier createdBy;
 
 	@Schema(description = "The content of the message.", example = "Hello, how can I help you?")

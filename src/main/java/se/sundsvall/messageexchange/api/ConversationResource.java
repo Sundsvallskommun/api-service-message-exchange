@@ -54,7 +54,7 @@ class ConversationResource {
 	}
 
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
-	@Operation(description = "Get all conversations", responses = {
+	@Operation(description = "Get all conversations with or without filters. The resource allows the client a wide range of variations on how to filter the result.", responses = {
 		@ApiResponse(responseCode = "200", description = "OK - Successful operation", useReturnTypeSchema = true)
 	})
 	ResponseEntity<Page<Conversation>> getConversations(

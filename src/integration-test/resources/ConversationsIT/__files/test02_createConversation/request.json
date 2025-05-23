@@ -1,14 +1,21 @@
 {
 	"participants": [
 		{
-			"type": "string",
-			"value": "string"
+			"type": "user",
+			"value": "ad012ad"
 		}
 	],
-	"channelId": "[\"channel1-ref1-context1\",\"channel2-ref2-context2\"]",
-	"metaData": [
+	"externalReferences": [
 		{
-			"key": "string",
+			"key": "key1",
+			"values": [
+				"string"
+			]
+		}
+	],
+	"metadata": [
+		{
+			"key": "key1",
 			"values": [
 				"string"
 			]

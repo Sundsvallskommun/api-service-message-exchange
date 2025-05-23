@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "1.0"
 servers:
-  - url: http://localhost:64308
+  - url: http://localhost:51387
     description: Generated server url
 tags:
   - name: Message resource
@@ -19,7 +19,8 @@ paths:
     get:
       tags:
         - Conversation resource
-      description: Get all conversations
+      description: Get all conversations with or without filters. The resource allows
+        the client a wide range of variations on how to filter the result.
       operationId: getConversations
       parameters:
         - name: municipalityId
@@ -137,7 +138,7 @@ paths:
     get:
       tags:
         - Message resource
-      description: "Get messages (lazy load, pageable, sortable)"
+      description: "Get all messages for a conversation, paginated."
       operationId: getMessages
       parameters:
         - name: municipalityId
@@ -596,7 +597,7 @@ components:
           type: string
           description: The unique identifier of the conversation.
           readOnly: true
-          example: "1234567890"
+          example: 2af1002e-008f-4bdc-924b-daaae31f1118
         participants:
           type: array
           items:
@@ -605,7 +606,7 @@ components:
           type: string
           description: The identifier of the municipality associated with the conversation.
           readOnly: true
-          example: municipality-123
+          example: "2281"
         namespace:
           type: string
           description: The namespace of the conversation.
@@ -613,8 +614,6 @@ components:
           example: namespace-abc
         externalReferences:
           type: array
-          description: The ID of the channel used for the conversation.
-          example: 12345
           items:
             $ref: "#/components/schemas/KeyValues"
         metadata:

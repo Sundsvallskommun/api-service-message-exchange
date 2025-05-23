@@ -74,7 +74,7 @@ class MessageResource {
 	}
 
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
-	@Operation(description = "Get messages (lazy load, pageable, sortable)", responses = {
+	@Operation(description = "Get all messages for a conversation, paginated.", responses = {
 		@ApiResponse(responseCode = "200", description = "OK - Successful operation", useReturnTypeSchema = true)
 	})
 	ResponseEntity<Page<Message>> getMessages(

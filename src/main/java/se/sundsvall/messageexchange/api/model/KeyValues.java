@@ -9,7 +9,7 @@ import java.util.Objects;
 public class KeyValues {
 	@Schema(description = "The key of the data", example = "key1")
 	private String key;
-	@ArraySchema(schema = @Schema(implementation = String.class))
+	@ArraySchema(schema = @Schema(implementation = String.class, description = "The values associated with the key"))
 	private List<String> values;
 
 	public static KeyValues create() {
