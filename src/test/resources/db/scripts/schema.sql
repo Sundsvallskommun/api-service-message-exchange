@@ -96,7 +96,7 @@
        on conversation (namespace, municipality_id, id);
 
     alter table if exists conversation_participants 
-       add constraint UK1qmyen32rb1319xn0qgfk3myr unique (identifier_id);
+       add constraint uq_conversation_participants_identifier_id unique (identifier_id);
 
     create index idx_message_conversation_id 
        on message (conversation_id);
@@ -105,13 +105,13 @@
        on message (sequence_number);
 
     alter table if exists message 
-       add constraint UK1o61wwl07l6bjhh2n360sgppo unique (sequence_number);
+       add constraint uq_message_sequence_number unique (sequence_number);
 
     alter table if exists message 
-       add constraint UKc4ndh9kdooko8xlpu15c93viu unique (created_by);
+       add constraint uq_message_created_by unique (created_by);
 
     alter table if exists message_read_by 
-       add constraint UKjpqp7o76hskthbsgupe9xhjyg unique (identifier_id);
+       add constraint uq_message_read_by_identifier_id unique (identifier_id);
 
     alter table if exists attachment 
        add constraint fk_attachment_data_attachment 
@@ -144,7 +144,7 @@
        references conversation_metadata (id);
 
     alter table if exists conversation_participants 
-       add constraint FKmbt2l7fpaaev65p8pqesd3aja 
+       add constraint fk_conversation_participants_identifier_id 
        foreign key (identifier_id) 
        references identifier (id);
 

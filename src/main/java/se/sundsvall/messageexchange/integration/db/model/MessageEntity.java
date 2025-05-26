@@ -16,6 +16,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -28,6 +29,14 @@ import org.hibernate.annotations.UuidGenerator;
 	indexes = {
 		@Index(name = "idx_message_conversation_id", columnList = "conversation_id"),
 		@Index(name = "idx_message_sequence_number", columnList = "sequence_number")
+	},
+	uniqueConstraints = {
+		@UniqueConstraint(name = "uq_message_sequence_number", columnNames = {
+			"sequence_number"
+		}),
+		@UniqueConstraint(name = "uq_message_created_by", columnNames = {
+			"created_by"
+		})
 	})
 public class MessageEntity {
 

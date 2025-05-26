@@ -11,13 +11,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import org.hibernate.annotations.TimeZoneStorage;
 import org.hibernate.annotations.UuidGenerator;
 
 @Entity
-@Table(name = "message_read_by")
+@Table(name = "message_read_by",
+	uniqueConstraints = {
+		@UniqueConstraint(name = "uq_message_read_by_identifier_id", columnNames = {
+			"identifier_id"
+		})
+	})
 public class ReadByEntity {
 
 	@Id

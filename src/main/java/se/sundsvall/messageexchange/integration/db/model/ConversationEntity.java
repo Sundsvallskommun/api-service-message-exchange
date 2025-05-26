@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.util.List;
 import java.util.Objects;
 import org.hibernate.annotations.UuidGenerator;
@@ -34,9 +35,11 @@ public class ConversationEntity {
 	@OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
 	@JoinTable(
 		name = "conversation_participants",
-		joinColumns = @JoinColumn(name = "conversation_id"),
-		inverseJoinColumns = @JoinColumn(name = "identifier_id"),
-		foreignKey = @ForeignKey(name = "fk_conversation_participants_conversation_id"))
+		joinColumns = @JoinColumn(name = "conversation_id", foreignKey = @ForeignKey(name = "fk_conversation_participants_conversation_id")),
+		inverseJoinColumns = @JoinColumn(name = "identifier_id", foreignKey = @ForeignKey(name = "fk_conversation_participants_identifier_id")),
+		uniqueConstraints = @UniqueConstraint(name = "uq_conversation_participants_identifier_id", columnNames = {
+			"identifier_id"
+		}))
 	private List<IdentifierEntity> participants;
 
 	@Column(name = "municipality_id")
