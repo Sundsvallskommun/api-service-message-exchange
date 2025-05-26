@@ -41,7 +41,7 @@ class MessageEntityTest {
 
 		// Arrange
 		final var id = "id";
-		final var sequenceNumber = 1L;
+		final var sequenceNumber = SequenceEntity.create();
 		final var inReplyTo = "inReplyTo";
 		final var created = now();
 		final var createdBy = IdentifierEntity.create();

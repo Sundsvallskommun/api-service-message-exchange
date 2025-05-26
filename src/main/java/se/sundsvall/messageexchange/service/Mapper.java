@@ -18,6 +18,7 @@ import se.sundsvall.messageexchange.integration.db.model.IdentifierEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 import se.sundsvall.messageexchange.integration.db.model.MetadataEntity;
 import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
+import se.sundsvall.messageexchange.integration.db.model.SequenceEntity;
 
 public final class Mapper {
 
@@ -91,7 +92,7 @@ public final class Mapper {
 
 		return Message.create()
 			.withId(entity.getId())
-			.withSequenceNumber(entity.getSequenceNumber())
+			.withSequenceNumber(Optional.ofNullable(entity.getSequenceNumber()).map(SequenceEntity::getId).orElse(null))
 			.withInReplyToMessageId(entity.getInReplyToMessageId())
 			.withCreated(entity.getCreated())
 			.withCreatedBy(toIdentifier(entity.getCreatedBy()))

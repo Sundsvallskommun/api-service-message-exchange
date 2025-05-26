@@ -1,4 +1,6 @@
 
+    create sequence message_sequence_id_generator start with 1 increment by 1 nocache;
+
     create table attachment (
         file_size integer,
         created datetime(6),
@@ -62,7 +64,7 @@
 
     create table message (
         created datetime(6),
-        sequence_number bigint,
+        sequence_number bigint not null,
         conversation_id varchar(255) not null,
         created_by varchar(255),
         id varchar(255) not null,
@@ -76,6 +78,11 @@
         id varchar(255) not null,
         identifier_id varchar(255) not null,
         message_id varchar(255) not null,
+        primary key (id)
+    ) engine=InnoDB;
+
+    create table message_sequence (
+        id bigint not null,
         primary key (id)
     ) engine=InnoDB;
 
@@ -96,6 +103,9 @@
 
     create index idx_message_sequence_number 
        on message (sequence_number);
+
+    alter table if exists message 
+       add constraint UK1o61wwl07l6bjhh2n360sgppo unique (sequence_number);
 
     alter table if exists message 
        add constraint UKc4ndh9kdooko8xlpu15c93viu unique (created_by);
@@ -152,6 +162,11 @@
        add constraint fk_message_created_by 
        foreign key (created_by) 
        references identifier (id);
+
+    alter table if exists message 
+       add constraint fk_message_sequence_number 
+       foreign key (sequence_number) 
+       references message_sequence (id);
 
     alter table if exists message_read_by 
        add constraint fk_read_by_identifier_id 

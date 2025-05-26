@@ -29,6 +29,7 @@ import se.sundsvall.messageexchange.integration.db.model.AttachmentEntity;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
+import se.sundsvall.messageexchange.integration.db.model.SequenceEntity;
 
 @Service
 public class MessageService {
@@ -37,21 +38,19 @@ public class MessageService {
 	private final ConversationRepository conversationRepository;
 	private final EntityManager entityManager;
 	private final AttachmentRepository attachmentRepository;
-	private final SequenceService sequenceService;
 
-	public MessageService(final MessageRepository messageRepository, final ConversationRepository conversationRepository, final EntityManager entityManager, final AttachmentRepository attachmentRepository, final SequenceService sequenceService) {
+	public MessageService(final MessageRepository messageRepository, final ConversationRepository conversationRepository, final EntityManager entityManager, final AttachmentRepository attachmentRepository) {
 		this.messageRepository = messageRepository;
 		this.conversationRepository = conversationRepository;
 		this.entityManager = entityManager;
 		this.attachmentRepository = attachmentRepository;
-		this.sequenceService = sequenceService;
 	}
 
 	public String createMessage(final String municipalityId, final String namespace, final String conversationId, final Message message, final List<MultipartFile> attachments) {
 
 		final var conversationEntity = findExistingConversation(municipalityId, namespace, conversationId);
 		final var entity = toMessageEntity(conversationEntity, message)
-			.withSequenceNumber(sequenceService.nextMessageSequence());
+			.withSequenceNumber(new SequenceEntity());
 		entity.setAttachments(AttachmentMapper.toAttachmentEntities(attachments, entityManager, entity));
 		return messageRepository.saveAndFlush(entity).getId();
 	}

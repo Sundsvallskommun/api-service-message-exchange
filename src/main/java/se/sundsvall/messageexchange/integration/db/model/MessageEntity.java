@@ -36,8 +36,9 @@ public class MessageEntity {
 	@Column(name = "id")
 	private String id;
 
-	@Column(name = "sequence_number")
-	private Long sequenceNumber;
+	@OneToOne(fetch = EAGER, cascade = ALL, orphanRemoval = true)
+	@JoinColumn(name = "sequence_number", nullable = false, foreignKey = @ForeignKey(name = "fk_message_sequence_number"))
+	private SequenceEntity sequenceNumber;
 
 	@Column(name = "in_reply_to_message_id")
 	private String inReplyToMessageId;
@@ -85,15 +86,15 @@ public class MessageEntity {
 		return this;
 	}
 
-	public Long getSequenceNumber() {
+	public SequenceEntity getSequenceNumber() {
 		return sequenceNumber;
 	}
 
-	public void setSequenceNumber(final Long sequenceNumber) {
+	public void setSequenceNumber(final SequenceEntity sequenceNumber) {
 		this.sequenceNumber = sequenceNumber;
 	}
 
-	public MessageEntity withSequenceNumber(final Long sequenceNumber) {
+	public MessageEntity withSequenceNumber(final SequenceEntity sequenceNumber) {
 		this.sequenceNumber = sequenceNumber;
 		return this;
 	}

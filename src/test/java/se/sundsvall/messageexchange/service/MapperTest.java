@@ -22,6 +22,7 @@ import se.sundsvall.messageexchange.integration.db.model.IdentifierEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 import se.sundsvall.messageexchange.integration.db.model.MetadataEntity;
 import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
+import se.sundsvall.messageexchange.integration.db.model.SequenceEntity;
 
 @ExtendWith(MockitoExtension.class)
 class MapperTest {
@@ -195,7 +196,7 @@ class MapperTest {
 	void toMessages() {
 		// Arrange
 		final var id = "id";
-		final var sequenceNumber = 222L;
+		final var sequenceNumber = SequenceEntity.create().withId(222L);
 		final var inReplyTo = "inReplyTo";
 		final var createdByType = "type";
 		final var createdByValue = "value";
@@ -214,7 +215,7 @@ class MapperTest {
 		// Assert
 		assertThat(result).hasSize(1);
 		assertThat(result.getFirst().getId()).isEqualTo(id);
-		assertThat(result.getFirst().getSequenceNumber()).isEqualTo(sequenceNumber);
+		assertThat(result.getFirst().getSequenceNumber()).isEqualTo(sequenceNumber.getId());
 		assertThat(result.getFirst().getInReplyToMessageId()).isEqualTo(inReplyTo);
 		assertThat(result.getFirst().getCreatedBy().getType()).isEqualTo(createdByType);
 		assertThat(result.getFirst().getCreatedBy().getValue()).isEqualTo(createdByValue);
@@ -225,7 +226,7 @@ class MapperTest {
 	void toMessage() {
 		// Arrange
 		final var id = "id";
-		final var sequenceNumber = 222L;
+		final var sequenceNumber = SequenceEntity.create().withId(222L);
 		final var inReplyTo = "inReplyTo";
 		final var createdByType = "type";
 		final var createdByValue = "value";
@@ -244,7 +245,7 @@ class MapperTest {
 		// Assert
 		assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("created");
 		assertThat(result.getId()).isEqualTo(id);
-		assertThat(result.getSequenceNumber()).isEqualTo(sequenceNumber);
+		assertThat(result.getSequenceNumber()).isEqualTo(sequenceNumber.getId());
 		assertThat(result.getInReplyToMessageId()).isEqualTo(inReplyTo);
 		assertThat(result.getCreatedBy().getType()).isEqualTo(createdByType);
 		assertThat(result.getCreatedBy().getValue()).isEqualTo(createdByValue);

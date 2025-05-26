@@ -46,12 +46,19 @@ INSERT INTO conversation_participants (conversation_id, identifier_id)
 VALUES ('c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', 'user3'),
        ('c2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', 'user4');
 
+-- Insert data into `message_sequence`
+INSERT INTO message_sequence (id)
+VALUES (1),
+       (2);
+
+alter sequence message_sequence_id_generator restart with 3;
+
 -- Insert data into `message`
-INSERT INTO message (id, created, conversation_id, created_by, in_reply_to_message_id, sequence_number, content)
+INSERT INTO message (id, created, conversation_id, created_by, in_reply_to_message_id, content, sequence_number)
 VALUES ('d82bd8ac-1507-4d9a-958d-369261eecc15', '2023-01-01 10:00:00', 'c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', 'user1',
-        NULL, 1, 'Message 1 content'),
+        NULL, 'Message 1 content', 1),
        ('m2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', '2023-01-01 11:00:00', 'c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', 'user2',
-        'd82bd8ac-1507-4d9a-958d-369261eecc15', 2, 'Message 2 content');
+        'd82bd8ac-1507-4d9a-958d-369261eecc15', 'Message 2 content', 2);
 
 -- Insert data into `message_read_by`
 INSERT INTO message_read_by (id, read_at, identifier_id, message_id)

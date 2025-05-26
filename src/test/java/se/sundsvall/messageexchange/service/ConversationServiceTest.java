@@ -19,6 +19,7 @@ import se.sundsvall.messageexchange.integration.db.ConversationRepository;
 import se.sundsvall.messageexchange.integration.db.MessageRepository;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
+import se.sundsvall.messageexchange.integration.db.model.SequenceEntity;
 
 @ExtendWith(MockitoExtension.class)
 class ConversationServiceTest {
@@ -43,7 +44,7 @@ class ConversationServiceTest {
 		when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
 			.thenReturn(Optional.of(entity));
 		when(messageRepositoryMock.findTopByConversationIdOrderBySequenceNumberDesc(conversationId))
-			.thenReturn(Optional.ofNullable(MessageEntity.create().withSequenceNumber(123L)));
+			.thenReturn(Optional.ofNullable(MessageEntity.create().withSequenceNumber(SequenceEntity.create().withId(123L))));
 
 		// Act
 		final var result = conversationService.readConversation(namespace, municipalityId, conversationId);

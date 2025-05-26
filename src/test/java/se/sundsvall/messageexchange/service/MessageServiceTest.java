@@ -53,9 +53,6 @@ import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
 class MessageServiceTest {
 
 	@Mock
-	private SequenceService sequenceService;
-
-	@Mock
 	private AttachmentEntity attachmentMock;
 
 	@Mock
@@ -101,14 +98,11 @@ class MessageServiceTest {
 			.thenReturn(Optional.of(conversationEntity));
 		when(messageRepositoryMock.saveAndFlush(any(MessageEntity.class))).thenReturn(messageEntity);
 
-		when(sequenceService.nextMessageSequence()).thenReturn(1L);
-
 		// Act
 		final var result = messageService.createMessage(municipalityId, namespace, conversationId, messageRequest, attachments);
 
 		// Assert
 		assertThat(result).isEqualTo("newMessageId");
-		verify(sequenceService).nextMessageSequence();
 		verify(conversationRepositoryMock).findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId);
 		verify(messageRepositoryMock).saveAndFlush(any(MessageEntity.class));
 	}

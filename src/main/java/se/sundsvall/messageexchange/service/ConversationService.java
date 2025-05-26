@@ -19,6 +19,7 @@ import se.sundsvall.messageexchange.integration.db.ConversationRepository;
 import se.sundsvall.messageexchange.integration.db.MessageRepository;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
+import se.sundsvall.messageexchange.integration.db.model.SequenceEntity;
 
 @Service
 public class ConversationService {
@@ -37,7 +38,7 @@ public class ConversationService {
 		final var matches = conversationRepository.findAll(fullFilter, pageable);
 		final var conversations = toConversations(matches.getContent());
 		conversations.forEach(conversation -> messageRepository.findTopByConversationIdOrderBySequenceNumberDesc(conversation.getId())
-			.ifPresent(message -> conversation.setLatestSequenceNumber(message.getSequenceNumber())));
+			.ifPresent(message -> conversation.setLatestSequenceNumber(message.getSequenceNumber().getId())));
 
 		return new PageImpl<>(conversations, pageable, matches.getTotalElements());
 	}
@@ -47,7 +48,7 @@ public class ConversationService {
 		final var entity = findExistingConversation(municipalityId, namespace, conversationId);
 		final var latestSequence = messageRepository.findTopByConversationIdOrderBySequenceNumberDesc(conversationId);
 
-		return toConversation(entity).withLatestSequenceNumber(latestSequence.map(MessageEntity::getSequenceNumber).orElse(null));
+		return toConversation(entity).withLatestSequenceNumber(latestSequence.map(MessageEntity::getSequenceNumber).map(SequenceEntity::getId).orElse(null));
 	}
 
 	public String createConversation(final String namespace, final String municipalityId, final Conversation conversation) {
