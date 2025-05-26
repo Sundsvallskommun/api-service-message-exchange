@@ -10,4 +10,6 @@ openapi:
   version: '@project.version@'
 spring:
   application:
-    name: template
+    name: message-exchange
+  flyway:
+    enabled: false

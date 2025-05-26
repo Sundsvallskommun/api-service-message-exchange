@@ -1,0 +1,25 @@
+{
+	"participants": [
+		{
+			"type": "user",
+			"value": "ad012ad"
+		}
+	],
+	"externalReferences": [
+		{
+			"key": "key1",
+			"values": [
+				"string"
+			]
+		}
+	],
+	"metadata": [
+		{
+			"key": "key1",
+			"values": [
+				"string"
+			]
+		}
+	],
+	"topic": "Customer Support"
+}
