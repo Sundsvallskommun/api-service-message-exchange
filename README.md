@@ -1,6 +1,7 @@
 # MessageExchange
 
-_Under construction._
+_This service is dedicated to storing and retrieving internal messages securely. It enables authorized stakeholders to
+access relevant communications, serving as the central hub for internal interactions._
 
 ## Getting Started
 
@@ -8,9 +9,8 @@ _Under construction._
 
 - **Java 21 or higher**
 - **Maven**
-- **MariaDB**(if applicable)
+- **MariaDB**
 - **Git**
-- **[Dependent Microservices](#dependencies)** (if applicable)
 
 ### Installation
 
@@ -18,7 +18,7 @@ _Under construction._
 
    ```bash
    git clone https://github.com/Sundsvallskommun/api-service-message-exchange.git
-   cd api-service-conversations
+   cd api-service-message-exchange
    ```
 2. **Configure the application:**
 
@@ -38,17 +38,6 @@ _Under construction._
    mvn spring-boot:run
    ```
 
-## Dependencies
-
-This microservice depends on the following services:
-
-- **Service Name**
-  - **Purpose:** Brief description of what the dependent service does.
-  - **Repository:** [Link to the repository](https://github.com/Sundsvallskommun/service_name)
-  - **Setup Instructions:** Refer to its documentation for installation and configuration steps.
-
-Ensure that these services are running and properly configured before starting this microservice.
-
 ## API Documentation
 
 Access the API documentation via Swagger UI:
@@ -66,7 +55,7 @@ Refer to the [API Documentation](#api-documentation) for detailed information on
 ### Example Request
 
 ```bash
-curl -X GET http://localhost:8080/api/resource
+curl -X GET http://localhost:8080/2281/MY_NAMESPACE/conversations/b82bd8ac-1507-4d9a-958d-369261eecc15
 ```
 
 ## Configuration
