@@ -5,6 +5,7 @@ import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 import static org.zalando.problem.Status.NOT_FOUND;
+import static se.sundsvall.messageexchange.service.Mapper.toIdentifierEntity;
 import static se.sundsvall.messageexchange.service.Mapper.toMessageEntity;
 
 import jakarta.persistence.EntityManager;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +29,7 @@ import se.sundsvall.messageexchange.integration.db.ConversationRepository;
 import se.sundsvall.messageexchange.integration.db.MessageRepository;
 import se.sundsvall.messageexchange.integration.db.model.AttachmentEntity;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
+import se.sundsvall.messageexchange.integration.db.model.IdentifierEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
 import se.sundsvall.messageexchange.integration.db.model.SequenceEntity;
@@ -52,6 +55,16 @@ public class MessageService {
 		final var entity = toMessageEntity(conversationEntity, message)
 			.withSequenceNumber(new SequenceEntity());
 		entity.setAttachments(AttachmentMapper.toAttachmentEntities(attachments, entityManager, entity));
+
+		if (conversationEntity.getParticipants() == null) {
+			conversationEntity.setParticipants(new ArrayList<>());
+		}
+
+		if (Identifier.get() != null && identifierNotPresent(conversationEntity.getParticipants().stream())) {
+			conversationEntity.getParticipants().add(toIdentifierEntity(Identifier.get()));
+			conversationRepository.save(conversationEntity);
+		}
+
 		return messageRepository.saveAndFlush(entity).getId();
 	}
 
@@ -117,14 +130,14 @@ public class MessageService {
 		final var list = ofNullable(message.getReadBy())
 			.orElseGet(ArrayList::new);
 
-		if (identifierNotPresent(list)) {
+		if (identifierNotPresent(list.stream().map(ReadByEntity::getIdentifier))) {
 			list.add(readByEntity);
 		}
 		return list;
 	}
 
-	private boolean identifierNotPresent(final List<ReadByEntity> list) {
-		return list.stream().map(ReadByEntity::getIdentifier).noneMatch(identifier -> identifier.getType().equals(Identifier.get().getType().name()) &&
+	private boolean identifierNotPresent(final Stream<IdentifierEntity> identifierEntityStream) {
+		return identifierEntityStream.noneMatch(identifier -> identifier.getType().equals(Identifier.get().getType().name()) &&
 			identifier.getValue().equals(Identifier.get().getValue()));
 	}
 }
