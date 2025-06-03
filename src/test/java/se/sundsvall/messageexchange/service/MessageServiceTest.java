@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -82,6 +83,9 @@ class MessageServiceTest {
 	@Captor
 	private ArgumentCaptor<Page<MessageEntity>> messageEntityCaptor;
 
+	@Captor
+	private ArgumentCaptor<ConversationEntity> conversationEntityCaptor;
+
 	@Test
 	void createMessage() {
 		// Arrange
@@ -93,18 +97,28 @@ class MessageServiceTest {
 		final var messageEntity = new MessageEntity();
 		messageEntity.setId("newMessageId");
 		final var attachments = List.<MultipartFile>of();
+		final var dept44Identifier = se.sundsvall.dept44.support.Identifier.create()
+			.withType(PARTY_ID)
+			.withValue("da012da");
 
-		when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
-			.thenReturn(Optional.of(conversationEntity));
-		when(messageRepositoryMock.saveAndFlush(any(MessageEntity.class))).thenReturn(messageEntity);
+		try (final var mockedStatic = mockStatic(se.sundsvall.dept44.support.Identifier.class)) {
+			mockedStatic.when(se.sundsvall.dept44.support.Identifier::get).thenReturn(dept44Identifier);
+			when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
+				.thenReturn(Optional.of(conversationEntity));
+			when(messageRepositoryMock.saveAndFlush(any(MessageEntity.class))).thenReturn(messageEntity);
 
-		// Act
-		final var result = messageService.createMessage(municipalityId, namespace, conversationId, messageRequest, attachments);
+			// Act
+			final var result = messageService.createMessage(municipalityId, namespace, conversationId, messageRequest, attachments);
 
-		// Assert
-		assertThat(result).isEqualTo("newMessageId");
-		verify(conversationRepositoryMock).findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId);
-		verify(messageRepositoryMock).saveAndFlush(any(MessageEntity.class));
+			// Assert
+			assertThat(result).isEqualTo("newMessageId");
+			verify(conversationRepositoryMock).findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId);
+			verify(messageRepositoryMock).saveAndFlush(any(MessageEntity.class));
+			verify(conversationRepositoryMock).save(conversationEntityCaptor.capture());
+			assertThat(conversationEntityCaptor.getValue().getParticipants())
+				.hasSize(1).extracting(IdentifierEntity::getType, IdentifierEntity::getValue)
+				.containsExactly(Tuple.tuple(PARTY_ID.name(), "da012da"));
+		}
 	}
 
 	@Test
