@@ -7,6 +7,7 @@ import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.web.util.UriComponentsBuilder.fromPath;
+import static se.sundsvall.dept44.support.Identifier.HEADER_NAME;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,6 +61,9 @@ class MessageResource {
 		@ApiResponse(responseCode = "201", description = "Created - Successful operation", useReturnTypeSchema = true)
 	})
 	ResponseEntity<Void> postMessage(
+		@Parameter(name = HEADER_NAME,
+			description = "User ID of the request sender, used to log who sent the message. The value must follow the format: type=TYPE; VALUE. Valid types are 'adAccount' and 'partyId'.",
+			example = "type=adAccount; joe01doe") @RequestHeader(name = HEADER_NAME, required = false) final String senderId,
 		@PathVariable @ValidMunicipalityId @Parameter(name = "municipalityId", description = "Municipality ID", example = "2281") final String municipalityId,
 		@PathVariable @ValidNamespace @Parameter(name = "namespace", description = "Namespace", example = "MY_NAMESPACE") final String namespace,
 		@PathVariable @ValidUuid @Parameter(name = "conversationId", description = "Conversation ID", example = "b82bd8ac-1507-4d9a-958d-369261eecc15") final String conversationId,
@@ -78,6 +83,9 @@ class MessageResource {
 		@ApiResponse(responseCode = "200", description = "OK - Successful operation", useReturnTypeSchema = true)
 	})
 	ResponseEntity<Page<Message>> getMessages(
+		@Parameter(name = HEADER_NAME,
+			description = "User ID of the request sender, used to log who read the message. The value must follow the format: type=TYPE; VALUE. Valid types are 'adAccount' and 'partyId'.",
+			example = "type=adAccount; joe01doe") @RequestHeader(name = HEADER_NAME, required = false) final String senderId,
 		@PathVariable @ValidMunicipalityId @Parameter(name = "municipalityId", description = "Municipality ID", example = "2281") final String municipalityId,
 		@PathVariable @ValidNamespace @Parameter(name = "namespace", description = "Namespace", example = "MY_NAMESPACE") final String namespace,
 		@PathVariable @ValidUuid @Parameter(name = "conversationId", description = "Conversation ID", example = "b82bd8ac-1507-4d9a-958d-369261eecc15") final String conversationId,

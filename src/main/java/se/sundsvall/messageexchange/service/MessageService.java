@@ -118,11 +118,9 @@ public class MessageService {
 
 		final var readByEntity = Mapper.toReadByEntity(Identifier.get());
 
-		if (readByEntity == null || readByEntity.getIdentifier() == null) {
-			throw new IllegalArgumentException("Identifier ID cannot be null");
+		if (readByEntity != null && readByEntity.getIdentifier() != null) {
+			matches.stream().forEach(message -> message.setReadBy(updateReadBy(message, readByEntity)));
 		}
-
-		matches.stream().forEach(message -> message.setReadBy(updateReadBy(message, readByEntity)));
 	}
 
 	private List<ReadByEntity> updateReadBy(final MessageEntity message, final ReadByEntity readByEntity) {
