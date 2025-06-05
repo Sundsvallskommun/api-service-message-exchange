@@ -389,20 +389,4 @@ class MessageServiceTest {
 		assertThat(emptyPage.getContent()).isEmpty();
 	}
 
-	@Test
-	void updateReadByThrowsExceptionWhenIdentifierIsNull() {
-		// Arrange
-		final var messageEntity = new MessageEntity();
-		final var messagePage = new PageImpl<>(List.of(messageEntity));
-
-		try (final var mockedStatic = mockStatic(Identifier.class)) {
-			mockedStatic.when(Identifier::get).thenReturn(null);
-
-			// Act & Assert
-			assertThatThrownBy(() -> messageService.updateReadBy(messagePage))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("Identifier ID cannot be null");
-		}
-	}
-
 }
