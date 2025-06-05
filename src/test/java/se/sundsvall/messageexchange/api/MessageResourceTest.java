@@ -8,6 +8,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 import static org.springframework.http.MediaType.TEXT_PLAIN;
+import static se.sundsvall.dept44.support.Identifier.HEADER_NAME;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -55,6 +56,7 @@ class MessageResourceTest {
 		webTestClient.post()
 			.uri(PATH, Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID))
 			.contentType(MULTIPART_FORM_DATA)
+			.header(HEADER_NAME, "type=adAccount; joe01doe")
 			.body(BodyInserters.fromMultipartData(body))
 			.exchange()
 			.expectStatus().isCreated();
@@ -67,6 +69,7 @@ class MessageResourceTest {
 
 		webTestClient.get()
 			.uri(PATH, Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID))
+			.header(HEADER_NAME, "type=adAccount; joe01doe")
 			.accept(APPLICATION_JSON)
 			.exchange()
 			.expectStatus().isOk();

@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "1.0"
 servers:
-  - url: http://localhost:50672
+  - url: http://localhost:51964
     description: Generated server url
 tags:
   - name: Message resource
@@ -141,6 +141,16 @@ paths:
       description: "Get all messages for a conversation, paginated."
       operationId: getMessages
       parameters:
+        - name: X-Sent-By
+          in: header
+          description: "User ID of the request sender, used to log who read the message.\
+          \ The value must follow the format: type=TYPE; VALUE. Valid types are 'adAccount'\
+          \ and 'partyId'."
+          required: true
+          schema:
+            minLength: 1
+            type: string
+          example: type=adAccount; joe01doe
         - name: municipalityId
           in: path
           description: Municipality ID
@@ -220,6 +230,16 @@ paths:
       description: Post a message with attachment
       operationId: postMessage
       parameters:
+        - name: X-Sent-By
+          in: header
+          description: "User ID of the request sender, used to log who read the message.\
+          \ The value must follow the format: type=TYPE; VALUE. Valid types are 'adAccount'\
+          \ and 'partyId'."
+          required: true
+          schema:
+            minLength: 1
+            type: string
+          example: type=adAccount; joe01doe
         - name: municipalityId
           in: path
           description: Municipality ID
@@ -683,11 +703,11 @@ components:
     StatusType:
       type: object
       properties:
-        reasonPhrase:
-          type: string
         statusCode:
           type: integer
           format: int32
+        reasonPhrase:
+          type: string
     ConstraintViolationProblem:
       type: object
       properties:
@@ -939,12 +959,12 @@ components:
     PageConversation:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         last:
@@ -961,11 +981,11 @@ components:
           format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         numberOfElements:
           type: integer
           format: int32
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
     PageableObject:
@@ -998,12 +1018,12 @@ components:
     PageMessage:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         last:
@@ -1020,11 +1040,11 @@ components:
           format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         numberOfElements:
           type: integer
           format: int32
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
   securitySchemes: { }
