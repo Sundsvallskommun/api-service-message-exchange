@@ -1,13 +1,13 @@
 package se.sundsvall.messageexchange.integration.db.model;
 
 import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.FetchType.LAZY;
 import static java.time.OffsetDateTime.now;
 import static java.time.temporal.ChronoUnit.MILLIS;
 import static org.hibernate.annotations.TimeZoneStorageType.NORMALIZE;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -38,7 +38,7 @@ public class AttachmentEntity {
 	@Column(name = "file_size")
 	private int fileSize;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = ALL)
+	@ManyToOne(fetch = LAZY, cascade = ALL)
 	@JoinColumn(name = "attachment_data_id", nullable = false, foreignKey = @ForeignKey(name = "fk_attachment_data_attachment"))
 	private AttachmentDataEntity attachmentData;
 
@@ -46,7 +46,7 @@ public class AttachmentEntity {
 	@TimeZoneStorage(NORMALIZE)
 	private OffsetDateTime created;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "message_id", nullable = false, foreignKey = @ForeignKey(name = "fk_attachment_message"))
 	private MessageEntity messageEntity;
 
@@ -152,8 +152,9 @@ public class AttachmentEntity {
 
 	@Override
 	public boolean equals(final Object o) {
-		if (o == null || getClass() != o.getClass())
+		if (o == null || getClass() != o.getClass()) {
 			return false;
+		}
 		final AttachmentEntity that = (AttachmentEntity) o;
 		return Objects.equals(id, that.id) && Objects.equals(fileName, that.fileName) && Objects.equals(mimeType, that.mimeType) && Objects.equals(fileSize, that.fileSize) && Objects.equals(attachmentData,
 			that.attachmentData) && Objects.equals(created, that.created) && Objects.equals(messageEntity, that.messageEntity);

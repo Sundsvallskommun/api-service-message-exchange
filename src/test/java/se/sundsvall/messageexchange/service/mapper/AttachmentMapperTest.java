@@ -1,4 +1,4 @@
-package se.sundsvall.messageexchange.service;
+package se.sundsvall.messageexchange.service.mapper;
 
 import static java.time.OffsetDateTime.now;
 import static java.time.temporal.ChronoUnit.SECONDS;

@@ -5,8 +5,8 @@ import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 import static org.zalando.problem.Status.NOT_FOUND;
-import static se.sundsvall.messageexchange.service.Mapper.toIdentifierEntity;
-import static se.sundsvall.messageexchange.service.Mapper.toMessageEntity;
+import static se.sundsvall.messageexchange.service.mapper.Mapper.toIdentifierEntity;
+import static se.sundsvall.messageexchange.service.mapper.Mapper.toMessageEntity;
 
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,6 +33,8 @@ import se.sundsvall.messageexchange.integration.db.model.IdentifierEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
 import se.sundsvall.messageexchange.integration.db.model.SequenceEntity;
+import se.sundsvall.messageexchange.service.mapper.AttachmentMapper;
+import se.sundsvall.messageexchange.service.mapper.Mapper;
 
 @Service
 public class MessageService {
@@ -42,7 +44,12 @@ public class MessageService {
 	private final EntityManager entityManager;
 	private final AttachmentRepository attachmentRepository;
 
-	public MessageService(final MessageRepository messageRepository, final ConversationRepository conversationRepository, final EntityManager entityManager, final AttachmentRepository attachmentRepository) {
+	public MessageService(
+		final MessageRepository messageRepository,
+		final ConversationRepository conversationRepository,
+		final EntityManager entityManager,
+		final AttachmentRepository attachmentRepository) {
+
 		this.messageRepository = messageRepository;
 		this.conversationRepository = conversationRepository;
 		this.entityManager = entityManager;
@@ -85,7 +92,10 @@ public class MessageService {
 
 	public void readErrandAttachment(final String namespace, final String municipalityId, final String conversationId, final String messageId, final String attachmentId, final HttpServletResponse response) {
 		findExistingConversation(municipalityId, namespace, conversationId);
-		streamAttachmentData(attachmentRepository.findByIdAndMessageEntityId(attachmentId, messageId), response);
+		final var attachmentEntity = attachmentRepository.findByIdAndMessageEntityId(attachmentId, messageId)
+			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Attachment with ID:'%s' not found".formatted(attachmentId)));
+
+		streamAttachmentData(attachmentEntity, response);
 	}
 
 	void streamAttachmentData(final AttachmentEntity attachment, final HttpServletResponse response) {

@@ -8,6 +8,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -19,6 +20,9 @@ import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Table(name = "message_read_by",
+	indexes = {
+		@Index(name = "idx_message_read_by_message_id_identifier_id", columnList = "message_id, identifier_id")
+	},
 	uniqueConstraints = {
 		@UniqueConstraint(name = "uq_message_read_by_identifier_id", columnNames = {
 			"identifier_id"
@@ -85,8 +89,9 @@ public class ReadByEntity {
 	@Override
 	public boolean equals(final Object o) {
 
-		if (o == null || getClass() != o.getClass())
+		if (o == null || getClass() != o.getClass()) {
 			return false;
+		}
 		final ReadByEntity that = (ReadByEntity) o;
 		return Objects.equals(id, that.id) && Objects.equals(identifier, that.identifier) && Objects.equals(readAt, that.readAt);
 	}

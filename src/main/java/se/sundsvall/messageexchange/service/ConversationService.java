@@ -1,10 +1,10 @@
 package se.sundsvall.messageexchange.service;
 
 import static org.zalando.problem.Status.NOT_FOUND;
-import static se.sundsvall.messageexchange.service.Mapper.toConversation;
-import static se.sundsvall.messageexchange.service.Mapper.toConversationEntity;
-import static se.sundsvall.messageexchange.service.Mapper.toConversations;
-import static se.sundsvall.messageexchange.service.Mapper.updateConversationEntity;
+import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversation;
+import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversationEntity;
+import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversations;
+import static se.sundsvall.messageexchange.service.mapper.Mapper.updateConversationEntity;
 import static se.sundsvall.messageexchange.util.SpecificationBuilder.withMunicipalityId;
 import static se.sundsvall.messageexchange.util.SpecificationBuilder.withNamespace;
 
@@ -76,5 +76,4 @@ public class ConversationService {
 		return conversationRepository.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId)
 			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Conversation with id %s not found".formatted(conversationId)));
 	}
-
 }

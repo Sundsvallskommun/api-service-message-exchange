@@ -21,9 +21,8 @@ import org.hibernate.annotations.UuidGenerator;
 @Entity
 @Table(name = "conversation",
 	indexes = {
-		@Index(name = "idx_conversation_municipality_id", columnList = "municipality_id"),
-		@Index(name = "idx_conversation_namespace", columnList = "namespace"),
-		@Index(name = "idx_conversation_namespace_municipality_id_id", columnList = "namespace,municipality_id,id")
+		@Index(name = "idx_conversation_topic", columnList = "topic"),
+		@Index(name = "idx_conversation_namespace_municipality_id_id", columnList = "namespace, municipality_id, id")
 	})
 public class ConversationEntity {
 
@@ -172,8 +171,9 @@ public class ConversationEntity {
 
 	@Override
 	public boolean equals(final Object o) {
-		if (o == null || getClass() != o.getClass())
+		if (o == null || getClass() != o.getClass()) {
 			return false;
+		}
 		final ConversationEntity that = (ConversationEntity) o;
 		return Objects.equals(id, that.id) && Objects.equals(participants, that.participants) && Objects.equals(municipalityId, that.municipalityId) && Objects.equals(namespace, that.namespace)
 			&& Objects.equals(externalReferences, that.externalReferences) && Objects.equals(metadata, that.metadata) && Objects.equals(topic, that.topic) && Objects.equals(messages, that.messages);

@@ -10,6 +10,4 @@ import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
 public interface ConversationRepository extends JpaRepository<ConversationEntity, String>, JpaSpecificationExecutor<ConversationEntity> {
 
 	Optional<ConversationEntity> findByNamespaceAndMunicipalityIdAndId(String namespace, String municipalityId, String id);
-
-	boolean existsByNamespaceAndMunicipalityIdAndId(String namespace, String municipalityId, String id);
 }

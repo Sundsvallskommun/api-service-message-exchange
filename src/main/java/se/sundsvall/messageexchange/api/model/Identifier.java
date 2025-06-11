@@ -7,9 +7,11 @@ import java.util.Objects;
 
 @Schema(description = "Represents a participant in a conversation, including their type and value.")
 public class Identifier {
+
 	@Schema(description = "The type of the participant, e.g., adAccount or partyId", example = "user")
 	@Pattern(regexp = "^(adAccount|partyId)$", message = "Type must be 'adAccount' or 'partyId'")
 	private String type;
+
 	@NotBlank
 	@Schema(description = "The unique identifier or value of the participant.", example = "ad012ad")
 	private String value;
@@ -46,8 +48,9 @@ public class Identifier {
 
 	@Override
 	public boolean equals(final Object o) {
-		if (o == null || getClass() != o.getClass())
+		if (o == null || getClass() != o.getClass()) {
 			return false;
+		}
 		final Identifier that = (Identifier) o;
 		return Objects.equals(type, that.type) && Objects.equals(value, that.value);
 	}
