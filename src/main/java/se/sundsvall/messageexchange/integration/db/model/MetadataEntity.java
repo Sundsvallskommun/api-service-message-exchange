@@ -6,6 +6,7 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import java.util.List;
@@ -13,7 +14,10 @@ import java.util.Objects;
 import org.hibernate.annotations.UuidGenerator;
 
 @Entity
-@Table(name = "conversation_metadata")
+@Table(name = "conversation_metadata",
+	indexes = {
+		@Index(name = "idx_conversation_metadata_id", columnList = "conversation_id, `key`")
+	})
 public class MetadataEntity {
 
 	@Id
@@ -77,8 +81,9 @@ public class MetadataEntity {
 
 	@Override
 	public boolean equals(final Object o) {
-		if (o == null || getClass() != o.getClass())
+		if (o == null || getClass() != o.getClass()) {
 			return false;
+		}
 		final MetadataEntity that = (MetadataEntity) o;
 		return Objects.equals(id, that.id) && Objects.equals(key, that.key) && Objects.equals(values, that.values);
 	}

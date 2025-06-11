@@ -7,8 +7,10 @@ import java.util.Objects;
 
 @Schema(description = "Represents a key-value pair of metadata.")
 public class KeyValues {
+
 	@Schema(description = "The key of the data", example = "key1")
 	private String key;
+
 	@ArraySchema(schema = @Schema(implementation = String.class, description = "The values associated with the key"))
 	private List<String> values;
 
@@ -44,8 +46,9 @@ public class KeyValues {
 
 	@Override
 	public boolean equals(final Object o) {
-		if (o == null || getClass() != o.getClass())
+		if (o == null || getClass() != o.getClass()) {
 			return false;
+		}
 		final KeyValues metaData = (KeyValues) o;
 		return Objects.equals(key, metaData.key) && Objects.equals(values, metaData.values);
 	}

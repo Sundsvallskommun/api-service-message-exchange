@@ -293,7 +293,7 @@ class MessageServiceTest {
 			.thenReturn(Optional.of(conversationEntity));
 		when(httpServletResponseMock.getOutputStream()).thenReturn(servletOutputStreamMock);
 		when(blobMock.getBinaryStream()).thenReturn(inputStream);
-		when(attachmentRepositoryMock.findByIdAndMessageEntityId(attachmentId, messageId)).thenReturn(attachmentEntity);
+		when(attachmentRepositoryMock.findByIdAndMessageEntityId(attachmentId, messageId)).thenReturn(Optional.of(attachmentEntity));
 
 		// Act
 		messageService.readErrandAttachment(namespace, municipalityId, conversationId, messageId, attachmentId, httpServletResponseMock);

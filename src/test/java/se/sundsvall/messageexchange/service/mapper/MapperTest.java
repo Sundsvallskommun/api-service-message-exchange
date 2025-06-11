@@ -1,4 +1,4 @@
-package se.sundsvall.messageexchange.service;
+package se.sundsvall.messageexchange.service.mapper;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;

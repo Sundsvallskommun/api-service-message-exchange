@@ -28,7 +28,9 @@ import org.hibernate.annotations.UuidGenerator;
 @Table(name = "message",
 	indexes = {
 		@Index(name = "idx_message_conversation_id", columnList = "conversation_id"),
-		@Index(name = "idx_message_sequence_number", columnList = "sequence_number")
+		@Index(name = "idx_message_conversation_id_created", columnList = "conversation_id, created"),
+		@Index(name = "idx_message_conversation_id_sequence_number", columnList = "conversation_id, sequence_number"),
+		@Index(name = "idx_message_in_reply_to_message_id", columnList = "in_reply_to_message_id")
 	},
 	uniqueConstraints = {
 		@UniqueConstraint(name = "uq_message_sequence_number", columnNames = {
@@ -201,8 +203,9 @@ public class MessageEntity {
 
 	@Override
 	public boolean equals(final Object o) {
-		if (o == null || getClass() != o.getClass())
+		if (o == null || getClass() != o.getClass()) {
 			return false;
+		}
 		final MessageEntity that = (MessageEntity) o;
 		return Objects.equals(id, that.id) && Objects.equals(sequenceNumber, that.sequenceNumber) && Objects.equals(inReplyToMessageId, that.inReplyToMessageId) && Objects.equals(created, that.created) && Objects.equals(
 			createdBy, that.createdBy) && Objects.equals(content, that.content) && Objects.equals(readBy, that.readBy) && Objects.equals(conversation, that.conversation) && Objects.equals(attachments, that.attachments);

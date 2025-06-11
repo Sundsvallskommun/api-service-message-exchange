@@ -9,6 +9,7 @@ public class ReadBy {
 
 	@Schema(description = "The identifier of the person who read the message.", example = "ad012ad")
 	private Identifier identifier;
+
 	@Schema(description = "The timestamp when the message was read.", example = "2023-01-01T12:00:00")
 	private OffsetDateTime readAt;
 
@@ -44,8 +45,9 @@ public class ReadBy {
 
 	@Override
 	public boolean equals(final Object o) {
-		if (o == null || getClass() != o.getClass())
+		if (o == null || getClass() != o.getClass()) {
 			return false;
+		}
 		final ReadBy readBy = (ReadBy) o;
 		return Objects.equals(identifier, readBy.identifier) && Objects.equals(readAt, readBy.readAt);
 	}

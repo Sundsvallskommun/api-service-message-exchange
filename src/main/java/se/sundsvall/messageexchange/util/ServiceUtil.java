@@ -28,5 +28,4 @@ public final class ServiceUtil {
 			return APPLICATION_OCTET_STREAM_VALUE; // Return mime type for arbitrary binary files
 		}
 	}
-
 }

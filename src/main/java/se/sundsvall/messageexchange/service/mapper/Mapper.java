@@ -1,4 +1,4 @@
-package se.sundsvall.messageexchange.service;
+package se.sundsvall.messageexchange.service.mapper;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -26,8 +26,7 @@ public final class Mapper {
 		// Prevent instantiation
 	}
 
-	static ConversationEntity toConversationEntity(final String municipalityId, final String namespace, final Conversation conversation) {
-
+	public static ConversationEntity toConversationEntity(final String municipalityId, final String namespace, final Conversation conversation) {
 		return ConversationEntity.create()
 			.withParticipants(toIdentifierEntities(conversation.getParticipants()))
 			.withMunicipalityId(municipalityId)
@@ -37,7 +36,7 @@ public final class Mapper {
 			.withTopic(conversation.getTopic());
 	}
 
-	static List<Conversation> toConversations(final List<ConversationEntity> entities) {
+	public static List<Conversation> toConversations(final List<ConversationEntity> entities) {
 		return Optional.ofNullable(entities)
 			.orElse(emptyList())
 			.stream()
@@ -45,8 +44,7 @@ public final class Mapper {
 			.toList();
 	}
 
-	static Conversation toConversation(final ConversationEntity entity) {
-
+	public static Conversation toConversation(final ConversationEntity entity) {
 		return Conversation.create()
 			.withId(entity.getId())
 			.withParticipants(toIdentifiers(entity.getParticipants()))
@@ -57,7 +55,7 @@ public final class Mapper {
 			.withTopic(entity.getTopic());
 	}
 
-	static ConversationEntity updateConversationEntity(final ConversationEntity entity, final Conversation conversation) {
+	public static ConversationEntity updateConversationEntity(final ConversationEntity entity, final Conversation conversation) {
 
 		Optional.ofNullable(conversation.getTopic()).ifPresent(entity::setTopic);
 		Optional.ofNullable(conversation.getParticipants()).ifPresent(participants -> updateParticipants(entity, participants));
@@ -82,13 +80,13 @@ public final class Mapper {
 		entity.getMetadata().addAll(toMetadataEntities(metadata));
 	}
 
-	static List<Message> toMessages(final List<MessageEntity> entities) {
+	public static List<Message> toMessages(final List<MessageEntity> entities) {
 		return entities.stream()
 			.map(Mapper::toMessage)
 			.toList();
 	}
 
-	static Message toMessage(final MessageEntity entity) {
+	public static Message toMessage(final MessageEntity entity) {
 
 		return Message.create()
 			.withId(entity.getId())
@@ -101,7 +99,7 @@ public final class Mapper {
 			.withAttachments(AttachmentMapper.toAttachments(entity.getAttachments()));
 	}
 
-	static MessageEntity toMessageEntity(final ConversationEntity entity, final Message message) {
+	public static MessageEntity toMessageEntity(final ConversationEntity entity, final Message message) {
 
 		final var identifier = se.sundsvall.dept44.support.Identifier.get();
 
@@ -113,14 +111,14 @@ public final class Mapper {
 			.withConversation(entity);
 	}
 
-	static List<Identifier> toIdentifiers(final List<IdentifierEntity> entities) {
+	public static List<Identifier> toIdentifiers(final List<IdentifierEntity> entities) {
 		return Optional.ofNullable(entities)
 			.orElse(emptyList()).stream()
 			.map(Mapper::toIdentifier)
 			.toList();
 	}
 
-	static Identifier toIdentifier(final IdentifierEntity entity) {
+	public static Identifier toIdentifier(final IdentifierEntity entity) {
 		return Optional.ofNullable(entity)
 			.map(p -> Identifier.create()
 				.withType(p.getType())
@@ -128,14 +126,14 @@ public final class Mapper {
 			.orElse(null);
 	}
 
-	static List<IdentifierEntity> toIdentifierEntities(final List<Identifier> identifiers) {
+	public static List<IdentifierEntity> toIdentifierEntities(final List<Identifier> identifiers) {
 		return Optional.ofNullable(identifiers)
 			.orElse(emptyList()).stream()
 			.map(Mapper::toIdentifierEntity)
 			.toList();
 	}
 
-	static IdentifierEntity toIdentifierEntity(final Identifier identifier) {
+	public static IdentifierEntity toIdentifierEntity(final Identifier identifier) {
 		return Optional.ofNullable(identifier)
 			.map(p -> IdentifierEntity.create()
 				.withType(p.getType())
@@ -143,38 +141,38 @@ public final class Mapper {
 			.orElse(null);
 	}
 
-	static KeyValues toMetadata(final MetadataEntity entity) {
+	public static KeyValues toMetadata(final MetadataEntity entity) {
 		return KeyValues.create()
 			.withKey(entity.getKey())
 			.withValues(entity.getValues());
 	}
 
-	static List<KeyValues> toMetadata(final List<MetadataEntity> entities) {
+	public static List<KeyValues> toMetadata(final List<MetadataEntity> entities) {
 		return Optional.ofNullable(entities)
 			.orElse(emptyList()).stream()
 			.map(Mapper::toMetadata)
 			.toList();
 	}
 
-	static MetadataEntity toMetadataEntity(final KeyValues keyValues) {
+	public static MetadataEntity toMetadataEntity(final KeyValues keyValues) {
 		return MetadataEntity.create()
 			.withKey(keyValues.getKey())
 			.withValues(keyValues.getValues());
 	}
 
-	static List<MetadataEntity> toMetadataEntities(final List<KeyValues> metadata) {
+	public static List<MetadataEntity> toMetadataEntities(final List<KeyValues> metadata) {
 		return Optional.ofNullable(metadata).orElse(emptyList()).stream()
 			.map(Mapper::toMetadataEntity)
 			.toList();
 	}
 
-	static List<ReadByEntity> toReadByEntities(final se.sundsvall.dept44.support.Identifier identifier) {
+	public static List<ReadByEntity> toReadByEntities(final se.sundsvall.dept44.support.Identifier identifier) {
 		return Optional.ofNullable(identifier)
 			.map(entity -> List.of(toReadByEntity(entity)))
 			.orElse(null);
 	}
 
-	static ReadByEntity toReadByEntity(final se.sundsvall.dept44.support.Identifier identifier) {
+	public static ReadByEntity toReadByEntity(final se.sundsvall.dept44.support.Identifier identifier) {
 		return Optional.ofNullable(identifier)
 			.map(p -> ReadByEntity.create()
 				.withIdentifier(toIdentifierEntity(identifier))
@@ -182,7 +180,7 @@ public final class Mapper {
 			.orElse(null);
 	}
 
-	static IdentifierEntity toIdentifierEntity(final se.sundsvall.dept44.support.Identifier identifier) {
+	public static IdentifierEntity toIdentifierEntity(final se.sundsvall.dept44.support.Identifier identifier) {
 
 		return Optional.ofNullable(identifier)
 			.map(p -> IdentifierEntity.create()
@@ -191,7 +189,7 @@ public final class Mapper {
 			.orElse(null);
 	}
 
-	static List<ReadByEntity> toReadByEntities(final List<ReadBy> readBy) {
+	public static List<ReadByEntity> toReadByEntities(final List<ReadBy> readBy) {
 
 		return Optional.ofNullable(readBy)
 			.orElse(emptyList()).stream()
@@ -199,7 +197,7 @@ public final class Mapper {
 			.toList();
 	}
 
-	static ReadByEntity toReadByEntity(final ReadBy readBy) {
+	public static ReadByEntity toReadByEntity(final ReadBy readBy) {
 
 		return Optional.ofNullable(readBy)
 			.map(r -> ReadByEntity.create()
@@ -208,14 +206,14 @@ public final class Mapper {
 			.orElse(null);
 	}
 
-	static List<ReadBy> toReadByList(final List<ReadByEntity> readBy) {
+	public static List<ReadBy> toReadByList(final List<ReadByEntity> readBy) {
 		return Optional.ofNullable(readBy)
 			.orElse(emptyList()).stream()
 			.map(Mapper::toReadBy)
 			.toList();
 	}
 
-	static ReadBy toReadBy(final ReadByEntity entity) {
+	public static ReadBy toReadBy(final ReadByEntity entity) {
 
 		return Optional.ofNullable(entity)
 			.map(e -> ReadBy.create()
@@ -224,14 +222,14 @@ public final class Mapper {
 			.orElse(null);
 	}
 
-	static List<ExternalReferencesEntity> toExternalReferencesEntities(final List<KeyValues> externalReferences) {
+	public static List<ExternalReferencesEntity> toExternalReferencesEntities(final List<KeyValues> externalReferences) {
 		return Optional.ofNullable(externalReferences)
 			.orElse(emptyList()).stream()
 			.map(Mapper::toExternalReferencesEntity)
 			.toList();
 	}
 
-	static ExternalReferencesEntity toExternalReferencesEntity(final KeyValues keyValues) {
+	public static ExternalReferencesEntity toExternalReferencesEntity(final KeyValues keyValues) {
 		return Optional.ofNullable(keyValues)
 			.map(p -> ExternalReferencesEntity.create()
 				.withKey(keyValues.getKey())
@@ -239,19 +237,18 @@ public final class Mapper {
 			.orElse(null);
 	}
 
-	static List<KeyValues> toExternalReferences(final List<ExternalReferencesEntity> externalReferences) {
+	public static List<KeyValues> toExternalReferences(final List<ExternalReferencesEntity> externalReferences) {
 		return Optional.ofNullable(externalReferences)
 			.orElse(emptyList()).stream()
 			.map(Mapper::toExternalReference)
 			.toList();
 	}
 
-	static KeyValues toExternalReference(final ExternalReferencesEntity externalReferencesEntity) {
+	public static KeyValues toExternalReference(final ExternalReferencesEntity externalReferencesEntity) {
 		return Optional.ofNullable(externalReferencesEntity)
 			.map(e -> KeyValues.create()
 				.withKey(e.getKey())
 				.withValues(e.getValues()))
 			.orElse(null);
 	}
-
 }

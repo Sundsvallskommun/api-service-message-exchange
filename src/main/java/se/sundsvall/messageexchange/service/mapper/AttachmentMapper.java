@@ -1,4 +1,4 @@
-package se.sundsvall.messageexchange.service;
+package se.sundsvall.messageexchange.service.mapper;
 
 import static java.util.Collections.emptyList;
 import static org.apache.commons.lang3.ObjectUtils.anyNull;

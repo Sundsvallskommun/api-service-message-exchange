@@ -6,6 +6,7 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import java.util.List;
@@ -13,7 +14,10 @@ import java.util.Objects;
 import org.hibernate.annotations.UuidGenerator;
 
 @Entity
-@Table(name = "conversation_external_reference")
+@Table(name = "conversation_external_reference",
+	indexes = {
+		@Index(name = "idx_conversation_external_reference_key", columnList = "`key`")
+	})
 public class ExternalReferencesEntity {
 
 	@Id
@@ -77,8 +81,9 @@ public class ExternalReferencesEntity {
 
 	@Override
 	public boolean equals(final Object o) {
-		if (o == null || getClass() != o.getClass())
+		if (o == null || getClass() != o.getClass()) {
 			return false;
+		}
 		final ExternalReferencesEntity that = (ExternalReferencesEntity) o;
 		return Objects.equals(id, that.id) && Objects.equals(key, that.key) && Objects.equals(values, that.values);
 	}
