@@ -49,7 +49,7 @@ class OpenApiSpecificationIT {
 		final var existingOpenApiSpecification = ResourceUtils.asString(openApiResource);
 		final var currentOpenApiSpecification = getCurrentOpenApiSpecification();
 
-		writeString(Path.of("target/api.yaml"), currentOpenApiSpecification);
+		writeString(Path.of("target/generated-api.yaml"), currentOpenApiSpecification);
 
 		assertThatJson(toJson(existingOpenApiSpecification))
 			.withOptions(List.of(Option.IGNORING_ARRAY_ORDER))
