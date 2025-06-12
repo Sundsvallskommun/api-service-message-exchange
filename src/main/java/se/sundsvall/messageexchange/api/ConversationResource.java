@@ -63,7 +63,7 @@ class ConversationResource {
 		@Parameter(name = "namespace", description = "Namespace", example = "MY_NAMESPACE") @ValidNamespace @PathVariable final String namespace,
 		@Parameter(description = "Syntax description: [spring-filter](https://github.com/turkraft/spring-filter/blob/85730f950a5f8623159cc0eb4d737555f9382bb7/README.md#syntax)",
 			example = "topic:'My topic' and messages.createdBy.value:'joe01doe' and messages.created>'2023-01-01T00:00:00Z'",
-			schema = @Schema(implementation = String.class)) @Filter @Nullable final Specification<ConversationEntity> filter,
+			schema = @Schema(implementation = String.class)) @Nullable @Filter final Specification<ConversationEntity> filter,
 		@ParameterObject final Pageable pageable) {
 		return ResponseEntity.ok(service.readConversations(namespace, municipalityId, filter, pageable));
 	}
