@@ -74,8 +74,22 @@ class MessageResourceTest {
 			.exchange()
 			.expectStatus().isOk();
 
-		verify(messageServiceMock).getMessages(eq(MUNICIPALITY_ID), eq(NAMESPACE), eq(CONVERSATION_ID), any());
+		verify(messageServiceMock).getMessages(eq(MUNICIPALITY_ID), eq(NAMESPACE), eq(CONVERSATION_ID), any(), any());
 
+	}
+
+	@Test
+	void getMessageWithFilter() {
+		webTestClient.get()
+			.uri(builder -> builder.path(PATH)
+				.queryParam("filter", "readBy=joe01doe")
+				.build(Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID)))
+			.header(HEADER_NAME, "type=adAccount; joe01doe")
+			.accept(APPLICATION_JSON)
+			.exchange()
+			.expectStatus().isOk();
+
+		verify(messageServiceMock).getMessages(eq(MUNICIPALITY_ID), eq(NAMESPACE), eq(CONVERSATION_ID), any(), any());
 	}
 
 	@Test

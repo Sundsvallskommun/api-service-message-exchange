@@ -154,7 +154,7 @@ class MessageResourceFailureTest {
 
 		doThrow(Problem.valueOf(NOT_FOUND, "Conversation not found"))
 			.when(messageServiceMock)
-			.getMessages(eq(MUNICIPALITY_ID), eq(NAMESPACE), eq(CONVERSATION_ID), any());
+			.getMessages(eq(MUNICIPALITY_ID), eq(NAMESPACE), eq(CONVERSATION_ID), any(), any());
 
 		webTestClient.get()
 			.uri(PATH, Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID))
