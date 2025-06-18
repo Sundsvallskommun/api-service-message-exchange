@@ -94,7 +94,7 @@ class MessageResource {
 		@PathVariable @ValidNamespace @Parameter(name = "namespace", description = "Namespace", example = "MY_NAMESPACE") final String namespace,
 		@PathVariable @ValidUuid @Parameter(name = "conversationId", description = "Conversation ID", example = "b82bd8ac-1507-4d9a-958d-369261eecc15") final String conversationId,
 		@Parameter(description = "Syntax description: [spring-filter](https://github.com/turkraft/spring-filter/blob/85730f950a5f8623159cc0eb4d737555f9382bb7/README.md#syntax)",
-			example = "topic:'My topic' and messages.createdBy.value:'joe01doe' and messages.created>'2023-01-01T00:00:00Z'",
+			example = "content:'My content' and createdBy.value:'joe01doe' and created>'2023-01-01T00:00:00Z'",
 			schema = @Schema(implementation = String.class)) @Nullable @Filter final Specification<MessageEntity> filter,
 		@ParameterObject final Pageable pageable) {
 

@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "1.0"
 servers:
-  - url: http://localhost:60707
+  - url: http://localhost:56259
     description: Generated server url
 tags:
   - name: Message resource
@@ -177,7 +177,7 @@ paths:
           required: false
           schema:
             type: string
-          example: topic:'My topic' and messages.createdBy.value:'joe01doe' and messages.created>'2023-01-01T00:00:00Z'
+          example: content:'My content' and createdBy.value:'joe01doe' and created>'2023-01-01T00:00:00Z'
         - name: page
           in: query
           description: Zero-based page index (0..N)
@@ -689,12 +689,12 @@ components:
     Problem:
       type: object
       properties:
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
         instance:
           type: string
           format: uri
@@ -824,12 +824,12 @@ components:
                 type: boolean
         message:
           type: string
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
         instance:
           type: string
           format: uri
@@ -977,6 +977,8 @@ components:
         numberOfElements:
           type: integer
           format: int32
+        sort:
+          $ref: "#/components/schemas/SortObject"
         pageable:
           $ref: "#/components/schemas/PageableObject"
         size:
@@ -989,13 +991,13 @@ components:
         number:
           type: integer
           format: int32
-        sort:
-          $ref: "#/components/schemas/SortObject"
         empty:
           type: boolean
     PageableObject:
       type: object
       properties:
+        sort:
+          $ref: "#/components/schemas/SortObject"
         paged:
           type: boolean
         pageNumber:
@@ -1009,8 +1011,6 @@ components:
         offset:
           type: integer
           format: int64
-        sort:
-          $ref: "#/components/schemas/SortObject"
     SortObject:
       type: object
       properties:
@@ -1036,6 +1036,8 @@ components:
         numberOfElements:
           type: integer
           format: int32
+        sort:
+          $ref: "#/components/schemas/SortObject"
         pageable:
           $ref: "#/components/schemas/PageableObject"
         size:
@@ -1048,8 +1050,6 @@ components:
         number:
           type: integer
           format: int32
-        sort:
-          $ref: "#/components/schemas/SortObject"
         empty:
           type: boolean
   securitySchemes: { }
