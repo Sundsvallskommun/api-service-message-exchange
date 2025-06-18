@@ -9,17 +9,20 @@ import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.web.util.UriComponentsBuilder.fromPath;
 import static se.sundsvall.dept44.support.Identifier.HEADER_NAME;
 
+import com.turkraft.springfilter.boot.Filter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,6 +40,7 @@ import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.messageexchange.api.model.Message;
 import se.sundsvall.messageexchange.api.validation.ValidNamespace;
+import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 import se.sundsvall.messageexchange.service.MessageService;
 
 @RestController
@@ -89,9 +93,12 @@ class MessageResource {
 		@PathVariable @ValidMunicipalityId @Parameter(name = "municipalityId", description = "Municipality ID", example = "2281") final String municipalityId,
 		@PathVariable @ValidNamespace @Parameter(name = "namespace", description = "Namespace", example = "MY_NAMESPACE") final String namespace,
 		@PathVariable @ValidUuid @Parameter(name = "conversationId", description = "Conversation ID", example = "b82bd8ac-1507-4d9a-958d-369261eecc15") final String conversationId,
+		@Parameter(description = "Syntax description: [spring-filter](https://github.com/turkraft/spring-filter/blob/85730f950a5f8623159cc0eb4d737555f9382bb7/README.md#syntax)",
+			example = "content:'My content' and createdBy.value:'joe01doe' and created>'2023-01-01T00:00:00Z'",
+			schema = @Schema(implementation = String.class)) @Nullable @Filter final Specification<MessageEntity> filter,
 		@ParameterObject final Pageable pageable) {
 
-		return ResponseEntity.ok(service.getMessages(municipalityId, namespace, conversationId, pageable));
+		return ResponseEntity.ok(service.getMessages(municipalityId, namespace, conversationId, filter, pageable));
 	}
 
 	@DeleteMapping(path = "/{messageId}", produces = ALL_VALUE)

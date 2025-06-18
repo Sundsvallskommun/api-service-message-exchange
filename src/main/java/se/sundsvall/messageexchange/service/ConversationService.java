@@ -5,8 +5,8 @@ import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversation;
 import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversationEntity;
 import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversations;
 import static se.sundsvall.messageexchange.service.mapper.Mapper.updateConversationEntity;
-import static se.sundsvall.messageexchange.util.SpecificationBuilder.withMunicipalityId;
-import static se.sundsvall.messageexchange.util.SpecificationBuilder.withNamespace;
+import static se.sundsvall.messageexchange.util.ConversationSpecificationBuilder.withMunicipalityId;
+import static se.sundsvall.messageexchange.util.ConversationSpecificationBuilder.withNamespace;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

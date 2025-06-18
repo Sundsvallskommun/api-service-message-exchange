@@ -15,13 +15,13 @@ import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
 @SuppressWarnings({
 	"unchecked"
 })
-class SpecificationBuilderTest {
+class ConversationSpecificationBuilderTest {
 
 	@Test
 	void withNamespaceShouldReturnSpecificationThatFiltersByNamespace() {
 
 		// Arrange
-		final var spec = SpecificationBuilder.withNamespace("test-namespace");
+		final var spec = ConversationSpecificationBuilder.withNamespace("test-namespace");
 		final var root = (Root<ConversationEntity>) mock(Root.class);
 		final var query = mock(CriteriaQuery.class);
 		final var cb = mock(CriteriaBuilder.class);
@@ -40,7 +40,7 @@ class SpecificationBuilderTest {
 	@Test
 	void withNamespaceShouldReturnAlwaysTruePredicateWhenNull() {
 		// Arrange
-		final var spec = SpecificationBuilder.withNamespace(null);
+		final var spec = ConversationSpecificationBuilder.withNamespace(null);
 		final var root = (Root<ConversationEntity>) mock(Root.class);
 		final var query = mock(CriteriaQuery.class);
 		final var cb = mock(CriteriaBuilder.class);
@@ -57,7 +57,7 @@ class SpecificationBuilderTest {
 	@Test
 	void withMunicipalityIdShouldReturnSpecificationThatFiltersByMunicipalityId() {
 		// Arrange
-		final var spec = SpecificationBuilder.withMunicipalityId("123");
+		final var spec = ConversationSpecificationBuilder.withMunicipalityId("123");
 		final var root = (Root<ConversationEntity>) mock(Root.class);
 		final var query = mock(CriteriaQuery.class);
 		final var cb = mock(CriteriaBuilder.class);
@@ -75,7 +75,7 @@ class SpecificationBuilderTest {
 
 	@Test
 	void withMunicipalityIdShouldReturnAlwaysTruePredicateWhenNull() {
-		final var spec = SpecificationBuilder.withMunicipalityId(null);
+		final var spec = ConversationSpecificationBuilder.withMunicipalityId(null);
 		final var root = (Root<ConversationEntity>) mock(Root.class);
 		final var query = mock(CriteriaQuery.class);
 		final var cb = mock(CriteriaBuilder.class);

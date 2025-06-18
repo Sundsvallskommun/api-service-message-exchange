@@ -5,9 +5,9 @@ import static java.util.Objects.nonNull;
 import org.springframework.data.jpa.domain.Specification;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
 
-public class SpecificationBuilder<T> {
+public class ConversationSpecificationBuilder<T> {
 
-	private static final SpecificationBuilder<ConversationEntity> CONVERSATION_ENTITY_SPECIFICATION_BUILDER = new SpecificationBuilder<>();
+	private static final ConversationSpecificationBuilder<ConversationEntity> CONVERSATION_ENTITY_SPECIFICATION_BUILDER = new ConversationSpecificationBuilder<>();
 
 	public static Specification<ConversationEntity> withNamespace(final String namespace) {
 		return CONVERSATION_ENTITY_SPECIFICATION_BUILDER.buildEqualFilter("namespace", namespace);

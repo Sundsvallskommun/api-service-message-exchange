@@ -7,6 +7,7 @@ import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 import static org.zalando.problem.Status.NOT_FOUND;
 import static se.sundsvall.messageexchange.service.mapper.Mapper.toIdentifierEntity;
 import static se.sundsvall.messageexchange.service.mapper.Mapper.toMessageEntity;
+import static se.sundsvall.messageexchange.util.MessageSpecificationBuilder.withConversation;
 
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,6 +19,7 @@ import java.util.stream.Stream;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -75,9 +77,12 @@ public class MessageService {
 		return messageRepository.saveAndFlush(entity).getId();
 	}
 
-	public Page<Message> getMessages(final String municipalityId, final String namespace, final String conversationId, final Pageable pageable) {
+	public Page<Message> getMessages(final String municipalityId, final String namespace, final String conversationId, final Specification<MessageEntity> filter, final Pageable pageable) {
+
 		final var conversationEntity = findExistingConversation(municipalityId, namespace, conversationId);
-		final var matches = messageRepository.findByConversation(conversationEntity, pageable);
+
+		final var fullFilter = withConversation(conversationEntity).and(filter);
+		final var matches = messageRepository.findAll(fullFilter, pageable);
 
 		final var messages = Mapper.toMessages(matches.getContent());
 		updateReadBy(matches);
