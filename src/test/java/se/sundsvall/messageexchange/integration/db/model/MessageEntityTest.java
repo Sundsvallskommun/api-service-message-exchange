@@ -49,6 +49,7 @@ class MessageEntityTest {
 		final var readBy = List.of(ReadByEntity.create());
 		final var conversation = ConversationEntity.create();
 		final var attachments = List.of(AttachmentEntity.create());
+		final var type = MessageType.SYSTEM_CREATED;
 
 		// Act
 		final var result = MessageEntity.create()
@@ -60,7 +61,8 @@ class MessageEntityTest {
 			.withContent(content)
 			.withReadBy(readBy)
 			.withConversation(conversation)
-			.withAttachments(attachments);
+			.withAttachments(attachments)
+			.withType(type);
 
 		// Assert
 		assertThat(result).isNotNull().hasNoNullFieldsOrProperties();
@@ -73,6 +75,7 @@ class MessageEntityTest {
 		assertThat(result.getReadBy()).isEqualTo(readBy);
 		assertThat(result.getConversation()).isEqualTo(conversation);
 		assertThat(result.getAttachments()).isEqualTo(attachments);
+		assertThat(result.getType()).isEqualTo(type);
 
 	}
 
@@ -82,13 +85,14 @@ class MessageEntityTest {
 		entity.onCreate();
 
 		assertThat(entity.getCreated()).isCloseTo(now(), within(1, SECONDS));
-		assertThat(entity).hasAllNullFieldsOrPropertiesExcept("created");
+		assertThat(entity).hasAllNullFieldsOrPropertiesExcept("created", "type");
+		assertThat(entity.getType()).isEqualTo(MessageType.USER_CREATED);
 	}
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		assertThat(MessageEntity.create()).hasAllNullFieldsOrProperties();
-		assertThat(new MessageEntity()).hasAllNullFieldsOrProperties();
+		assertThat(MessageEntity.create()).hasAllNullFieldsOrPropertiesExcept("type");
+		assertThat(new MessageEntity()).hasAllNullFieldsOrPropertiesExcept("type");
 	}
 
 }
