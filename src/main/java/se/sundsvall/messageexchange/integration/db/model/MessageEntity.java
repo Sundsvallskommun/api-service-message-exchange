@@ -7,6 +7,8 @@ import static java.time.temporal.ChronoUnit.MILLIS;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
@@ -74,6 +76,10 @@ public class MessageEntity {
 
 	@OneToMany(cascade = ALL, orphanRemoval = true, mappedBy = "messageEntity")
 	private List<AttachmentEntity> attachments;
+
+	@Column(name = "type", columnDefinition = "VARCHAR(15)", nullable = false)
+	@Enumerated(EnumType.STRING)
+	private MessageType type = MessageType.USER_CREATED;
 
 	public static MessageEntity create() {
 		return new MessageEntity();
@@ -201,6 +207,19 @@ public class MessageEntity {
 		return this;
 	}
 
+	public MessageType getType() {
+		return type;
+	}
+
+	public void setType(MessageType type) {
+		this.type = type;
+	}
+
+	public MessageEntity withType(MessageType type) {
+		this.type = type;
+		return this;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (o == null || getClass() != o.getClass()) {
@@ -208,12 +227,12 @@ public class MessageEntity {
 		}
 		final MessageEntity that = (MessageEntity) o;
 		return Objects.equals(id, that.id) && Objects.equals(sequenceNumber, that.sequenceNumber) && Objects.equals(inReplyToMessageId, that.inReplyToMessageId) && Objects.equals(created, that.created) && Objects.equals(
-			createdBy, that.createdBy) && Objects.equals(content, that.content) && Objects.equals(readBy, that.readBy) && Objects.equals(conversation, that.conversation) && Objects.equals(attachments, that.attachments);
+			createdBy, that.createdBy) && Objects.equals(content, that.content) && Objects.equals(readBy, that.readBy) && Objects.equals(conversation, that.conversation) && Objects.equals(attachments, that.attachments) && Objects.equals(type, that.type);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, sequenceNumber, inReplyToMessageId, created, createdBy, content, readBy, conversation, attachments);
+		return Objects.hash(id, sequenceNumber, inReplyToMessageId, created, createdBy, content, readBy, conversation, attachments, type);
 	}
 
 	@Override
@@ -228,6 +247,7 @@ public class MessageEntity {
 			", readBy=" + readBy +
 			", conversation=" + conversation +
 			", attachments=" + attachments +
+			", type=" + type +
 			'}';
 	}
 }

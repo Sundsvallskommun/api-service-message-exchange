@@ -70,6 +70,7 @@
         id varchar(255) not null,
         in_reply_to_message_id varchar(255),
         content longtext,
+        type VARCHAR(15) not null,
         primary key (id)
     ) engine=InnoDB;
 
