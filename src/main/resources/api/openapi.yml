@@ -5,7 +5,7 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "1.0"
+  version: "1.1"
 servers:
   - url: http://localhost:56259
     description: Generated server url
@@ -948,6 +948,13 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Attachment"
+        type:
+          type: string
+          description: Type of message (user or system created)
+          readOnly: true
+          enum:
+            - USER_CREATED
+            - SYSTEM_CREATED
       description: "Represents a message within a conversation, including metadata\
         \ and content."
     ReadBy:

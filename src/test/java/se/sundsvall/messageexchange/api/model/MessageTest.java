@@ -46,6 +46,7 @@ class MessageTest {
 		final var content = "content";
 		final var readBy = List.of(ReadBy.create());
 		final var attachments = List.of(Attachment.create());
+		final var type = MessageType.USER_CREATED;
 
 		// Act
 		final var result = Message.create()
@@ -56,7 +57,8 @@ class MessageTest {
 			.withCreatedBy(createdBy)
 			.withContent(content)
 			.withReadBy(readBy)
-			.withAttachments(attachments);
+			.withAttachments(attachments)
+			.withType(type);
 
 		// Assert
 		assertThat(result).isNotNull().hasNoNullFieldsOrProperties();
@@ -67,6 +69,7 @@ class MessageTest {
 		assertThat(result.getCreatedBy()).isEqualTo(createdBy);
 		assertThat(result.getContent()).isEqualTo(content);
 		assertThat(result.getReadBy()).isEqualTo(readBy);
+		assertThat(result.getType()).isEqualTo(type);
 
 	}
 

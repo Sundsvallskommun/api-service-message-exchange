@@ -35,6 +35,9 @@ public class Message {
 	@ArraySchema(schema = @Schema(implementation = Attachment.class, description = "The list of attachments associated with the message."))
 	private List<Attachment> attachments;
 
+	@Schema(description = "Type of message (user or system created)", accessMode = Schema.AccessMode.READ_ONLY)
+	private MessageType type;
+
 	public static Message create() {
 		return new Message();
 	}
@@ -143,18 +146,31 @@ public class Message {
 		return this;
 	}
 
+	public MessageType getType() {
+		return type;
+	}
+
+	public void setType(MessageType type) {
+		this.type = type;
+	}
+
+	public Message withType(MessageType type) {
+		this.type = type;
+		return this;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (o == null || getClass() != o.getClass())
 			return false;
 		final Message message = (Message) o;
 		return Objects.equals(id, message.id) && Objects.equals(sequenceNumber, message.sequenceNumber) && Objects.equals(inReplyToMessageId, message.inReplyToMessageId) && Objects.equals(created, message.created)
-			&& Objects.equals(createdBy, message.createdBy) && Objects.equals(content, message.content) && Objects.equals(readBy, message.readBy) && Objects.equals(attachments, message.attachments);
+			&& Objects.equals(createdBy, message.createdBy) && Objects.equals(content, message.content) && Objects.equals(readBy, message.readBy) && Objects.equals(attachments, message.attachments) && Objects.equals(type, message.type);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, sequenceNumber, inReplyToMessageId, created, createdBy, content, readBy, attachments);
+		return Objects.hash(id, sequenceNumber, inReplyToMessageId, created, createdBy, content, readBy, attachments, type);
 	}
 
 	@Override
@@ -168,6 +184,7 @@ public class Message {
 			", content='" + content + '\'' +
 			", readBy=" + readBy +
 			", attachments=" + attachments +
+			", type=" + type +
 			'}';
 	}
 }

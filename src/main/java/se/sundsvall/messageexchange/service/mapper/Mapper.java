@@ -11,6 +11,7 @@ import se.sundsvall.messageexchange.api.model.Conversation;
 import se.sundsvall.messageexchange.api.model.Identifier;
 import se.sundsvall.messageexchange.api.model.KeyValues;
 import se.sundsvall.messageexchange.api.model.Message;
+import se.sundsvall.messageexchange.api.model.MessageType;
 import se.sundsvall.messageexchange.api.model.ReadBy;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
 import se.sundsvall.messageexchange.integration.db.model.ExternalReferencesEntity;
@@ -96,7 +97,9 @@ public final class Mapper {
 			.withCreatedBy(toIdentifier(entity.getCreatedBy()))
 			.withContent(entity.getContent())
 			.withReadBy(toReadByList(entity.getReadBy()))
-			.withAttachments(AttachmentMapper.toAttachments(entity.getAttachments()));
+			.withAttachments(AttachmentMapper.toAttachments(entity.getAttachments()))
+			.withType(MessageType.valueOf(entity.getType().toString()));
+
 	}
 
 	public static MessageEntity toMessageEntity(final ConversationEntity entity, final Message message) {
