@@ -20,6 +20,7 @@ import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
 import se.sundsvall.messageexchange.integration.db.model.ExternalReferencesEntity;
 import se.sundsvall.messageexchange.integration.db.model.IdentifierEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
+import se.sundsvall.messageexchange.integration.db.model.MessageType;
 import se.sundsvall.messageexchange.integration.db.model.MetadataEntity;
 import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
 import se.sundsvall.messageexchange.integration.db.model.SequenceEntity;
@@ -201,13 +202,15 @@ class MapperTest {
 		final var createdByType = "type";
 		final var createdByValue = "value";
 		final var content = "content";
+		final var type = MessageType.SYSTEM_CREATED;
 
 		final var entities = List.of(MessageEntity.create()
 			.withId(id)
 			.withSequenceNumber(sequenceNumber)
 			.withInReplyToMessageId(inReplyTo)
 			.withCreatedBy(IdentifierEntity.create().withType(createdByType).withValue(createdByValue))
-			.withContent(content));
+			.withContent(content)
+			.withType(type));
 
 		// Act
 		final var result = Mapper.toMessages(entities);
@@ -220,6 +223,7 @@ class MapperTest {
 		assertThat(result.getFirst().getCreatedBy().getType()).isEqualTo(createdByType);
 		assertThat(result.getFirst().getCreatedBy().getValue()).isEqualTo(createdByValue);
 		assertThat(result.getFirst().getContent()).isEqualTo(content);
+		assertThat(result.getFirst().getType()).isEqualTo(se.sundsvall.messageexchange.api.model.MessageType.SYSTEM_CREATED);
 	}
 
 	@Test
@@ -231,13 +235,15 @@ class MapperTest {
 		final var createdByType = "type";
 		final var createdByValue = "value";
 		final var content = "content";
+		final var type = MessageType.SYSTEM_CREATED;
 
 		final var entity = MessageEntity.create()
 			.withId(id)
 			.withSequenceNumber(sequenceNumber)
 			.withInReplyToMessageId(inReplyTo)
 			.withCreatedBy(IdentifierEntity.create().withType(createdByType).withValue(createdByValue))
-			.withContent(content);
+			.withContent(content)
+			.withType(type);
 
 		// Act
 		final var result = Mapper.toMessage(entity);
@@ -250,6 +256,7 @@ class MapperTest {
 		assertThat(result.getCreatedBy().getType()).isEqualTo(createdByType);
 		assertThat(result.getCreatedBy().getValue()).isEqualTo(createdByValue);
 		assertThat(result.getContent()).isEqualTo(content);
+		assertThat(result.getType()).isEqualTo(se.sundsvall.messageexchange.api.model.MessageType.SYSTEM_CREATED);
 	}
 
 	@Test
