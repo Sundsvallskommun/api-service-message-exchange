@@ -79,26 +79,14 @@ public final class Mapper {
 	public static Optional<String> conversationDiffMessage(final ConversationEntity entity, final Conversation conversation) {
 		final var changes = new ArrayList<String>();
 
-		// Topic
-		Optional.ofNullable(conversation.getTopic()).ifPresent(topic -> {
-			if (!topic.equals(entity.getTopic())) {
-				changes.add(TOPIC_CHANGED_MSG.formatted(entity.getTopic(), topic));
-			}
-		});
+		checkTopicDiff(entity, conversation, changes);
+		checkParticipantsDiff(entity, conversation, changes);
+		checkExternalReferenceDiff(entity, conversation, changes);
 
-		// Participants
-		Optional.ofNullable(conversation.getParticipants()).ifPresent(participants -> {
-			var added = addedObjects(entity.getParticipants(), conversation.getParticipants(), Mapper::toIdentifier);
-			if (!added.isEmpty()) {
-				changes.add(PARTICIPANT_ADDED_MSG.formatted(added.size()));
-			}
-			var removed = removedObjects(entity.getParticipants(), conversation.getParticipants(), Mapper::toIdentifierEntity);
-			if (!removed.isEmpty()) {
-				changes.add(PARTICIPANT_REMOVED_MSG.formatted(removed.size()));
-			}
-		});
+		return changes.isEmpty() ? Optional.empty() : Optional.of(String.join(". ", changes).concat("."));
+	}
 
-		// External reference
+	private static void checkExternalReferenceDiff(ConversationEntity entity, Conversation conversation, ArrayList<String> changes) {
 		Optional.ofNullable(conversation.getExternalReferences()).ifPresent(externalReferences -> {
 			var added = false;
 			var removed = false;
@@ -126,8 +114,27 @@ public final class Mapper {
 				changes.add(EXTERNAL_REFERENCE_REMOVED_MSG);
 			}
 		});
+	}
 
-		return changes.isEmpty() ? Optional.empty() : Optional.of(String.join(". ", changes).concat("."));
+	private static void checkParticipantsDiff(ConversationEntity entity, Conversation conversation, ArrayList<String> changes) {
+		Optional.ofNullable(conversation.getParticipants()).ifPresent(participants -> {
+			var added = addedObjects(entity.getParticipants(), conversation.getParticipants(), Mapper::toIdentifier);
+			if (!added.isEmpty()) {
+				changes.add(PARTICIPANT_ADDED_MSG.formatted(added.size()));
+			}
+			var removed = removedObjects(entity.getParticipants(), conversation.getParticipants(), Mapper::toIdentifierEntity);
+			if (!removed.isEmpty()) {
+				changes.add(PARTICIPANT_REMOVED_MSG.formatted(removed.size()));
+			}
+		});
+	}
+
+	private static void checkTopicDiff(ConversationEntity entity, Conversation conversation, ArrayList<String> changes) {
+		Optional.ofNullable(conversation.getTopic()).ifPresent(topic -> {
+			if (!topic.equals(entity.getTopic())) {
+				changes.add(TOPIC_CHANGED_MSG.formatted(entity.getTopic(), topic));
+			}
+		});
 	}
 
 	private static List<String> getExternalReferenceValuesByKey(ConversationEntity entity, String key) {
