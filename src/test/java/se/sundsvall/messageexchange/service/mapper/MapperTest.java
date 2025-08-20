@@ -884,4 +884,20 @@ class MapperTest {
 
 	}
 
+	@Test
+	void conversationDiffMessage() {
+		var conversationEntity = ConversationEntity.create()
+			.withTopic("Old topic")
+			.withParticipants(List.of(IdentifierEntity.create().withType("type").withValue("1"), IdentifierEntity.create().withType("type").withValue("2")))
+			.withExternalReferences(List.of(ExternalReferencesEntity.create().withKey("key").withValues(List.of("1"))));
+		var conversation = Conversation.create()
+			.withTopic("New topic")
+			.withParticipants(List.of(Identifier.create().withType("type").withValue("2"), Identifier.create().withType("type").withValue("3")))
+			.withExternalReferences(List.of(KeyValues.create().withKey("key").withValues(List.of("1", "2"))));
+
+		var diff = Mapper.conversationDiffMessage(conversationEntity, conversation);
+		assertThat(diff).hasValue("Ämnesrad ändrad från 'Old topic' till 'New topic'. 1 deltagare tillagd. 1 deltagare borttagen. Referens tillagd i konversation.");
+
+	}
+
 }

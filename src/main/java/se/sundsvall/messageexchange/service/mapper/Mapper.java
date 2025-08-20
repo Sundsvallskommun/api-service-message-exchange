@@ -5,8 +5,12 @@ import static java.util.Optional.ofNullable;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import se.sundsvall.messageexchange.api.model.Conversation;
 import se.sundsvall.messageexchange.api.model.Identifier;
 import se.sundsvall.messageexchange.api.model.KeyValues;
@@ -22,6 +26,12 @@ import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
 import se.sundsvall.messageexchange.integration.db.model.SequenceEntity;
 
 public final class Mapper {
+
+	private static final String TOPIC_CHANGED_MSG = "Ämnesrad ändrad från '%s' till '%s'";
+	private static final String PARTICIPANT_ADDED_MSG = "%s deltagare tillagd";
+	private static final String PARTICIPANT_REMOVED_MSG = "%s deltagare borttagen";
+	private static final String EXTERNAL_REFERENCE_ADDED_MSG = "Referens tillagd i konversation";
+	private static final String EXTERNAL_REFERENCE_REMOVED_MSG = "Referens borttagen i konversation";
 
 	private Mapper() {
 		// Prevent instantiation
@@ -64,6 +74,88 @@ public final class Mapper {
 		Optional.ofNullable(conversation.getExternalReferences()).ifPresent(externalReferences -> updateExternalReferences(entity, externalReferences));
 
 		return entity;
+	}
+
+	public static Optional<String> conversationDiffMessage(final ConversationEntity entity, final Conversation conversation) {
+		final var changes = new ArrayList<String>();
+
+		// Topic
+		Optional.ofNullable(conversation.getTopic()).ifPresent(topic -> {
+			if (!topic.equals(entity.getTopic())) {
+				changes.add(TOPIC_CHANGED_MSG.formatted(entity.getTopic(), topic));
+			}
+		});
+
+		// Participants
+		Optional.ofNullable(conversation.getParticipants()).ifPresent(participants -> {
+			var added = addedObjects(entity.getParticipants(), conversation.getParticipants(), Mapper::toIdentifier);
+			if (!added.isEmpty()) {
+				changes.add(PARTICIPANT_ADDED_MSG.formatted(added.size()));
+			}
+			var removed = removedObjects(entity.getParticipants(), conversation.getParticipants(), Mapper::toIdentifierEntity);
+			if (!removed.isEmpty()) {
+				changes.add(PARTICIPANT_REMOVED_MSG.formatted(removed.size()));
+			}
+		});
+
+		// External reference
+		Optional.ofNullable(conversation.getExternalReferences()).ifPresent(externalReferences -> {
+			var added = false;
+			var removed = false;
+
+			for (var key : externalReferences.stream().map(KeyValues::getKey).toList()) {
+				var addedValuesForKey = addedObjects(getExternalReferenceValuesByKey(entity, key), getExternalReferenceValuesByKey(conversation, key), s -> s);
+				if (!addedValuesForKey.isEmpty()) {
+					added = true;
+					break;
+				}
+			}
+
+			for (var key : ofNullable(entity.getExternalReferences()).orElse(new ArrayList<>()).stream().map(ExternalReferencesEntity::getKey).toList()) {
+				var removedValuesForKey = removedObjects(getExternalReferenceValuesByKey(entity, key), getExternalReferenceValuesByKey(conversation, key), s -> s);
+				if (!removedValuesForKey.isEmpty()) {
+					removed = true;
+					break;
+				}
+			}
+
+			if (added) {
+				changes.add(EXTERNAL_REFERENCE_ADDED_MSG);
+			}
+			if (removed) {
+				changes.add(EXTERNAL_REFERENCE_REMOVED_MSG);
+			}
+		});
+
+		return changes.isEmpty() ? Optional.empty() : Optional.of(String.join(". ", changes).concat("."));
+	}
+
+	private static List<String> getExternalReferenceValuesByKey(ConversationEntity entity, String key) {
+		return ofNullable(entity.getExternalReferences()).orElse(new ArrayList<>()).stream()
+			.filter(item -> item.getKey().equals(key))
+			.findFirst()
+			.map(ExternalReferencesEntity::getValues)
+			.orElse(new ArrayList<>());
+	}
+
+	private static List<String> getExternalReferenceValuesByKey(Conversation conversation, String key) {
+		return ofNullable(conversation.getExternalReferences()).orElse(new ArrayList<>()).stream()
+			.filter(item -> item.getKey().equals(key))
+			.findFirst()
+			.map(KeyValues::getValues)
+			.orElse(new ArrayList<>());
+	}
+
+	private static <T, R> Set<R> addedObjects(List<T> before, List<R> after, Function<T, R> converter) {
+		var added = new HashSet<>(after);
+		added.removeAll(ofNullable(before).orElse(new ArrayList<>()).stream().map(converter).collect(Collectors.toSet()));
+		return added;
+	}
+
+	private static <T, R> Set<R> removedObjects(List<R> before, List<T> after, Function<T, R> converter) {
+		var removed = new HashSet<>(before);
+		removed.removeAll(ofNullable(after).orElse(new ArrayList<>()).stream().map(converter).collect(Collectors.toSet()));
+		return removed;
 	}
 
 	private static void updateExternalReferences(final ConversationEntity entity, final List<KeyValues> externalReferences) {

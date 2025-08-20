@@ -1,6 +1,7 @@
 package se.sundsvall.messageexchange.service;
 
 import static org.zalando.problem.Status.NOT_FOUND;
+import static se.sundsvall.messageexchange.service.mapper.Mapper.conversationDiffMessage;
 import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversation;
 import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversationEntity;
 import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversations;
@@ -19,11 +20,13 @@ import se.sundsvall.messageexchange.integration.db.ConversationRepository;
 import se.sundsvall.messageexchange.integration.db.MessageRepository;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
+import se.sundsvall.messageexchange.integration.db.model.MessageType;
 import se.sundsvall.messageexchange.integration.db.model.SequenceEntity;
 
 @Service
 public class ConversationService {
 
+	private static final String CONVERSATION_CREATED_MSG = "Conversation created";
 	private final ConversationRepository conversationRepository;
 	private final MessageRepository messageRepository;
 
@@ -54,13 +57,20 @@ public class ConversationService {
 	public String createConversation(final String namespace, final String municipalityId, final Conversation conversation) {
 
 		final var entity = toConversationEntity(municipalityId, namespace, conversation);
-
-		return conversationRepository.save(entity).getId();
+		final var savedConversation = conversationRepository.save(entity);
+		final var message = createSystemMessage(CONVERSATION_CREATED_MSG, savedConversation);
+		messageRepository.save(message);
+		return savedConversation.getId();
 	}
 
 	public Conversation updateConversation(final String namespace, final String municipalityId, final String conversationId, final Conversation conversation) {
 
 		final var entity = findExistingConversation(municipalityId, namespace, conversationId);
+
+		conversationDiffMessage(entity, conversation).ifPresent(msg -> {
+			final var message = createSystemMessage(msg, entity);
+			messageRepository.save(message);
+		});
 
 		return toConversation(conversationRepository.save(updateConversationEntity(entity, conversation)));
 	}
@@ -75,5 +85,13 @@ public class ConversationService {
 	private ConversationEntity findExistingConversation(final String municipalityId, final String namespace, final String conversationId) {
 		return conversationRepository.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId)
 			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Conversation with id %s not found".formatted(conversationId)));
+	}
+
+	private MessageEntity createSystemMessage(String content, ConversationEntity conversationEntity) {
+		return MessageEntity.create()
+			.withType(MessageType.SYSTEM_CREATED)
+			.withContent(content)
+			.withSequenceNumber(new SequenceEntity())
+			.withConversation(conversationEntity);
 	}
 }
