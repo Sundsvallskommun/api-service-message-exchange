@@ -32,6 +32,7 @@ public final class Mapper {
 	private static final String PARTICIPANT_REMOVED_MSG = "%s deltagare borttagen";
 	private static final String EXTERNAL_REFERENCE_ADDED_MSG = "Referens tillagd i konversation";
 	private static final String EXTERNAL_REFERENCE_REMOVED_MSG = "Referens borttagen i konversation";
+	public static final String CONVERSATION_CREATED_MSG = "Konversation skapad";
 
 	private Mapper() {
 		// Prevent instantiation

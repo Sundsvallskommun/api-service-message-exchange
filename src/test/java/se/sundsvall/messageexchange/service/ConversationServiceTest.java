@@ -122,7 +122,7 @@ class ConversationServiceTest {
 			assertThat(message.getType()).isEqualTo(MessageType.SYSTEM_CREATED);
 			assertThat(message.getConversation()).isSameAs(entity);
 			assertThat(message.getSequenceNumber()).isNotNull();
-			assertThat(message.getContent()).isEqualTo("Conversation created");
+			assertThat(message.getContent()).isEqualTo("Konversation skapad");
 		});
 	}
 

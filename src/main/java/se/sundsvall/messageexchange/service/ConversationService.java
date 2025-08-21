@@ -1,6 +1,7 @@
 package se.sundsvall.messageexchange.service;
 
 import static org.zalando.problem.Status.NOT_FOUND;
+import static se.sundsvall.messageexchange.service.mapper.Mapper.CONVERSATION_CREATED_MSG;
 import static se.sundsvall.messageexchange.service.mapper.Mapper.conversationDiffMessage;
 import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversation;
 import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversationEntity;
@@ -26,7 +27,6 @@ import se.sundsvall.messageexchange.integration.db.model.SequenceEntity;
 @Service
 public class ConversationService {
 
-	private static final String CONVERSATION_CREATED_MSG = "Conversation created";
 	private final ConversationRepository conversationRepository;
 	private final MessageRepository messageRepository;
 
