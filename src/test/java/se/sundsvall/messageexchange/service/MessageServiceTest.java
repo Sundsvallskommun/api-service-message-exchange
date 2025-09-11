@@ -29,6 +29,7 @@ import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -163,7 +164,7 @@ class MessageServiceTest {
 
 			when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
 				.thenReturn(Optional.of(conversationEntity));
-			when(messageRepositoryMock.findAll(any(Specification.class), eq(pageable))).thenReturn(messagePage);
+			when(messageRepositoryMock.findAll(ArgumentMatchers.<Specification<MessageEntity>>any(), eq(pageable))).thenReturn(messagePage);
 
 			// Act
 			final var result = messageService.getMessages(municipalityId, namespace, conversationId, filter, pageable);
@@ -173,7 +174,7 @@ class MessageServiceTest {
 			assertThat(result.getContent()).hasSize(1);
 			assertThat(result.getContent().getFirst().getReadBy()).hasSize(1);
 			verify(conversationRepositoryMock).findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId);
-			verify(messageRepositoryMock).findAll(any(Specification.class), eq(pageable));
+			verify(messageRepositoryMock).findAll(ArgumentMatchers.<Specification<MessageEntity>>any(), eq(pageable));
 			verify(messageRepositoryMock).saveAll(messageEntityCaptor.capture());
 			assertThat(messageEntityCaptor.getValue().getContent().getFirst().getReadBy()).hasSize(2);
 
@@ -201,7 +202,7 @@ class MessageServiceTest {
 
 			when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
 				.thenReturn(Optional.of(conversationEntity));
-			when(messageRepositoryMock.findAll(any(Specification.class), eq(pageable))).thenReturn(messagePage);
+			when(messageRepositoryMock.findAll(ArgumentMatchers.<Specification<MessageEntity>>any(), eq(pageable))).thenReturn(messagePage);
 
 			// Act
 			final var result = messageService.getMessages(municipalityId, namespace, conversationId, filter, pageable);
@@ -211,7 +212,7 @@ class MessageServiceTest {
 			assertThat(result.getContent()).hasSize(1);
 			assertThat(result.getContent().getFirst().getReadBy()).hasSize(1);
 			verify(conversationRepositoryMock).findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId);
-			verify(messageRepositoryMock).findAll(any(Specification.class), eq(pageable));
+			verify(messageRepositoryMock).findAll(ArgumentMatchers.<Specification<MessageEntity>>any(), eq(pageable));
 			verify(messageRepositoryMock).saveAll(messageEntityCaptor.capture());
 			assertThat(messageEntityCaptor.getValue().getContent().getFirst().getReadBy()).hasSize(1);
 

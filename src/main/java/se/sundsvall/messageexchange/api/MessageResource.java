@@ -6,6 +6,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.http.ResponseEntity.created;
+import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.web.util.UriComponentsBuilder.fromPath;
 import static se.sundsvall.dept44.support.Identifier.HEADER_NAME;
 
@@ -39,6 +41,7 @@ import org.zalando.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.messageexchange.api.model.Message;
+import se.sundsvall.messageexchange.api.validation.NonEmptyMultipartFiles;
 import se.sundsvall.messageexchange.api.validation.ValidNamespace;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 import se.sundsvall.messageexchange.service.MessageService;
@@ -72,7 +75,7 @@ class MessageResource {
 		@PathVariable @ValidNamespace @Parameter(name = "namespace", description = "Namespace", example = "MY_NAMESPACE") final String namespace,
 		@PathVariable @ValidUuid @Parameter(name = "conversationId", description = "Conversation ID", example = "b82bd8ac-1507-4d9a-958d-369261eecc15") final String conversationId,
 		@RequestPart("message") @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Message to be posted") final Message message,
-		@RequestPart(value = "attachments", required = false) @Parameter(name = "attachments", description = "List of attachments") final List<MultipartFile> attachments) {
+		@RequestPart(value = "attachments", required = false) @NonEmptyMultipartFiles @Parameter(name = "attachments", description = "List of attachments") final List<MultipartFile> attachments) {
 
 		final var messageId = service.createMessage(municipalityId, namespace, conversationId, message, attachments);
 
@@ -98,7 +101,7 @@ class MessageResource {
 			schema = @Schema(implementation = String.class)) @Nullable @Filter final Specification<MessageEntity> filter,
 		@ParameterObject final Pageable pageable) {
 
-		return ResponseEntity.ok(service.getMessages(municipalityId, namespace, conversationId, filter, pageable));
+		return ok(service.getMessages(municipalityId, namespace, conversationId, filter, pageable));
 	}
 
 	@DeleteMapping(path = "/{messageId}", produces = ALL_VALUE)
@@ -112,7 +115,7 @@ class MessageResource {
 		@PathVariable @ValidUuid @Parameter(name = "messageId", description = "Message ID", example = "d82bd8ac-1507-4d9a-958d-369261eecc15") final String messageId) {
 
 		service.deleteMessage(municipalityId, namespace, conversationId, messageId);
-		return ResponseEntity.noContent().build();
+		return noContent().build();
 	}
 
 	@GetMapping(path = "/{messageId}/attachments/{attachmentId}", produces = ALL_VALUE)
@@ -125,7 +128,7 @@ class MessageResource {
 		@PathVariable @ValidNamespace @Parameter(name = "namespace", description = "Namespace", example = "MY_NAMESPACE") final String namespace,
 		@PathVariable @ValidUuid @Parameter(name = "conversationId", description = "Conversation ID", example = "b82bd8ac-1507-4d9a-958d-369261eecc15") final String conversationId,
 		@PathVariable @ValidUuid @Parameter(name = "messageId", description = "Message ID", example = "d82bd8ac-1507-4d9a-958d-369261eecc15") final String messageId,
-		@PathVariable("attachmentId") @ValidUuid @Parameter(name = "attachmentId", description = "Errand attachment id", example = "5f79a808-0ef3-4985-99b9-b12f23e202a7") final String attachmentId,
+		@PathVariable @ValidUuid @Parameter(name = "attachmentId", description = "Errand attachment id", example = "5f79a808-0ef3-4985-99b9-b12f23e202a7") final String attachmentId,
 		final HttpServletResponse response) {
 
 		service.readErrandAttachment(namespace, municipalityId, conversationId, messageId, attachmentId, response);

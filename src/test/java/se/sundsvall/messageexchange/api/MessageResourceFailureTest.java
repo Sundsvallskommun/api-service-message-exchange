@@ -1,13 +1,17 @@
 package se.sundsvall.messageexchange.api;
 
 import static java.util.UUID.randomUUID;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.groups.Tuple.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 import static org.springframework.http.MediaType.TEXT_PLAIN;
+import static org.zalando.problem.Status.BAD_REQUEST;
 import static org.zalando.problem.Status.NOT_FOUND;
 import static se.sundsvall.dept44.support.Identifier.HEADER_NAME;
 
@@ -21,6 +25,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.zalando.problem.Problem;
+import org.zalando.problem.violations.ConstraintViolationProblem;
+import org.zalando.problem.violations.Violation;
 import se.sundsvall.messageexchange.Application;
 import se.sundsvall.messageexchange.api.model.Message;
 import se.sundsvall.messageexchange.service.MessageService;
@@ -96,6 +102,33 @@ class MessageResourceFailureTest {
 			.body(BodyInserters.fromMultipartData(body))
 			.exchange()
 			.expectStatus().isBadRequest();
+	}
+
+	@Test
+	void postMessageWithEmptyAttachmentFile() {
+
+		final var request = new Message();
+		final var multipartBodyBuilder = new MultipartBodyBuilder();
+		multipartBodyBuilder.part("message", request, APPLICATION_JSON);
+		multipartBodyBuilder.part("attachments", "").filename("file.pdf").contentType(APPLICATION_PDF);
+		final var body = multipartBodyBuilder.build();
+
+		final var response = webTestClient.post()
+			.uri(PATH, Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID))
+			.contentType(MULTIPART_FORM_DATA)
+			.body(BodyInserters.fromMultipartData(body))
+			.exchange()
+			.expectStatus().isBadRequest()
+			.expectBody(ConstraintViolationProblem.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).isNotNull();
+		assertThat(response.getTitle()).isEqualTo("Constraint Violation");
+		assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
+		assertThat(response.getViolations())
+			.extracting(Violation::getField, Violation::getMessage)
+			.containsExactlyInAnyOrder(tuple("postMessage.attachments", "all files must contain data"));
 	}
 
 	@Test
