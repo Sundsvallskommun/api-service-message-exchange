@@ -4,7 +4,6 @@
 logging:
   level:
     root: INFO
-
 spring:
   cache:
     type: none
