@@ -10,13 +10,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-class NonEmptyMultipartFilesValidatorTest {
+class ValidMultipartFilesValidatorTest {
 
-	private NonEmptyMultipartFilesValidator validator;
+	private ValidMultipartFilesValidator validator;
 
 	@BeforeEach
 	void setUp() {
-		validator = new NonEmptyMultipartFilesValidator();
+		validator = new ValidMultipartFilesValidator();
 	}
 
 	@Test

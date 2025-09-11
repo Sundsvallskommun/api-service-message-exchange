@@ -7,9 +7,9 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
-import se.sundsvall.messageexchange.api.validation.NonEmptyMultipartFiles;
+import se.sundsvall.messageexchange.api.validation.ValidMultipartFiles;
 
-public class NonEmptyMultipartFilesValidator implements ConstraintValidator<NonEmptyMultipartFiles, List<MultipartFile>> {
+public class ValidMultipartFilesValidator implements ConstraintValidator<ValidMultipartFiles, List<MultipartFile>> {
 
 	@Override
 	public boolean isValid(List<MultipartFile> multipartFiles, ConstraintValidatorContext context) {

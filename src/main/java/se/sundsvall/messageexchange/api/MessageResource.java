@@ -41,7 +41,7 @@ import org.zalando.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.messageexchange.api.model.Message;
-import se.sundsvall.messageexchange.api.validation.NonEmptyMultipartFiles;
+import se.sundsvall.messageexchange.api.validation.ValidMultipartFiles;
 import se.sundsvall.messageexchange.api.validation.ValidNamespace;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 import se.sundsvall.messageexchange.service.MessageService;
@@ -75,7 +75,7 @@ class MessageResource {
 		@PathVariable @ValidNamespace @Parameter(name = "namespace", description = "Namespace", example = "MY_NAMESPACE") final String namespace,
 		@PathVariable @ValidUuid @Parameter(name = "conversationId", description = "Conversation ID", example = "b82bd8ac-1507-4d9a-958d-369261eecc15") final String conversationId,
 		@RequestPart("message") @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Message to be posted") final Message message,
-		@RequestPart(value = "attachments", required = false) @NonEmptyMultipartFiles @Parameter(name = "attachments", description = "List of attachments") final List<MultipartFile> attachments) {
+		@RequestPart(value = "attachments", required = false) @ValidMultipartFiles @Parameter(name = "attachments", description = "List of attachments") final List<MultipartFile> attachments) {
 
 		final var messageId = service.createMessage(municipalityId, namespace, conversationId, message, attachments);
 
