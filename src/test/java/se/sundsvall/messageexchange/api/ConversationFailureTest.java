@@ -83,7 +83,6 @@ class ConversationFailureTest {
 			.expectStatus().isBadRequest();
 
 		verifyNoInteractions(conversationServiceMock);
-
 	}
 
 	@Test

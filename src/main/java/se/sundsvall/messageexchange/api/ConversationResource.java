@@ -5,6 +5,8 @@ import static org.springframework.http.MediaType.ALL_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.created;
+import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.web.util.UriComponentsBuilder.fromPath;
 
 import com.turkraft.springfilter.boot.Filter;
@@ -65,7 +67,7 @@ class ConversationResource {
 			example = "topic:'My topic' and messages.createdBy.value:'joe01doe' and messages.created>'2023-01-01T00:00:00Z'",
 			schema = @Schema(implementation = String.class)) @Nullable @Filter final Specification<ConversationEntity> filter,
 		@ParameterObject final Pageable pageable) {
-		return ResponseEntity.ok(service.readConversations(namespace, municipalityId, filter, pageable));
+		return ok(service.readConversations(namespace, municipalityId, filter, pageable));
 	}
 
 	@GetMapping(path = "/{conversationId}", produces = APPLICATION_JSON_VALUE)
@@ -78,7 +80,7 @@ class ConversationResource {
 		@Parameter(name = "namespace", description = "Namespace", example = "MY_NAMESPACE") @ValidNamespace @PathVariable final String namespace,
 		@Parameter(name = "conversationId", description = "Conversation ID", example = "b82bd8ac-1507-4d9a-958d-369261eecc15") @ValidUuid @PathVariable final String conversationId) {
 
-		return ResponseEntity.ok(service.readConversation(namespace, municipalityId, conversationId));
+		return ok(service.readConversation(namespace, municipalityId, conversationId));
 	}
 
 	@PostMapping(consumes = APPLICATION_JSON_VALUE, produces = ALL_VALUE)
@@ -108,7 +110,7 @@ class ConversationResource {
 		@Parameter(name = "conversationId", description = "Conversation ID", example = "b82bd8ac-1507-4d9a-958d-369261eecc15") @ValidUuid @PathVariable final String conversationId,
 		@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Conversation to be updated") @RequestBody final Conversation conversation) {
 
-		return ResponseEntity.ok(service.updateConversation(namespace, municipalityId, conversationId, conversation));
+		return ok(service.updateConversation(namespace, municipalityId, conversationId, conversation));
 	}
 
 	@DeleteMapping(path = "/{conversationId}", produces = APPLICATION_JSON_VALUE)
@@ -122,7 +124,7 @@ class ConversationResource {
 		@Parameter(name = "conversationId", description = "Conversation ID", example = "b82bd8ac-1507-4d9a-958d-369261eecc15") @ValidUuid @PathVariable final String conversationId) {
 
 		service.deleteConversation(namespace, municipalityId, conversationId);
-		return ResponseEntity.noContent().build();
+		return noContent().build();
 	}
 
 }

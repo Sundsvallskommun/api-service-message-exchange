@@ -1,5 +1,6 @@
 package se.sundsvall.messageexchange.integration.db;
 
+import static java.nio.file.Files.readString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE;
 
@@ -36,6 +37,6 @@ class SchemaVerificationTest {
 	}
 
 	private String getResourceString(final String fileName) throws IOException, URISyntaxException {
-		return Files.readString(Paths.get(getClass().getClassLoader().getResource(fileName).toURI()));
+		return readString(Paths.get(getClass().getClassLoader().getResource(fileName).toURI()));
 	}
 }
