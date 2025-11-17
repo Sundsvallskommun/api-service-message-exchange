@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: message-exchange
   contact: { }
@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "1.1"
 servers:
-  - url: http://localhost:56259
+  - url: http://localhost:62905
     description: Generated server url
 tags:
   - name: Message resource
@@ -49,17 +49,17 @@ paths:
           description: Zero-based page index (0..N)
           required: false
           schema:
-            minimum: 0
             type: integer
             default: 0
+            minimum: 0
         - name: size
           in: query
           description: The size of the page to be returned
           required: false
           schema:
-            minimum: 1
             type: integer
             default: 20
+            minimum: 1
         - name: sort
           in: query
           description: "Sorting criteria in the format: property,(asc|desc). Default\
@@ -183,17 +183,17 @@ paths:
           description: Zero-based page index (0..N)
           required: false
           schema:
-            minimum: 0
             type: integer
             default: 0
+            minimum: 0
         - name: size
           in: query
           description: The size of the page to be returned
           required: false
           schema:
-            minimum: 1
             type: integer
             default: 20
+            minimum: 1
         - name: sort
           in: query
           description: "Sorting criteria in the format: property,(asc|desc). Default\
@@ -271,8 +271,6 @@ paths:
         content:
           multipart/form-data:
             schema:
-              required:
-                - message
               type: object
               properties:
                 message:
@@ -283,6 +281,8 @@ paths:
                   items:
                     type: string
                     format: binary
+              required:
+                - message
       responses:
         "201":
           description: Created - Successful operation
@@ -617,75 +617,87 @@ components:
   schemas:
     Conversation:
       type: object
+      description: "Represents a conversation containing identifiers, messages, and\
+        \ metadata."
       properties:
         id:
           type: string
           description: The unique identifier of the conversation.
+          examples:
+            - 2af1002e-008f-4bdc-924b-daaae31f1118
           readOnly: true
-          example: 2af1002e-008f-4bdc-924b-daaae31f1118
         participants:
           type: array
           items:
             $ref: "#/components/schemas/Identifier"
+            description: The list of participants in the conversation.
         municipalityId:
           type: string
           description: The identifier of the municipality associated with the conversation.
+          examples:
+            - "2281"
           readOnly: true
-          example: "2281"
         namespace:
           type: string
           description: The namespace of the conversation.
+          examples:
+            - namespace-abc
           readOnly: true
-          example: namespace-abc
         externalReferences:
           type: array
           items:
             $ref: "#/components/schemas/KeyValues"
+            description: The list of external references associated with the conversation.
         metadata:
           type: array
           items:
             $ref: "#/components/schemas/KeyValues"
+            description: A list of metadata associated with the conversation.
         topic:
           type: string
           description: The topic of the conversation.
-          example: Customer Support
+          examples:
+            - Customer Support
         latestSequenceNumber:
           type: integer
-          description: The latest sequence number of the conversation.
           format: int64
+          description: The latest sequence number of the conversation.
+          examples:
+            - "1"
           readOnly: true
-          example: 1
-      description: "Represents a conversation containing identifiers, messages, and\
-        \ metadata."
     Identifier:
-      required:
-        - value
       type: object
-      properties:
-        type:
-          pattern: ^(adAccount|partyId)$
-          type: string
-          description: "The type of the participant, e.g., adAccount or partyId"
-          example: user
-        value:
-          minLength: 1
-          type: string
-          description: The unique identifier or value of the participant.
-          example: ad012ad
       description: "Represents a participant in a conversation, including their type\
         \ and value."
+      properties:
+        type:
+          type: string
+          description: "The type of the participant, e.g., adAccount or partyId"
+          examples:
+            - user
+          pattern: ^(adAccount|partyId)$
+        value:
+          type: string
+          description: The unique identifier or value of the participant.
+          examples:
+            - ad012ad
+          minLength: 1
+      required:
+        - value
     KeyValues:
       type: object
+      description: Represents a key-value pair of metadata.
       properties:
         key:
           type: string
           description: The key of the data
-          example: key1
+          examples:
+            - key1
         values:
           type: array
           items:
             type: string
-      description: Represents a key-value pair of metadata.
+            description: The values associated with the key
     Problem:
       type: object
       properties:
@@ -703,8 +715,7 @@ components:
           format: uri
         parameters:
           type: object
-          additionalProperties:
-            type: object
+          additionalProperties: { }
     StatusType:
       type: object
       properties:
@@ -760,8 +771,7 @@ components:
           format: uri
         parameters:
           type: object
-          additionalProperties:
-            type: object
+          additionalProperties: { }
         suppressed:
           type: array
           items:
@@ -798,8 +808,7 @@ components:
     ThrowableProblem:
       type: object
       properties:
-        cause:
-          $ref: "#/components/schemas/ThrowableProblem"
+        cause: { }
         stackTrace:
           type: array
           items:
@@ -838,8 +847,7 @@ components:
           format: uri
         parameters:
           type: object
-          additionalProperties:
-            type: object
+          additionalProperties: { }
         suppressed:
           type: array
           items:
@@ -882,92 +890,111 @@ components:
           type: string
     Attachment:
       type: object
+      description: Represents an attachment in a message
       properties:
         id:
           type: string
           description: Unique identifier for the attachment
+          examples:
+            - cb20c51f-fcf3-42c0-b613-de563634a8ec
           readOnly: true
-          example: cb20c51f-fcf3-42c0-b613-de563634a8ec
         fileName:
           type: string
           description: Name of the file
+          examples:
+            - my-file.txt
           readOnly: true
-          example: my-file.txt
         fileSize:
           type: integer
-          description: Size of the file in bytes
           format: int32
+          description: Size of the file in bytes
+          examples:
+            - "1024"
           readOnly: true
-          example: 1024
         mimeType:
           type: string
           description: Mime type of the file
           readOnly: true
         created:
           type: string
-          description: The attachment created date
           format: date-time
+          description: The attachment created date
+          examples:
+            - 2023-01-01T00:00:00Z
           readOnly: true
-          example: 2023-01-01T00:00:00Z
-      description: Represents an attachment in a message
     Message:
       type: object
+      description: "Represents a message within a conversation, including metadata\
+        \ and content."
       properties:
         id:
           type: string
           description: The unique identifier of the message.
+          examples:
+            - 7f77f9fd-d01d-4742-974a-714b911e3496
           readOnly: true
-          example: 7f77f9fd-d01d-4742-974a-714b911e3496
         sequenceNumber:
           type: integer
-          description: The sequence number of the message in the conversation.
           format: int64
+          description: The sequence number of the message in the conversation.
+          examples:
+            - "1"
           readOnly: true
-          example: 1
         inReplyToMessageId:
           type: string
           description: "The identifier of the message this message is replying to,\
             \ if any."
-          example: 2af1002e-008f-4bdc-924b-daaae31f1118
+          examples:
+            - 2af1002e-008f-4bdc-924b-daaae31f1118
         created:
           type: string
-          description: The timestamp when the message was created.
           format: date-time
+          description: The timestamp when the message was created.
+          examples:
+            - 2023-01-01T12:00:00
           readOnly: true
         createdBy:
           $ref: "#/components/schemas/Identifier"
+          description: Identifier for the person that created the message
+          readOnly: true
         content:
           type: string
           description: The content of the message.
-          example: "Hello, how can I help you?"
+          examples:
+            - "Hello, how can I help you?"
         readBy:
           type: array
           items:
             $ref: "#/components/schemas/ReadBy"
+            description: The list of people who have read the message.
         attachments:
           type: array
           items:
             $ref: "#/components/schemas/Attachment"
+            description: The list of attachments associated with the message.
         type:
           type: string
           description: Type of message (user or system created)
-          readOnly: true
           enum:
             - USER_CREATED
             - SYSTEM_CREATED
-      description: "Represents a message within a conversation, including metadata\
-        \ and content."
+          readOnly: true
     ReadBy:
       type: object
+      description: "Represents a person who has read a message, including their identifier\
+        \ and the timestamp of when they read it."
       properties:
         identifier:
           $ref: "#/components/schemas/Identifier"
+          description: The identifier of the person who read the message.
+          examples:
+            - ad012ad
         readAt:
           type: string
-          description: The timestamp when the message was read.
           format: date-time
-      description: "Represents a person who has read a message, including their identifier\
-        \ and the timestamp of when they read it."
+          description: The timestamp when the message was read.
+          examples:
+            - 2023-01-01T12:00:00
     PageConversation:
       type: object
       properties:
@@ -981,11 +1008,11 @@ components:
           type: boolean
         last:
           type: boolean
+        sort:
+          $ref: "#/components/schemas/SortObject"
         numberOfElements:
           type: integer
           format: int32
-        sort:
-          $ref: "#/components/schemas/SortObject"
         pageable:
           $ref: "#/components/schemas/PageableObject"
         size:
@@ -1040,11 +1067,11 @@ components:
           type: boolean
         last:
           type: boolean
+        sort:
+          $ref: "#/components/schemas/SortObject"
         numberOfElements:
           type: integer
           format: int32
-        sort:
-          $ref: "#/components/schemas/SortObject"
         pageable:
           $ref: "#/components/schemas/PageableObject"
         size:

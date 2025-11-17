@@ -8,7 +8,7 @@ import java.util.Objects;
 @Schema(description = "Represents a key-value pair of metadata.")
 public class KeyValues {
 
-	@Schema(description = "The key of the data", example = "key1")
+	@Schema(description = "The key of the data", examples = "key1")
 	private String key;
 
 	@ArraySchema(schema = @Schema(implementation = String.class, description = "The values associated with the key"))

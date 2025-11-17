@@ -10,16 +10,16 @@ import java.util.Objects;
 @Schema(description = "Represents a conversation containing identifiers, messages, and metadata.")
 public class Conversation {
 
-	@Schema(description = "The unique identifier of the conversation.", example = "2af1002e-008f-4bdc-924b-daaae31f1118", accessMode = READ_ONLY)
+	@Schema(description = "The unique identifier of the conversation.", examples = "2af1002e-008f-4bdc-924b-daaae31f1118", accessMode = READ_ONLY)
 	private String id;
 
 	@ArraySchema(schema = @Schema(implementation = Identifier.class, description = "The list of participants in the conversation."))
 	private List<Identifier> participants;
 
-	@Schema(description = "The identifier of the municipality associated with the conversation.", example = "2281", accessMode = READ_ONLY)
+	@Schema(description = "The identifier of the municipality associated with the conversation.", examples = "2281", accessMode = READ_ONLY)
 	private String municipalityId;
 
-	@Schema(description = "The namespace of the conversation.", example = "namespace-abc", accessMode = READ_ONLY)
+	@Schema(description = "The namespace of the conversation.", examples = "namespace-abc", accessMode = READ_ONLY)
 	private String namespace;
 
 	@ArraySchema(schema = @Schema(implementation = KeyValues.class, description = "The list of external references associated with the conversation."))
@@ -28,10 +28,10 @@ public class Conversation {
 	@ArraySchema(schema = @Schema(implementation = KeyValues.class, description = "A list of metadata associated with the conversation."))
 	private List<KeyValues> metadata;
 
-	@Schema(description = "The topic of the conversation.", example = "Customer Support")
+	@Schema(description = "The topic of the conversation.", examples = "Customer Support")
 	private String topic;
 
-	@Schema(description = "The latest sequence number of the conversation.", example = "1", accessMode = READ_ONLY)
+	@Schema(description = "The latest sequence number of the conversation.", examples = "1", accessMode = READ_ONLY)
 	private Long latestSequenceNumber;
 
 	public static Conversation create() {

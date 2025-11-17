@@ -10,23 +10,23 @@ import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 @Schema(description = "Represents a message within a conversation, including metadata and content.")
 public class Message {
 
-	@Schema(description = "The unique identifier of the message.", example = "7f77f9fd-d01d-4742-974a-714b911e3496", accessMode = Schema.AccessMode.READ_ONLY)
+	@Schema(description = "The unique identifier of the message.", examples = "7f77f9fd-d01d-4742-974a-714b911e3496", accessMode = Schema.AccessMode.READ_ONLY)
 	private String id;
 
-	@Schema(description = "The sequence number of the message in the conversation.", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
+	@Schema(description = "The sequence number of the message in the conversation.", examples = "1", accessMode = Schema.AccessMode.READ_ONLY)
 	private Long sequenceNumber;
 
-	@Schema(description = "The identifier of the message this message is replying to, if any.", example = "2af1002e-008f-4bdc-924b-daaae31f1118")
+	@Schema(description = "The identifier of the message this message is replying to, if any.", examples = "2af1002e-008f-4bdc-924b-daaae31f1118")
 	@ValidUuid(nullable = true)
 	private String inReplyToMessageId;
 
-	@Schema(description = "The timestamp when the message was created.", example = "2023-01-01T12:00:00", accessMode = Schema.AccessMode.READ_ONLY)
+	@Schema(description = "The timestamp when the message was created.", examples = "2023-01-01T12:00:00", accessMode = Schema.AccessMode.READ_ONLY)
 	private OffsetDateTime created;
 
 	@Schema(description = "Identifier for the person that created the message", accessMode = Schema.AccessMode.READ_ONLY)
 	private Identifier createdBy;
 
-	@Schema(description = "The content of the message.", example = "Hello, how can I help you?")
+	@Schema(description = "The content of the message.", examples = "Hello, how can I help you?")
 	private String content;
 
 	@ArraySchema(schema = @Schema(implementation = ReadBy.class, description = "The list of people who have read the message."))

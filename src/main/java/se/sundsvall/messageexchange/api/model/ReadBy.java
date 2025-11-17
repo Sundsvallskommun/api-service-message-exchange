@@ -7,10 +7,10 @@ import java.util.Objects;
 @Schema(description = "Represents a person who has read a message, including their identifier and the timestamp of when they read it.")
 public class ReadBy {
 
-	@Schema(description = "The identifier of the person who read the message.", example = "ad012ad")
+	@Schema(description = "The identifier of the person who read the message.", examples = "ad012ad")
 	private Identifier identifier;
 
-	@Schema(description = "The timestamp when the message was read.", example = "2023-01-01T12:00:00")
+	@Schema(description = "The timestamp when the message was read.", examples = "2023-01-01T12:00:00")
 	private OffsetDateTime readAt;
 
 	public static ReadBy create() {
