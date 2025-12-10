@@ -9,19 +9,19 @@ import java.util.Objects;
 @Schema(description = "Represents an attachment in a message")
 public class Attachment {
 
-	@Schema(description = "Unique identifier for the attachment", example = "cb20c51f-fcf3-42c0-b613-de563634a8ec", accessMode = READ_ONLY)
+	@Schema(description = "Unique identifier for the attachment", examples = "cb20c51f-fcf3-42c0-b613-de563634a8ec", accessMode = READ_ONLY)
 	private String id;
 
-	@Schema(description = "Name of the file", example = "my-file.txt", accessMode = READ_ONLY)
+	@Schema(description = "Name of the file", examples = "my-file.txt", accessMode = READ_ONLY)
 	private String fileName;
 
-	@Schema(description = "Size of the file in bytes", example = "1024", accessMode = READ_ONLY)
+	@Schema(description = "Size of the file in bytes", examples = "1024", accessMode = READ_ONLY)
 	private int fileSize;
 
 	@Schema(description = "Mime type of the file", accessMode = Schema.AccessMode.READ_ONLY)
 	private String mimeType;
 
-	@Schema(description = "The attachment created date", example = "2023-01-01T00:00:00Z", accessMode = READ_ONLY)
+	@Schema(description = "The attachment created date", examples = "2023-01-01T00:00:00Z", accessMode = READ_ONLY)
 	private OffsetDateTime created;
 
 	public static Attachment create() {

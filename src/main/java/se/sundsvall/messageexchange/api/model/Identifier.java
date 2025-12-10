@@ -8,12 +8,12 @@ import java.util.Objects;
 @Schema(description = "Represents a participant in a conversation, including their type and value.")
 public class Identifier {
 
-	@Schema(description = "The type of the participant, e.g., adAccount or partyId", example = "user")
+	@Schema(description = "The type of the participant, e.g., adAccount or partyId", examples = "user")
 	@Pattern(regexp = "^(adAccount|partyId)$", message = "Type must be 'adAccount' or 'partyId'")
 	private String type;
 
 	@NotBlank
-	@Schema(description = "The unique identifier or value of the participant.", example = "ad012ad")
+	@Schema(description = "The unique identifier or value of the participant.", examples = "ad012ad")
 	private String value;
 
 	public static Identifier create() {

@@ -7,7 +7,7 @@ access relevant communications, serving as the central hub for internal interact
 
 ### Prerequisites
 
-- **Java 21 or higher**
+- **Java 25 or higher**
 - **Maven**
 - **MariaDB**
 - **Git**
