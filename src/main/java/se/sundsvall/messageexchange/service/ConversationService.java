@@ -1,15 +1,5 @@
 package se.sundsvall.messageexchange.service;
 
-import static org.zalando.problem.Status.NOT_FOUND;
-import static se.sundsvall.messageexchange.service.mapper.Mapper.CONVERSATION_CREATED_MSG;
-import static se.sundsvall.messageexchange.service.mapper.Mapper.conversationDiffMessage;
-import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversation;
-import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversationEntity;
-import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversations;
-import static se.sundsvall.messageexchange.service.mapper.Mapper.updateConversationEntity;
-import static se.sundsvall.messageexchange.util.ConversationSpecificationBuilder.withMunicipalityId;
-import static se.sundsvall.messageexchange.util.ConversationSpecificationBuilder.withNamespace;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +13,16 @@ import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageType;
 import se.sundsvall.messageexchange.integration.db.model.SequenceEntity;
+
+import static org.zalando.problem.Status.NOT_FOUND;
+import static se.sundsvall.messageexchange.service.mapper.Mapper.CONVERSATION_CREATED_MSG;
+import static se.sundsvall.messageexchange.service.mapper.Mapper.conversationDiffMessage;
+import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversation;
+import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversationEntity;
+import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversations;
+import static se.sundsvall.messageexchange.service.mapper.Mapper.updateConversationEntity;
+import static se.sundsvall.messageexchange.util.ConversationSpecificationBuilder.withMunicipalityId;
+import static se.sundsvall.messageexchange.util.ConversationSpecificationBuilder.withNamespace;
 
 @Service
 public class ConversationService {

@@ -1,9 +1,5 @@
 package se.sundsvall.messageexchange.service.mapper;
 
-import static java.util.Collections.emptyList;
-import static org.apache.commons.lang3.ObjectUtils.anyNull;
-import static se.sundsvall.messageexchange.util.ServiceUtil.detectMimeTypeFromStream;
-
 import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.util.List;
@@ -19,6 +15,10 @@ import se.sundsvall.messageexchange.api.model.Attachment;
 import se.sundsvall.messageexchange.integration.db.model.AttachmentDataEntity;
 import se.sundsvall.messageexchange.integration.db.model.AttachmentEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
+
+import static java.util.Collections.emptyList;
+import static org.apache.commons.lang3.ObjectUtils.anyNull;
+import static se.sundsvall.messageexchange.util.ServiceUtil.detectMimeTypeFromStream;
 
 public final class AttachmentMapper {
 

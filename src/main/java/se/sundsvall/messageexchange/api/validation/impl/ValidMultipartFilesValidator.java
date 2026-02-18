@@ -1,13 +1,13 @@
 package se.sundsvall.messageexchange.api.validation.impl;
 
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 import se.sundsvall.messageexchange.api.validation.ValidMultipartFiles;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 public class ValidMultipartFilesValidator implements ConstraintValidator<ValidMultipartFiles, List<MultipartFile>> {
 
