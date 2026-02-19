@@ -1,10 +1,10 @@
 package se.sundsvall.messageexchange.api.validation.impl;
 
-import static se.sundsvall.messageexchange.Constants.NAMESPACE_REGEXP;
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import se.sundsvall.messageexchange.api.validation.ValidNamespace;
+
+import static se.sundsvall.messageexchange.Constants.NAMESPACE_REGEXP;
 
 public class NamespaceValidator implements ConstraintValidator<ValidNamespace, String> {
 

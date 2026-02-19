@@ -1,11 +1,5 @@
 package se.sundsvall.messageexchange.service.mapper;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
-import static org.mockito.Mockito.mockStatic;
-import static se.sundsvall.dept44.support.Identifier.Type.PARTY_ID;
-
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -24,6 +18,12 @@ import se.sundsvall.messageexchange.integration.db.model.MessageType;
 import se.sundsvall.messageexchange.integration.db.model.MetadataEntity;
 import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
 import se.sundsvall.messageexchange.integration.db.model.SequenceEntity;
+
+import static java.time.temporal.ChronoUnit.SECONDS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
+import static org.mockito.Mockito.mockStatic;
+import static se.sundsvall.dept44.support.Identifier.Type.PARTY_ID;
 
 @ExtendWith(MockitoExtension.class)
 class MapperTest {

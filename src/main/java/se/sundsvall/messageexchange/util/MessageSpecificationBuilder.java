@@ -1,9 +1,9 @@
 package se.sundsvall.messageexchange.util;
 
-import static java.util.Objects.nonNull;
-
 import org.springframework.data.jpa.domain.Specification;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
+
+import static java.util.Objects.nonNull;
 
 public class MessageSpecificationBuilder<T> {
 

@@ -1,9 +1,9 @@
 package se.sundsvall.messageexchange.configuration;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.turkraft.springfilter.parser.InvalidSyntaxException;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ExceptionHandlerConfigTest {
 

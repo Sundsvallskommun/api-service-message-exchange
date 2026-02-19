@@ -1,14 +1,5 @@
 package se.sundsvall.messageexchange.service;
 
-import static java.util.Optional.ofNullable;
-import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-import static org.zalando.problem.Status.NOT_FOUND;
-import static se.sundsvall.messageexchange.service.mapper.Mapper.toIdentifierEntity;
-import static se.sundsvall.messageexchange.service.mapper.Mapper.toMessageEntity;
-import static se.sundsvall.messageexchange.util.MessageSpecificationBuilder.withConversation;
-
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -37,6 +28,15 @@ import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
 import se.sundsvall.messageexchange.integration.db.model.SequenceEntity;
 import se.sundsvall.messageexchange.service.mapper.AttachmentMapper;
 import se.sundsvall.messageexchange.service.mapper.Mapper;
+
+import static java.util.Optional.ofNullable;
+import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static org.zalando.problem.Status.NOT_FOUND;
+import static se.sundsvall.messageexchange.service.mapper.Mapper.toIdentifierEntity;
+import static se.sundsvall.messageexchange.service.mapper.Mapper.toMessageEntity;
+import static se.sundsvall.messageexchange.util.MessageSpecificationBuilder.withConversation;
 
 @Service
 public class MessageService {
