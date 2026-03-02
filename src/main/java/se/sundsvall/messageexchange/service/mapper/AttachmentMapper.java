@@ -9,8 +9,7 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
-import org.zalando.problem.Problem;
-import org.zalando.problem.Status;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.messageexchange.api.model.Attachment;
 import se.sundsvall.messageexchange.integration.db.model.AttachmentDataEntity;
 import se.sundsvall.messageexchange.integration.db.model.AttachmentEntity;
@@ -18,6 +17,7 @@ import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 
 import static java.util.Collections.emptyList;
 import static org.apache.commons.lang3.ObjectUtils.anyNull;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static se.sundsvall.messageexchange.util.ServiceUtil.detectMimeTypeFromStream;
 
 public final class AttachmentMapper {
@@ -41,7 +41,7 @@ public final class AttachmentMapper {
 				.withMimeType(detectMimeTypeFromStream(attachment.getOriginalFilename(), attachment.getInputStream()));
 		} catch (final IOException e) {
 			LOGGER.warn("Exception when reading file", e);
-			throw Problem.valueOf(Status.BAD_REQUEST, "Could not read input stream!");
+			throw Problem.valueOf(BAD_REQUEST, "Could not read input stream!");
 		}
 	}
 

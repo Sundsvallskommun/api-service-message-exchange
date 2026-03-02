@@ -23,7 +23,7 @@ class ExceptionHandlerConfigTest {
 		assertThat(problem).isNotNull();
 		assertThat(problem.getTitle()).isEqualTo("Invalid Filter Content");
 		assertThat(problem.getStatus()).isNotNull();
-		assertThat(problem.getStatus().getStatusCode()).isEqualTo(400);
+		assertThat(problem.getStatus().value()).isEqualTo(400);
 		assertThat(problem.getDetail()).isEqualTo(errorMessage);
 	}
 
