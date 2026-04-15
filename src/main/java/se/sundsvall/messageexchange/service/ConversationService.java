@@ -20,6 +20,7 @@ import static se.sundsvall.messageexchange.service.mapper.Mapper.conversationDif
 import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversation;
 import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversationEntity;
 import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversations;
+import static se.sundsvall.messageexchange.service.mapper.Mapper.toIdentifierEntity;
 import static se.sundsvall.messageexchange.service.mapper.Mapper.updateConversationEntity;
 import static se.sundsvall.messageexchange.util.ConversationSpecificationBuilder.withMunicipalityId;
 import static se.sundsvall.messageexchange.util.ConversationSpecificationBuilder.withNamespace;
@@ -92,6 +93,7 @@ public class ConversationService {
 			.withType(MessageType.SYSTEM_CREATED)
 			.withContent(content)
 			.withSequenceNumber(new SequenceEntity())
-			.withConversation(conversationEntity);
+			.withConversation(conversationEntity)
+			.withCreatedBy(toIdentifierEntity(se.sundsvall.dept44.support.Identifier.get()));
 	}
 }

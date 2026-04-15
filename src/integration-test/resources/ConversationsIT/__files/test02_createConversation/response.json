@@ -1,0 +1,34 @@
+{
+	"content": [
+		{
+			"attachments": [],
+			"content": "Konversation skapad",
+			"created": "${json-unit.any-string}",
+			"createdBy": {
+				"type": "AD_ACCOUNT",
+				"value": "joe01doe"
+			},
+			"id": "${json-unit.any-string}",
+			"readBy": [],
+			"sequenceNumber": 3,
+			"type": "SYSTEM_CREATED"
+		}
+	],
+	"empty": false,
+	"first": true,
+	"last": true,
+	"number": 0,
+	"numberOfElements": 1,
+	"pageable": {
+		"offset": 0,
+		"pageNumber": 0,
+		"pageSize": 20,
+		"paged": true,
+		"sort": [],
+		"unpaged": false
+	},
+	"size": 20,
+	"sort": [],
+	"totalElements": 1,
+	"totalPages": 1
+}

@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.dept44.problem.Problem;
+import se.sundsvall.dept44.support.Identifier;
 import se.sundsvall.messageexchange.api.model.Conversation;
 import se.sundsvall.messageexchange.integration.db.ConversationRepository;
 import se.sundsvall.messageexchange.integration.db.MessageRepository;
@@ -110,11 +111,13 @@ class ConversationServiceTest {
 		final var entity = new ConversationEntity();
 		entity.setId("newConversationId");
 		when(conversationRepositoryMock.save(any(ConversationEntity.class))).thenReturn(entity);
+		se.sundsvall.dept44.support.Identifier.set(Identifier.create().withType(Identifier.Type.AD_ACCOUNT).withValue("adUser"));
 
 		// Act
 		final var result = conversationService.createConversation(namespace, municipalityId, request);
 
 		// Assert
+
 		assertThat(result).isEqualTo("newConversationId");
 		verify(conversationRepositoryMock).save(any(ConversationEntity.class));
 		verify(messageRepositoryMock).save(messageEntityArgumentCaptor.capture());
@@ -123,6 +126,8 @@ class ConversationServiceTest {
 			assertThat(message.getConversation()).isSameAs(entity);
 			assertThat(message.getSequenceNumber()).isNotNull();
 			assertThat(message.getContent()).isEqualTo("Konversation skapad");
+			assertThat(message.getCreatedBy().getType()).isEqualTo(Identifier.Type.AD_ACCOUNT.toString());
+			assertThat(message.getCreatedBy().getValue()).isEqualTo("adUser");
 		});
 	}
 
@@ -159,6 +164,7 @@ class ConversationServiceTest {
 		when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
 			.thenReturn(Optional.of(entity));
 		when(conversationRepositoryMock.save(entity)).thenReturn(entity);
+		se.sundsvall.dept44.support.Identifier.set(Identifier.create().withType(Identifier.Type.AD_ACCOUNT).withValue("adUser"));
 
 		// Act
 		final var result = conversationService.updateConversation(namespace, municipalityId, conversationId, request);
@@ -173,6 +179,8 @@ class ConversationServiceTest {
 			assertThat(message.getConversation()).isSameAs(entity);
 			assertThat(message.getSequenceNumber()).isNotNull();
 			assertThat(message.getContent()).isEqualTo("Ämnesrad ändrad från 'y' till 'x'.");
+			assertThat(message.getCreatedBy().getType()).isEqualTo(Identifier.Type.AD_ACCOUNT.toString());
+			assertThat(message.getCreatedBy().getValue()).isEqualTo("adUser");
 		});
 	}
 

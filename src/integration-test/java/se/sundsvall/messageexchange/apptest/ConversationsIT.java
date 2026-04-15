@@ -11,6 +11,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.util.List;
 
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
 import se.sundsvall.dept44.test.AbstractAppTest;
@@ -30,6 +31,7 @@ class ConversationsIT extends AbstractAppTest {
 	private static final String NAMESPACE_1 = "NAMESPACE-1";
 	private static final String CONVERSATION_ID = "c1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5";
 	private static final String PATH = "/" + MUNICIPALITY_ID + "/" + NAMESPACE_1 + "/conversations";
+	private static final String SENT_BY_HEADER = "X-Sent-By";
 
 	@Test
 	void test01_findConversation() {
@@ -44,13 +46,27 @@ class ConversationsIT extends AbstractAppTest {
 
 	@Test
 	void test02_createConversation() {
+		var location = Objects.requireNonNull(setupCall()
+				.withServicePath(PATH)
+				.withHeader(SENT_BY_HEADER, "joe01doe; type=adAccount")
+				.withHttpMethod(POST)
+				.withRequest(REQUEST_FILE)
+				.withExpectedResponseStatus(CREATED)
+				.withExpectedResponseHeader(LOCATION, List.of(PATH + "/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))
+				.sendRequest()
+				.getResponseHeaders()
+				.get(LOCATION))
+			.getFirst();
+
 		setupCall()
-			.withServicePath(PATH)
-			.withHttpMethod(POST)
-			.withRequest(REQUEST_FILE)
-			.withExpectedResponseStatus(CREATED)
-			.withExpectedResponseHeader(LOCATION, List.of(PATH + "/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))
+			.withServicePath(location + "/messages")
+			.withHeader(SENT_BY_HEADER, "joe01doe; type=adAccount")
+			.withHttpMethod(GET)
+			.withExpectedResponseStatus(OK)
+			.withExpectedResponseHeader(CONTENT_TYPE, List.of(APPLICATION_JSON_VALUE))
+			.withExpectedResponse(RESPONSE_FILE)
 			.sendRequestAndVerifyResponse();
+
 	}
 
 	@Test
