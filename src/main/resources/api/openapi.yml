@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "1.1"
 servers:
-- url: http://localhost:53891
+- url: http://localhost:51313
   description: Generated server url
 tags:
 - name: Message resource
@@ -663,7 +663,7 @@ components:
           format: int64
           description: The latest sequence number of the conversation.
           examples:
-          - "1"
+          - 1
           readOnly: true
     Identifier:
       type: object
@@ -729,10 +729,10 @@ components:
             $ref: "#/components/schemas/Violation"
         title:
           type: string
-        causeAsProblem:
-          $ref: "#/components/schemas/ThrowableProblem"
         detail:
           type: string
+        causeAsProblem:
+          $ref: "#/components/schemas/ThrowableProblem"
         instance:
           type: string
           format: uri
@@ -781,7 +781,7 @@ components:
           format: int32
           description: Size of the file in bytes
           examples:
-          - "1024"
+          - 1024
           readOnly: true
         mimeType:
           type: string
@@ -810,7 +810,7 @@ components:
           format: int64
           description: The sequence number of the message in the conversation.
           examples:
-          - "1"
+          - 1
           readOnly: true
         inReplyToMessageId:
           type: string
@@ -870,23 +870,23 @@ components:
     PageConversation:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         pageable:
           $ref: "#/components/schemas/PageableObject"
-        numberOfElements:
-          type: integer
-          format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
         first:
           type: boolean
         last:
           type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
         size:
           type: integer
           format: int32
@@ -920,32 +920,32 @@ components:
     SortObject:
       type: object
       properties:
-        unsorted:
-          type: boolean
         sorted:
+          type: boolean
+        unsorted:
           type: boolean
         empty:
           type: boolean
     PageMessage:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         pageable:
           $ref: "#/components/schemas/PageableObject"
-        numberOfElements:
-          type: integer
-          format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
         first:
           type: boolean
         last:
           type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
         size:
           type: integer
           format: int32
