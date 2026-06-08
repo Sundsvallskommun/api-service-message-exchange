@@ -19,14 +19,15 @@ import se.sundsvall.messageexchange.integration.db.model.MetadataEntity;
 import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
 import se.sundsvall.messageexchange.integration.db.model.SequenceEntity;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
+import static org.mockito.Answers.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mockStatic;
 import static se.sundsvall.dept44.support.Identifier.Type.PARTY_ID;
 
 @ExtendWith(MockitoExtension.class)
 class MapperTest {
+
+	private static final OffsetDateTime READ_AT = OffsetDateTime.parse("2025-01-01T12:00:00Z");
 
 	@Test
 	void toConversations() {
@@ -565,14 +566,18 @@ class MapperTest {
 			.withType(PARTY_ID)
 			.withValue(value);
 
-		// Act
-		final var result = Mapper.toReadByEntity(identifier);
+		try (final var mockedTime = mockStatic(OffsetDateTime.class, CALLS_REAL_METHODS)) {
+			mockedTime.when(OffsetDateTime::now).thenReturn(READ_AT);
 
-		// Assert
-		assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
-		assertThat(result.getIdentifier().getType()).isEqualTo(type);
-		assertThat(result.getIdentifier().getValue()).isEqualTo(value);
-		assertThat(result.getReadAt()).isCloseTo(OffsetDateTime.now(), within(5, SECONDS));
+			// Act
+			final var result = Mapper.toReadByEntity(identifier);
+
+			// Assert
+			assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
+			assertThat(result.getIdentifier().getType()).isEqualTo(type);
+			assertThat(result.getIdentifier().getValue()).isEqualTo(value);
+			assertThat(result.getReadAt()).isEqualTo(READ_AT);
+		}
 	}
 
 	@Test
@@ -594,7 +599,7 @@ class MapperTest {
 			.withIdentifier(Identifier.create()
 				.withType(type)
 				.withValue(value))
-			.withReadAt(OffsetDateTime.now());
+			.withReadAt(READ_AT);
 
 		// Act
 		final var result = Mapper.toReadByEntities(List.of(readBy));
@@ -604,7 +609,7 @@ class MapperTest {
 		assertThat(result.getFirst()).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
 		assertThat(result.getFirst().getIdentifier().getType()).isEqualTo(type);
 		assertThat(result.getFirst().getIdentifier().getValue()).isEqualTo(value);
-		assertThat(result.getFirst().getReadAt()).isCloseTo(OffsetDateTime.now(), within(5, SECONDS));
+		assertThat(result.getFirst().getReadAt()).isEqualTo(READ_AT);
 	}
 
 	@Test
@@ -635,7 +640,7 @@ class MapperTest {
 			.withIdentifier(Identifier.create()
 				.withType(type)
 				.withValue(value))
-			.withReadAt(OffsetDateTime.now());
+			.withReadAt(READ_AT);
 
 		// Act
 		final var result = Mapper.toReadByEntity(readBy);
@@ -644,7 +649,7 @@ class MapperTest {
 		assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
 		assertThat(result.getIdentifier().getType()).isEqualTo(type);
 		assertThat(result.getIdentifier().getValue()).isEqualTo(value);
-		assertThat(result.getReadAt()).isCloseTo(OffsetDateTime.now(), within(5, SECONDS));
+		assertThat(result.getReadAt()).isEqualTo(READ_AT);
 	}
 
 	@Test
@@ -666,7 +671,7 @@ class MapperTest {
 			.withIdentifier(IdentifierEntity.create()
 				.withType(type)
 				.withValue(value))
-			.withReadAt(OffsetDateTime.now());
+			.withReadAt(READ_AT);
 
 		// Act
 		final var result = Mapper.toReadByList(List.of(readByEntity));
@@ -676,7 +681,7 @@ class MapperTest {
 		assertThat(result.getFirst()).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(result.getFirst().getIdentifier().getType()).isEqualTo(type);
 		assertThat(result.getFirst().getIdentifier().getValue()).isEqualTo(value);
-		assertThat(result.getFirst().getReadAt()).isCloseTo(OffsetDateTime.now(), within(5, SECONDS));
+		assertThat(result.getFirst().getReadAt()).isEqualTo(READ_AT);
 	}
 
 	@Test
@@ -707,7 +712,7 @@ class MapperTest {
 			.withIdentifier(IdentifierEntity.create()
 				.withType(type)
 				.withValue(value))
-			.withReadAt(OffsetDateTime.now());
+			.withReadAt(READ_AT);
 
 		// Act
 		final var result = Mapper.toReadBy(readByEntity);
@@ -716,7 +721,7 @@ class MapperTest {
 		assertThat(result).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(result.getIdentifier().getType()).isEqualTo(type);
 		assertThat(result.getIdentifier().getValue()).isEqualTo(value);
-		assertThat(result.getReadAt()).isCloseTo(OffsetDateTime.now(), within(5, SECONDS));
+		assertThat(result.getReadAt()).isEqualTo(READ_AT);
 	}
 
 	@Test
