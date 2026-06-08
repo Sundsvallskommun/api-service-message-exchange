@@ -5,7 +5,7 @@
 			"content": "Konversation skapad",
 			"created": "${json-unit.any-string}",
 			"createdBy": {
-				"type": "AD_ACCOUNT",
+				"type": "adAccount",
 				"value": "joe01doe"
 			},
 			"id": "${json-unit.any-string}",

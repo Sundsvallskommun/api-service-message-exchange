@@ -263,7 +263,7 @@ class MapperTest {
 	void toMessageEntity() {
 		// Arrange
 		final var inReplyTo = "inReplyTo";
-		final var createdByType = "PARTY_ID";
+		final var createdByType = "partyId";
 		final var createdByValue = "value";
 		final var content = "content";
 		final var dept44Identifier = se.sundsvall.dept44.support.Identifier.create()
@@ -510,7 +510,7 @@ class MapperTest {
 	void toReadByEntitiesFromDept44Identifier() {
 
 		// Arrange
-		final var type = "PARTY_ID";
+		final var type = "partyId";
 		final var value = "value";
 		final var identifier = se.sundsvall.dept44.support.Identifier.create()
 			.withType(PARTY_ID)
@@ -529,7 +529,7 @@ class MapperTest {
 	@Test
 	void toIdentifierEntityFromDept44Identifier() {
 		// Arrange
-		final var type = "PARTY_ID";
+		final var type = "partyId";
 		final var value = "value";
 
 		final var identifier = se.sundsvall.dept44.support.Identifier.create()
@@ -558,7 +558,7 @@ class MapperTest {
 	@Test
 	void toReadByEntityFromDept44Identifier() {
 		// Arrange
-		final var type = "PARTY_ID";
+		final var type = "partyId";
 		final var value = "value";
 
 		final var identifier = se.sundsvall.dept44.support.Identifier.create()
@@ -587,7 +587,7 @@ class MapperTest {
 	@Test
 	void toReadByListEntityFromReadByList() {
 		// Arrange
-		final var type = "PARTY_ID";
+		final var type = "partyId";
 		final var value = "value";
 
 		final var readBy = ReadBy.create()
@@ -628,7 +628,7 @@ class MapperTest {
 	@Test
 	void toReadByEntityFromReadByList() {
 		// Arrange
-		final var type = "PARTY_ID";
+		final var type = "partyId";
 		final var value = "value";
 
 		final var readBy = ReadBy.create()
@@ -659,7 +659,7 @@ class MapperTest {
 	@Test
 	void toReadByList() {
 		// Arrange
-		final var type = "PARTY_ID";
+		final var type = "partyId";
 		final var value = "value";
 
 		final var readByEntity = ReadByEntity.create()
@@ -700,7 +700,7 @@ class MapperTest {
 	@Test
 	void toReadBy() {
 		// Arrange
-		final var type = "PARTY_ID";
+		final var type = "partyId";
 		final var value = "value";
 
 		final var readByEntity = ReadByEntity.create()

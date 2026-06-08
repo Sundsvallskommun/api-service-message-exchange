@@ -126,7 +126,7 @@ class ConversationServiceTest {
 			assertThat(message.getConversation()).isSameAs(entity);
 			assertThat(message.getSequenceNumber()).isNotNull();
 			assertThat(message.getContent()).isEqualTo("Konversation skapad");
-			assertThat(message.getCreatedBy().getType()).isEqualTo(Identifier.Type.AD_ACCOUNT.toString());
+			assertThat(message.getCreatedBy().getType()).isEqualTo("adAccount");
 			assertThat(message.getCreatedBy().getValue()).isEqualTo("adUser");
 		});
 	}
@@ -179,7 +179,7 @@ class ConversationServiceTest {
 			assertThat(message.getConversation()).isSameAs(entity);
 			assertThat(message.getSequenceNumber()).isNotNull();
 			assertThat(message.getContent()).isEqualTo("Ämnesrad ändrad från 'y' till 'x'.");
-			assertThat(message.getCreatedBy().getType()).isEqualTo(Identifier.Type.AD_ACCOUNT.toString());
+			assertThat(message.getCreatedBy().getType()).isEqualTo("adAccount");
 			assertThat(message.getCreatedBy().getValue()).isEqualTo("adUser");
 		});
 	}
