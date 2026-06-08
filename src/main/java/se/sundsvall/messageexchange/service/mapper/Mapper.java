@@ -287,7 +287,7 @@ public final class Mapper {
 
 		return Optional.ofNullable(identifier)
 			.map(p -> IdentifierEntity.create()
-				.withType(p.getType().name())
+				.withType(p.getTypeString())
 				.withValue(p.getValue()))
 			.orElse(null);
 	}

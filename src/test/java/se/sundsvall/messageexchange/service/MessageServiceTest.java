@@ -50,7 +50,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static se.sundsvall.dept44.support.Identifier.Type.AD_ACCOUNT;
 import static se.sundsvall.dept44.support.Identifier.Type.PARTY_ID;
 
 @ExtendWith(MockitoExtension.class)
@@ -120,7 +119,7 @@ class MessageServiceTest {
 			verify(conversationRepositoryMock).save(conversationEntityCaptor.capture());
 			assertThat(conversationEntityCaptor.getValue().getParticipants())
 				.hasSize(1).extracting(IdentifierEntity::getType, IdentifierEntity::getValue)
-				.containsExactly(Tuple.tuple(PARTY_ID.name(), "da012da"));
+				.containsExactly(Tuple.tuple("partyId", "da012da"));
 		}
 	}
 
@@ -151,7 +150,7 @@ class MessageServiceTest {
 		final var conversationId = "conversationId";
 		final var pageable = PageRequest.of(0, 10);
 		final var conversationEntity = new ConversationEntity();
-		final var messageEntity = new MessageEntity().withReadBy(new ArrayList<>(List.of(ReadByEntity.create().withIdentifier(IdentifierEntity.create().withType(PARTY_ID.name()).withValue("ad012ad")))));
+		final var messageEntity = new MessageEntity().withReadBy(new ArrayList<>(List.of(ReadByEntity.create().withIdentifier(IdentifierEntity.create().withType("partyId").withValue("ad012ad")))));
 		final var messagePage = new PageImpl<>(List.of(messageEntity), pageable, 1);
 		final var filter = MessageSpecificationBuilder.withConversation(conversationEntity);
 
@@ -189,7 +188,7 @@ class MessageServiceTest {
 		final var conversationId = "conversationId";
 		final var pageable = PageRequest.of(0, 10);
 		final var conversationEntity = new ConversationEntity();
-		final var messageEntity = new MessageEntity().withReadBy(new ArrayList<>(List.of(ReadByEntity.create().withIdentifier(IdentifierEntity.create().withType(PARTY_ID.name()).withValue("value")))));
+		final var messageEntity = new MessageEntity().withReadBy(new ArrayList<>(List.of(ReadByEntity.create().withIdentifier(IdentifierEntity.create().withType("partyId").withValue("value")))));
 		final var messagePage = new PageImpl<>(List.of(messageEntity), pageable, 1);
 		final var filter = MessageSpecificationBuilder.withConversation(conversationEntity);
 
@@ -362,7 +361,7 @@ class MessageServiceTest {
 		// Arrange
 		final var identifier = Identifier.create().withValue("testIdentifier").withType(PARTY_ID);
 
-		final var messageEntity = new MessageEntity().withReadBy(new ArrayList<>(List.of(ReadByEntity.create().withIdentifier(IdentifierEntity.create().withType(AD_ACCOUNT.name()).withValue("existingIdentifier")))));
+		final var messageEntity = new MessageEntity().withReadBy(new ArrayList<>(List.of(ReadByEntity.create().withIdentifier(IdentifierEntity.create().withType("adAccount").withValue("existingIdentifier")))));
 		final var messagePage = new PageImpl<>(List.of(messageEntity));
 
 		try (final var mockedStatic = mockStatic(Identifier.class)) {
@@ -375,9 +374,9 @@ class MessageServiceTest {
 			assertThat(messageEntity.getReadBy()).isNotNull();
 			assertThat(messageEntity.getReadBy()).hasSize(2);
 			assertThat(messageEntity.getReadBy().getFirst().getIdentifier().getValue()).isEqualTo("existingIdentifier");
-			assertThat(messageEntity.getReadBy().getFirst().getIdentifier().getType()).isEqualTo(AD_ACCOUNT.name());
+			assertThat(messageEntity.getReadBy().getFirst().getIdentifier().getType()).isEqualTo("adAccount");
 			assertThat(messageEntity.getReadBy().getLast().getIdentifier().getValue()).isEqualTo("testIdentifier");
-			assertThat(messageEntity.getReadBy().getLast().getIdentifier().getType()).isEqualTo(PARTY_ID.name());
+			assertThat(messageEntity.getReadBy().getLast().getIdentifier().getType()).isEqualTo("partyId");
 		}
 	}
 

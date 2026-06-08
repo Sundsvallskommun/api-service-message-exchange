@@ -150,7 +150,7 @@ public class MessageService {
 	}
 
 	private boolean identifierNotPresent(final Stream<IdentifierEntity> identifierEntityStream) {
-		return identifierEntityStream.noneMatch(identifier -> identifier.getType().equals(Identifier.get().getType().name()) &&
+		return identifierEntityStream.noneMatch(identifier -> identifier.getType().equals(Identifier.get().getTypeString()) &&
 			identifier.getValue().equals(Identifier.get().getValue()));
 	}
 }
