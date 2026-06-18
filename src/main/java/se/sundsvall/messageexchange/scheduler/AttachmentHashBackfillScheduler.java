@@ -1,17 +1,11 @@
 package se.sundsvall.messageexchange.scheduler;
 
-import java.io.OutputStream;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.util.HexFormat;
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.config.ScheduledTaskHolder;
 import org.springframework.scheduling.support.ScheduledMethodRunnable;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import se.sundsvall.dept44.scheduling.Dept44Scheduled;
 import se.sundsvall.messageexchange.integration.db.AttachmentRepository;
 
 @Component
@@ -20,43 +14,36 @@ public class AttachmentHashBackfillScheduler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AttachmentHashBackfillScheduler.class);
 
 	private final AttachmentRepository attachmentRepository;
+	private final AttachmentHashBackfillWorker worker;
 	private final ScheduledTaskHolder scheduledTaskHolder;
 
-	public AttachmentHashBackfillScheduler(final AttachmentRepository attachmentRepository, final ScheduledTaskHolder scheduledTaskHolder) {
+	public AttachmentHashBackfillScheduler(
+		final AttachmentRepository attachmentRepository,
+		final AttachmentHashBackfillWorker worker,
+		final ScheduledTaskHolder scheduledTaskHolder) {
 		this.attachmentRepository = attachmentRepository;
+		this.worker = worker;
 		this.scheduledTaskHolder = scheduledTaskHolder;
 	}
 
-	@Scheduled(cron = "${scheduler.attachment-hash-backfill.cron}")
-	@SchedulerLock(name = "attachment_hash_backfill", lockAtMostFor = "${scheduler.attachment-hash-backfill.lock-at-most-for}")
-	@Transactional
+	@Dept44Scheduled(
+		name = "attachment-hash-backfill",
+		cron = "${scheduler.attachment-hash-backfill.cron}",
+		lockAtMostFor = "${scheduler.attachment-hash-backfill.lock-at-most-for}")
 	public void backfillAttachmentHashes() {
-		final var attachments = attachmentRepository.findAllByHashIsNull();
+		final var ids = attachmentRepository.findAllByHashIsNull()
+			.stream()
+			.map(a -> a.getId())
+			.toList();
 
-		if (attachments.isEmpty()) {
+		if (ids.isEmpty()) {
 			cancelSelf();
 			return;
 		}
 
-		LOGGER.info("Starting hash backfill for {} attachment(s)", attachments.size());
-		var processed = 0;
-
-		for (final var attachment : attachments) {
-			try {
-				final var digest = MessageDigest.getInstance("SHA-256");
-				try (var stream = attachment.getAttachmentData().getFile().getBinaryStream();
-					var dis = new DigestInputStream(stream, digest)) {
-					dis.transferTo(OutputStream.nullOutputStream());
-				}
-				attachment.setHash(HexFormat.of().formatHex(digest.digest()));
-				attachmentRepository.save(attachment);
-				processed++;
-			} catch (final Exception e) {
-				LOGGER.warn("Failed to compute hash for attachment {}", attachment.getId(), e);
-			}
-		}
-
-		LOGGER.info("Hash backfill complete, processed {}/{} attachment(s)", processed, attachments.size());
+		LOGGER.info("Starting hash backfill for {} attachment(s)", ids.size());
+		ids.forEach(worker::computeAndSaveHash);
+		LOGGER.info("Hash backfill complete for {} attachment(s)", ids.size());
 
 		if (attachmentRepository.findAllByHashIsNull().isEmpty()) {
 			cancelSelf();

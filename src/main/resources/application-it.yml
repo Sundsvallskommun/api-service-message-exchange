@@ -4,6 +4,9 @@
 logging:
   level:
     root: INFO
+scheduler:
+  attachment-hash-backfill:
+    cron: "-"
 spring:
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver

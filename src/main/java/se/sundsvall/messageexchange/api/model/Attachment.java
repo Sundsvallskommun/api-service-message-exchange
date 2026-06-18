@@ -18,7 +18,7 @@ public class Attachment {
 	@Schema(description = "Size of the file in bytes", examples = "1024", accessMode = READ_ONLY)
 	private int fileSize;
 
-	@Schema(description = "Mime type of the file", accessMode = Schema.AccessMode.READ_ONLY)
+	@Schema(description = "Mime type of the file", accessMode = READ_ONLY)
 	private String mimeType;
 
 	@Schema(description = "SHA-256 content hash of the file (hex-encoded)", accessMode = READ_ONLY)
