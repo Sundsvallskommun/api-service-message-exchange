@@ -38,6 +38,9 @@ public class AttachmentEntity {
 	@Column(name = "file_size")
 	private int fileSize;
 
+	@Column(name = "hash", length = 64)
+	private String hash;
+
 	@ManyToOne(fetch = LAZY, cascade = ALL)
 	@JoinColumn(name = "attachment_data_id", nullable = false, foreignKey = @ForeignKey(name = "fk_attachment_data_attachment"))
 	private AttachmentDataEntity attachmentData;
@@ -111,6 +114,19 @@ public class AttachmentEntity {
 		return this;
 	}
 
+	public String getHash() {
+		return hash;
+	}
+
+	public void setHash(final String hash) {
+		this.hash = hash;
+	}
+
+	public AttachmentEntity withHash(final String hash) {
+		this.hash = hash;
+		return this;
+	}
+
 	public AttachmentDataEntity getAttachmentData() {
 		return attachmentData;
 	}
@@ -156,13 +172,13 @@ public class AttachmentEntity {
 			return false;
 		}
 		final AttachmentEntity that = (AttachmentEntity) o;
-		return Objects.equals(id, that.id) && Objects.equals(fileName, that.fileName) && Objects.equals(mimeType, that.mimeType) && Objects.equals(fileSize, that.fileSize) && Objects.equals(attachmentData,
+		return Objects.equals(id, that.id) && Objects.equals(fileName, that.fileName) && Objects.equals(mimeType, that.mimeType) && Objects.equals(fileSize, that.fileSize) && Objects.equals(hash, that.hash) && Objects.equals(attachmentData,
 			that.attachmentData) && Objects.equals(created, that.created) && Objects.equals(messageEntity, that.messageEntity);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, fileName, mimeType, fileSize, attachmentData, created, messageEntity);
+		return Objects.hash(id, fileName, mimeType, fileSize, hash, attachmentData, created, messageEntity);
 	}
 
 	@Override
@@ -172,6 +188,7 @@ public class AttachmentEntity {
 			", fileName='" + fileName + '\'' +
 			", mimeType='" + mimeType + '\'' +
 			", fileSize=" + fileSize +
+			", hash='" + hash + '\'' +
 			", attachmentData=" + attachmentData +
 			", created=" + created +
 			", messageEntity=" + messageEntity +

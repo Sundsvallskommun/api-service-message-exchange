@@ -46,6 +46,7 @@ class AttachmentEntityTest {
 		final var file = new AttachmentDataEntity().withFile(new MariaDbBlob("file".getBytes()));
 		final var mimeType = "mimeType";
 		final var fileSize = 100;
+		final var hash = "abc123";
 		final var messageEntity = MessageEntity.create();
 
 		// Act
@@ -56,6 +57,7 @@ class AttachmentEntityTest {
 			.withMimeType(mimeType)
 			.withCreated(now().truncatedTo(SECONDS))
 			.withFileSize(fileSize)
+			.withHash(hash)
 			.withMessageEntity(messageEntity);
 
 		// Assert
@@ -65,6 +67,7 @@ class AttachmentEntityTest {
 		assertThat(attachmentEntity.getAttachmentData()).isEqualTo(file);
 		assertThat(attachmentEntity.getMimeType()).isEqualTo(mimeType);
 		assertThat(attachmentEntity.getFileSize()).isEqualTo(fileSize);
+		assertThat(attachmentEntity.getHash()).isEqualTo(hash);
 	}
 
 	@Test

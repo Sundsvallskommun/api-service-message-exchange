@@ -17,3 +17,7 @@ spring:
     multipart:
       max-file-size: 50MB
       max-request-size: -1
+scheduler:
+  attachment-hash-backfill:
+    cron: "0 0 3 * * *"
+    lock-at-most-for: PT1H
