@@ -4,6 +4,7 @@
     create table attachment (
         file_size integer,
         created datetime(6),
+        hash varchar(64),
         attachment_data_id varchar(255) not null,
         file_name varchar(255),
         id varchar(255) not null,

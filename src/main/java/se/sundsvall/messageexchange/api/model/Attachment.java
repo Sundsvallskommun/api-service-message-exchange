@@ -18,8 +18,11 @@ public class Attachment {
 	@Schema(description = "Size of the file in bytes", examples = "1024", accessMode = READ_ONLY)
 	private int fileSize;
 
-	@Schema(description = "Mime type of the file", accessMode = Schema.AccessMode.READ_ONLY)
+	@Schema(description = "Mime type of the file", accessMode = READ_ONLY)
 	private String mimeType;
+
+	@Schema(description = "SHA-256 content hash of the file (hex-encoded)", accessMode = READ_ONLY)
+	private String hash;
 
 	@Schema(description = "The attachment created date", examples = "2023-01-01T00:00:00Z", accessMode = READ_ONLY)
 	private OffsetDateTime created;
@@ -80,6 +83,19 @@ public class Attachment {
 		return this;
 	}
 
+	public String getHash() {
+		return hash;
+	}
+
+	public void setHash(final String hash) {
+		this.hash = hash;
+	}
+
+	public Attachment withHash(final String hash) {
+		this.hash = hash;
+		return this;
+	}
+
 	public OffsetDateTime getCreated() {
 		return created;
 	}
@@ -98,13 +114,13 @@ public class Attachment {
 		if (o == null || getClass() != o.getClass())
 			return false;
 		final Attachment that = (Attachment) o;
-		return Objects.equals(id, that.id) && Objects.equals(fileName, that.fileName) && Objects.equals(fileSize, that.fileSize) && Objects.equals(mimeType, that.mimeType) && Objects.equals(created,
+		return Objects.equals(id, that.id) && Objects.equals(fileName, that.fileName) && Objects.equals(fileSize, that.fileSize) && Objects.equals(mimeType, that.mimeType) && Objects.equals(hash, that.hash) && Objects.equals(created,
 			that.created);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, fileName, fileSize, mimeType, created);
+		return Objects.hash(id, fileName, fileSize, mimeType, hash, created);
 	}
 
 	@Override
@@ -114,6 +130,7 @@ public class Attachment {
 			", fileName='" + fileName + '\'' +
 			", fileSize=" + fileSize +
 			", mimeType='" + mimeType + '\'' +
+			", hash='" + hash + '\'' +
 			", created=" + created +
 			'}';
 	}

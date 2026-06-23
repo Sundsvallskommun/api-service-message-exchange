@@ -66,8 +66,8 @@ VALUES ('read1', '2023-01-01 10:30:00', 'user5', 'd82bd8ac-1507-4d9a-958d-369261
        ('read2', '2023-01-01 11:30:00', 'user6', 'm2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6');
 
 -- Insert data into `attachment`
-INSERT INTO attachment (id, file_size, created, attachment_data_id, file_name, message_id, mime_type)
+INSERT INTO attachment (id, file_size, created, attachment_data_id, file_name, message_id, mime_type, hash)
 VALUES ('a1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5', 5068, '2023-01-01 10:05:00', 'ec677eb3-604c-4935-bff7-f8f0b500c8f4',
-        'file1.txt', 'd82bd8ac-1507-4d9a-958d-369261eecc15', 'image/jpeg'),
+        'file1.txt', 'd82bd8ac-1507-4d9a-958d-369261eecc15', 'image/jpeg', '367a3839a1ff937698f921defd2550c57867307173a7fe7385fbd6fa3fb673ac'),
        ('a2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', 2048, '2023-01-01 11:05:00', 'd1f2c8d4-d234-4504-a483-b74570a7941d',
-        'file2.txt', 'm2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', 'text/plain');
+        'file2.txt', 'm2a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6', 'text/plain', '1a19017e8f247d057a2addc92c059eebcb0c10d5e83e0f607a516149e82aa8d6');

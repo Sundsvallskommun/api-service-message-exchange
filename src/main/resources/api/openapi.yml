@@ -5,7 +5,7 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "1.1"
+  version: "1.2"
 servers:
 - url: http://localhost:51313
   description: Generated server url
@@ -786,6 +786,10 @@ components:
         mimeType:
           type: string
           description: Mime type of the file
+          readOnly: true
+        hash:
+          type: string
+          description: SHA-256 content hash of the file (hex-encoded)
           readOnly: true
         created:
           type: string

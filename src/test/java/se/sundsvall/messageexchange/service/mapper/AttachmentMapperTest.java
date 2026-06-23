@@ -56,12 +56,17 @@ class AttachmentMapperTest {
 	void toAttachmentEntity() throws IOException {
 
 		final var entity = MessageEntity.create();
+		// SHA-256("test") in hex
+		final var expectedHash = "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08";
 
 		when(entityManagerMock.unwrap(Session.class)).thenReturn(sessionMock);
 		when(sessionMock.getLobHelper()).thenReturn(lobHelperMock);
 		when(lobHelperMock.createBlob(any(), anyLong())).thenReturn(blobMock);
 		when(multipartFileMock.getOriginalFilename()).thenReturn(FILE_NAME);
-		when(multipartFileMock.getInputStream()).thenReturn(new ByteArrayInputStream("test".getBytes()));
+		when(multipartFileMock.getInputStream())
+			.thenReturn(new ByteArrayInputStream("test".getBytes()))
+			.thenReturn(new ByteArrayInputStream("test".getBytes()))
+			.thenReturn(new ByteArrayInputStream("test".getBytes()));
 
 		final var result = AttachmentMapper.toAttachmentEntity(multipartFileMock, entityManagerMock, entity);
 
@@ -70,13 +75,12 @@ class AttachmentMapperTest {
 		assertThat(result.getAttachmentData().getFile()).isSameAs(blobMock);
 		assertThat(result.getMimeType()).isEqualTo("text/plain");
 		assertThat(result.getMessageEntity()).isSameAs(entity);
+		assertThat(result.getHash()).isEqualTo(expectedHash);
 	}
 
 	@Test
 	void toAttachmentEntityThrowsIOException() throws IOException {
 
-		when(entityManagerMock.unwrap(Session.class)).thenReturn(sessionMock);
-		when(sessionMock.getLobHelper()).thenReturn(lobHelperMock);
 		when(multipartFileMock.getInputStream()).thenThrow(new IOException("test exception"));
 
 		assertThatThrownBy(() -> AttachmentMapper.toAttachmentEntity(multipartFileMock, entityManagerMock, MessageEntity.create()))

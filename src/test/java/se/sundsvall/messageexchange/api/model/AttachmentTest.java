@@ -39,6 +39,7 @@ class AttachmentTest {
 		final var id = "id";
 		final var fileName = "name";
 		final var mimeType = "mimeType";
+		final var hash = "abc123";
 		final var created = now();
 
 		// Act
@@ -46,6 +47,7 @@ class AttachmentTest {
 			.withId(id)
 			.withFileName(fileName)
 			.withMimeType(mimeType)
+			.withHash(hash)
 			.withCreated(created);
 
 		// Assert
@@ -53,6 +55,7 @@ class AttachmentTest {
 		assertThat(result.getId()).isEqualTo(id);
 		assertThat(result.getFileName()).isEqualTo(fileName);
 		assertThat(result.getMimeType()).isEqualTo(mimeType);
+		assertThat(result.getHash()).isEqualTo(hash);
 		assertThat(result.getCreated()).isEqualTo(created);
 
 	}
