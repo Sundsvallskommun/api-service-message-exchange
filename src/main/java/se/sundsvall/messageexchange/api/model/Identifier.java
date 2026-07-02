@@ -2,6 +2,7 @@ package se.sundsvall.messageexchange.api.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.util.Objects;
 
@@ -9,6 +10,7 @@ import java.util.Objects;
 public class Identifier {
 
 	@Schema(description = "The type of the participant, e.g., adAccount or partyId", examples = "user")
+	@NotNull
 	@Pattern(regexp = "^(adAccount|partyId)$", message = "Type must be 'adAccount' or 'partyId'")
 	private String type;
 
