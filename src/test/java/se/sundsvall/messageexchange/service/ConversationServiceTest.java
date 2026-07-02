@@ -1,5 +1,6 @@
 package se.sundsvall.messageexchange.service;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,6 +14,8 @@ import se.sundsvall.dept44.support.Identifier;
 import se.sundsvall.messageexchange.api.model.Conversation;
 import se.sundsvall.messageexchange.integration.db.ConversationRepository;
 import se.sundsvall.messageexchange.integration.db.MessageRepository;
+import se.sundsvall.messageexchange.integration.db.ReadByCountProjection;
+import se.sundsvall.messageexchange.integration.db.ReadByPartCountProjection;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageType;
@@ -233,5 +236,117 @@ class ConversationServiceTest {
 			.isInstanceOf(Problem.class)
 			.hasMessageContaining("Not Found: Conversation with id conversationId not found")
 			.extracting("status").isEqualTo(NOT_FOUND);
+	}
+
+	@Test
+	void countReadBy() {
+		// Arrange
+		final var namespace = "namespace";
+		final var municipalityId = "2281";
+		final var conversationId = "conversationId";
+		final var entity = new ConversationEntity();
+
+		when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
+			.thenReturn(Optional.of(entity));
+		when(messageRepositoryMock.countMessages(conversationId, false)).thenReturn(13L);
+		when(messageRepositoryMock.countReadByGroupedByIdentifier(conversationId, false))
+			.thenReturn(List.of(readByCountProjection("adAccount", "joe01doe", 4L)));
+		when(messageRepositoryMock.countReadByGroupedByPart(conversationId, false))
+			.thenReturn(List.of(readByPartCountProjection("errand-123", 6L)));
+
+		// Act
+		final var result = conversationService.countReadBy(namespace, municipalityId, conversationId, false);
+
+		// Assert
+		assertThat(result).isNotNull();
+		assertThat(result.getMessageCount()).isEqualTo(13L);
+		assertThat(result.getReadByCount()).hasSize(1).satisfies(counts -> {
+			assertThat(counts.getFirst().getIdentifier().getType()).isEqualTo("adAccount");
+			assertThat(counts.getFirst().getIdentifier().getValue()).isEqualTo("joe01doe");
+			assertThat(counts.getFirst().getCount()).isEqualTo(4L);
+		});
+		assertThat(result.getReadByPartCount()).hasSize(1).satisfies(counts -> {
+			assertThat(counts.getFirst().getPart()).isEqualTo("errand-123");
+			assertThat(counts.getFirst().getCount()).isEqualTo(6L);
+		});
+		verify(conversationRepositoryMock).findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId);
+		verify(messageRepositoryMock).countMessages(conversationId, false);
+		verify(messageRepositoryMock).countReadByGroupedByIdentifier(conversationId, false);
+		verify(messageRepositoryMock).countReadByGroupedByPart(conversationId, false);
+	}
+
+	@Test
+	void countReadByIncludingSystemMessages() {
+		// Arrange
+		final var namespace = "namespace";
+		final var municipalityId = "2281";
+		final var conversationId = "conversationId";
+		final var entity = new ConversationEntity();
+
+		when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
+			.thenReturn(Optional.of(entity));
+		when(messageRepositoryMock.countMessages(conversationId, true)).thenReturn(14L);
+		when(messageRepositoryMock.countReadByGroupedByIdentifier(conversationId, true)).thenReturn(List.of());
+		when(messageRepositoryMock.countReadByGroupedByPart(conversationId, true)).thenReturn(List.of());
+
+		// Act
+		final var result = conversationService.countReadBy(namespace, municipalityId, conversationId, true);
+
+		// Assert
+		assertThat(result.getMessageCount()).isEqualTo(14L);
+		assertThat(result.getReadByCount()).isEmpty();
+		assertThat(result.getReadByPartCount()).isEmpty();
+		verify(messageRepositoryMock).countMessages(conversationId, true);
+		verify(messageRepositoryMock).countReadByGroupedByIdentifier(conversationId, true);
+		verify(messageRepositoryMock).countReadByGroupedByPart(conversationId, true);
+	}
+
+	@Test
+	void countReadByConversationNotFound() {
+		// Arrange
+		final var namespace = "namespace";
+		final var municipalityId = "2281";
+		final var conversationId = "conversationId";
+		when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
+			.thenReturn(Optional.empty());
+
+		// Act & Assert
+		assertThatThrownBy(() -> conversationService.countReadBy(namespace, municipalityId, conversationId, false))
+			.isInstanceOf(Problem.class)
+			.hasMessageContaining("Not Found: Conversation with id conversationId not found")
+			.extracting("status").isEqualTo(NOT_FOUND);
+	}
+
+	private static ReadByCountProjection readByCountProjection(final String type, final String value, final long count) {
+		return new ReadByCountProjection() {
+			@Override
+			public String getType() {
+				return type;
+			}
+
+			@Override
+			public String getValue() {
+				return value;
+			}
+
+			@Override
+			public long getCount() {
+				return count;
+			}
+		};
+	}
+
+	private static ReadByPartCountProjection readByPartCountProjection(final String part, final long count) {
+		return new ReadByPartCountProjection() {
+			@Override
+			public String getPart() {
+				return part;
+			}
+
+			@Override
+			public long getCount() {
+				return count;
+			}
+		};
 	}
 }

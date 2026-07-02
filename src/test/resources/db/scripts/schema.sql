@@ -83,6 +83,14 @@
         primary key (id)
     ) engine=InnoDB;
 
+    create table message_read_by_part (
+        read_at datetime(6) not null,
+        id varchar(255) not null,
+        message_id varchar(255) not null,
+        part varchar(255) not null,
+        primary key (id)
+    ) engine=InnoDB;
+
     create table message_sequence (
         id bigint not null,
         primary key (id)
@@ -124,10 +132,13 @@
     create index idx_message_read_by_message_id_identifier_id 
        on message_read_by (message_id, identifier_id);
 
-    alter table if exists message_read_by 
+    alter table if exists message_read_by
        add constraint uq_message_read_by_identifier_id unique (identifier_id);
 
-    alter table if exists attachment 
+    create index idx_message_read_by_part_message_id_part
+       on message_read_by_part (message_id, part);
+
+    alter table if exists attachment
        add constraint fk_attachment_data_attachment 
        foreign key (attachment_data_id) 
        references attachment_data (id);
@@ -187,7 +198,12 @@
        foreign key (identifier_id) 
        references identifier (id);
 
-    alter table if exists message_read_by 
-       add constraint fk_message_read_by 
-       foreign key (message_id) 
+    alter table if exists message_read_by
+       add constraint fk_message_read_by
+       foreign key (message_id)
+       references message (id);
+
+    alter table if exists message_read_by_part
+       add constraint fk_message_read_by_part
+       foreign key (message_id)
        references message (id);

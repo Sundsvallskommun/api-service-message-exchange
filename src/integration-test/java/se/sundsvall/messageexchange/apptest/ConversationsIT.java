@@ -102,4 +102,15 @@ class ConversationsIT extends AbstractAppTest {
 			.sendRequestAndVerifyResponse();
 	}
 
+	@Test
+	void test06_countReadBy() {
+		setupCall()
+			.withServicePath(PATH + "/" + CONVERSATION_ID + "/countReadBy")
+			.withHttpMethod(GET)
+			.withExpectedResponseStatus(OK)
+			.withExpectedResponseHeader(CONTENT_TYPE, List.of(APPLICATION_JSON_VALUE))
+			.withExpectedResponse(RESPONSE_FILE)
+			.sendRequestAndVerifyResponse();
+	}
+
 }

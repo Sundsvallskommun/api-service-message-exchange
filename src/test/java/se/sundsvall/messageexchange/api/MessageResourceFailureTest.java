@@ -1,5 +1,6 @@
 package se.sundsvall.messageexchange.api;
 
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.dept44.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.dept44.problem.violations.Violation;
 import se.sundsvall.messageexchange.Application;
+import se.sundsvall.messageexchange.api.model.MarkAsReadRequest;
 import se.sundsvall.messageexchange.api.model.Message;
 import se.sundsvall.messageexchange.service.MessageService;
 
@@ -189,7 +191,7 @@ class MessageResourceFailureTest {
 
 		doThrow(Problem.valueOf(NOT_FOUND, "Conversation not found"))
 			.when(messageServiceMock)
-			.getMessages(eq(MUNICIPALITY_ID), eq(NAMESPACE), eq(CONVERSATION_ID), any(), any());
+			.getMessages(eq(MUNICIPALITY_ID), eq(NAMESPACE), eq(CONVERSATION_ID), any(), any(), eq(true));
 
 		webTestClient.get()
 			.uri(PATH, Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID))
@@ -197,6 +199,51 @@ class MessageResourceFailureTest {
 			.accept(APPLICATION_JSON)
 			.exchange()
 			.expectStatus().isNotFound();
+	}
+
+	@Test
+	void markAsReadWithEmptyMessageIds() {
+
+		final var request = MarkAsReadRequest.create()
+			.withMessageIds(List.of())
+			.withPart("errand-123");
+
+		final var response = webTestClient.post()
+			.uri(PATH + "/markAsRead", Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID))
+			.contentType(APPLICATION_JSON)
+			.bodyValue(request)
+			.exchange()
+			.expectStatus().isBadRequest()
+			.expectBody(ConstraintViolationProblem.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).isNotNull();
+		assertThat(response.getViolations())
+			.extracting(Violation::field)
+			.contains("messageIds");
+	}
+
+	@Test
+	void markAsReadWithNeitherIdentifierNorPart() {
+
+		final var request = MarkAsReadRequest.create()
+			.withMessageIds(List.of(MESSAGE_ID));
+
+		final var response = webTestClient.post()
+			.uri(PATH + "/markAsRead", Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID))
+			.contentType(APPLICATION_JSON)
+			.bodyValue(request)
+			.exchange()
+			.expectStatus().isBadRequest()
+			.expectBody(ConstraintViolationProblem.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response).isNotNull();
+		assertThat(response.getViolations())
+			.extracting(Violation::message)
+			.contains("At least one of 'identifier' or 'part' must be provided");
 	}
 
 	@Test

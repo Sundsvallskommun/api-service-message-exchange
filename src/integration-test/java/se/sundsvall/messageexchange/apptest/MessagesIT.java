@@ -73,6 +73,29 @@ class MessagesIT extends AbstractAppTest {
 	}
 
 	@Test
+	void test05_markAsRead() {
+		setupCall()
+			.withServicePath(PATH + "/markAsRead")
+			.withHeader(SENT_BY_HEADER, "joe01doe; type=adAccount")
+			.withHttpMethod(POST)
+			.withRequest(REQUEST_FILE)
+			.withExpectedResponseStatus(NO_CONTENT)
+			.sendRequestAndVerifyResponse();
+	}
+
+	@Test
+	void test06_findMessagesWithoutSettingReadBy() {
+		setupCall()
+			.withServicePath(PATH + "?setReadBy=false")
+			.withHeader(SENT_BY_HEADER, "joe01doe; type=adAccount")
+			.withHttpMethod(GET)
+			.withExpectedResponseStatus(OK)
+			.withExpectedResponseHeader(CONTENT_TYPE, List.of(APPLICATION_JSON_VALUE))
+			.withExpectedResponse(RESPONSE_FILE)
+			.sendRequestAndVerifyResponse();
+	}
+
+	@Test
 	void test04_readAttachment() throws IOException {
 		setupCall()
 			.withServicePath(PATH + "/" + MESSAGE_ID + "/attachments/a1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5")

@@ -6,6 +6,7 @@
 		"value": "string"
 	},
 	"content": "Hello, how can I help you?",
+	"createdByPart": "errand-123",
 	"readBy": [
 		{
 			"type": "string",

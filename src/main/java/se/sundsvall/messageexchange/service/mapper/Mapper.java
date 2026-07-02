@@ -1,6 +1,7 @@
 package se.sundsvall.messageexchange.service.mapper;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -14,12 +15,19 @@ import se.sundsvall.messageexchange.api.model.KeyValues;
 import se.sundsvall.messageexchange.api.model.Message;
 import se.sundsvall.messageexchange.api.model.MessageType;
 import se.sundsvall.messageexchange.api.model.ReadBy;
+import se.sundsvall.messageexchange.api.model.ReadByCount;
+import se.sundsvall.messageexchange.api.model.ReadByPart;
+import se.sundsvall.messageexchange.api.model.ReadByPartCount;
+import se.sundsvall.messageexchange.api.model.ReadByStatistics;
+import se.sundsvall.messageexchange.integration.db.ReadByCountProjection;
+import se.sundsvall.messageexchange.integration.db.ReadByPartCountProjection;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
 import se.sundsvall.messageexchange.integration.db.model.ExternalReferencesEntity;
 import se.sundsvall.messageexchange.integration.db.model.IdentifierEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 import se.sundsvall.messageexchange.integration.db.model.MetadataEntity;
 import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
+import se.sundsvall.messageexchange.integration.db.model.ReadByPartEntity;
 import se.sundsvall.messageexchange.integration.db.model.SequenceEntity;
 
 import static java.util.Collections.emptyList;
@@ -197,6 +205,7 @@ public final class Mapper {
 			.withCreatedBy(toIdentifier(entity.getCreatedBy()))
 			.withContent(entity.getContent())
 			.withReadBy(toReadByList(entity.getReadBy()))
+			.withReadByPart(toReadByPartList(entity.getReadByPart()))
 			.withAttachments(AttachmentMapper.toAttachments(entity.getAttachments()))
 			.withType(MessageType.valueOf(entity.getType().toString()));
 
@@ -206,12 +215,18 @@ public final class Mapper {
 
 		final var identifier = se.sundsvall.dept44.support.Identifier.get();
 
-		return MessageEntity.create()
+		final var messageEntity = MessageEntity.create()
 			.withInReplyToMessageId(message.getInReplyToMessageId())
 			.withCreatedBy(toIdentifierEntity(identifier))
 			.withReadBy(toReadByEntities(identifier))
 			.withContent(message.getContent())
 			.withConversation(entity);
+
+		ofNullable(message.getCreatedByPart())
+			.filter(part -> !part.isBlank())
+			.ifPresent(part -> messageEntity.setReadByPart(new ArrayList<>(List.of(toReadByPartEntity(part)))));
+
+		return messageEntity;
 	}
 
 	public static List<Identifier> toIdentifiers(final List<IdentifierEntity> entities) {
@@ -323,6 +338,64 @@ public final class Mapper {
 				.withIdentifier(toIdentifier(e.getIdentifier()))
 				.withReadAt(entity.getReadAt()))
 			.orElse(null);
+	}
+
+	public static ReadByEntity toReadByEntity(final Identifier identifier) {
+		return Optional.ofNullable(identifier)
+			.map(p -> ReadByEntity.create()
+				.withIdentifier(toIdentifierEntity(identifier))
+				.withReadAt(OffsetDateTime.now(ZoneId.systemDefault())))
+			.orElse(null);
+	}
+
+	public static ReadByPartEntity toReadByPartEntity(final String part) {
+		return Optional.ofNullable(part)
+			.map(p -> ReadByPartEntity.create()
+				.withPart(p)
+				.withReadAt(OffsetDateTime.now(ZoneId.systemDefault())))
+			.orElse(null);
+	}
+
+	public static List<ReadByPart> toReadByPartList(final List<ReadByPartEntity> readByPart) {
+		return Optional.ofNullable(readByPart)
+			.orElse(emptyList()).stream()
+			.map(Mapper::toReadByPart)
+			.toList();
+	}
+
+	public static ReadByPart toReadByPart(final ReadByPartEntity entity) {
+		return Optional.ofNullable(entity)
+			.map(e -> ReadByPart.create()
+				.withPart(e.getPart())
+				.withReadAt(e.getReadAt()))
+			.orElse(null);
+	}
+
+	public static ReadByStatistics toReadByStatistics(final long messageCount, final List<ReadByCountProjection> readByCounts, final List<ReadByPartCountProjection> readByPartCounts) {
+		return ReadByStatistics.create()
+			.withMessageCount(messageCount)
+			.withReadByCount(toReadByCounts(readByCounts))
+			.withReadByPartCount(toReadByPartCounts(readByPartCounts));
+	}
+
+	private static List<ReadByCount> toReadByCounts(final List<ReadByCountProjection> readByCounts) {
+		return Optional.ofNullable(readByCounts)
+			.orElse(emptyList()).stream()
+			.map(p -> ReadByCount.create()
+				.withIdentifier(Identifier.create()
+					.withType(p.getType())
+					.withValue(p.getValue()))
+				.withCount(p.getCount()))
+			.toList();
+	}
+
+	private static List<ReadByPartCount> toReadByPartCounts(final List<ReadByPartCountProjection> readByPartCounts) {
+		return Optional.ofNullable(readByPartCounts)
+			.orElse(emptyList()).stream()
+			.map(p -> ReadByPartCount.create()
+				.withPart(p.getPart())
+				.withCount(p.getCount()))
+			.toList();
 	}
 
 	public static List<ExternalReferencesEntity> toExternalReferencesEntities(final List<KeyValues> externalReferences) {

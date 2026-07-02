@@ -1,6 +1,7 @@
 package se.sundsvall.messageexchange.service.mapper;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +11,8 @@ import se.sundsvall.messageexchange.api.model.Identifier;
 import se.sundsvall.messageexchange.api.model.KeyValues;
 import se.sundsvall.messageexchange.api.model.Message;
 import se.sundsvall.messageexchange.api.model.ReadBy;
+import se.sundsvall.messageexchange.integration.db.ReadByCountProjection;
+import se.sundsvall.messageexchange.integration.db.ReadByPartCountProjection;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
 import se.sundsvall.messageexchange.integration.db.model.ExternalReferencesEntity;
 import se.sundsvall.messageexchange.integration.db.model.IdentifierEntity;
@@ -17,6 +20,7 @@ import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageType;
 import se.sundsvall.messageexchange.integration.db.model.MetadataEntity;
 import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
+import se.sundsvall.messageexchange.integration.db.model.ReadByPartEntity;
 import se.sundsvall.messageexchange.integration.db.model.SequenceEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -250,7 +254,7 @@ class MapperTest {
 		final var result = Mapper.toMessage(entity);
 
 		// Assert
-		assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("created");
+		assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("created", "createdByPart");
 		assertThat(result.getId()).isEqualTo(id);
 		assertThat(result.getSequenceNumber()).isEqualTo(sequenceNumber.getId());
 		assertThat(result.getInReplyToMessageId()).isEqualTo(inReplyTo);
@@ -284,13 +288,63 @@ class MapperTest {
 			final var result = Mapper.toMessageEntity(conversationEntity, message);
 
 			// Assert
-			assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("id", "created", "attachments", "sequenceNumber");
+			assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("id", "created", "attachments", "sequenceNumber", "readByPart");
 			assertThat(result.getInReplyToMessageId()).isEqualTo(inReplyTo);
 			assertThat(result.getCreatedBy().getType()).isEqualTo(createdByType);
 			assertThat(result.getCreatedBy().getValue()).isEqualTo(createdByValue);
 			assertThat(result.getContent()).isEqualTo(content);
 			assertThat(result.getConversation()).isEqualTo(conversationEntity);
+			assertThat(result.getReadByPart()).isNull();
 
+		}
+	}
+
+	@Test
+	void toMessageEntityWithCreatedByPart() {
+		// Arrange
+		final var createdByValue = "value";
+		final var dept44Identifier = se.sundsvall.dept44.support.Identifier.create()
+			.withType(PARTY_ID)
+			.withValue(createdByValue);
+
+		try (final var mockedStatic = mockStatic(se.sundsvall.dept44.support.Identifier.class)) {
+			mockedStatic.when(se.sundsvall.dept44.support.Identifier::get).thenReturn(dept44Identifier);
+
+			final var conversationEntity = ConversationEntity.create().withId("conversationId");
+			final var message = Message.create()
+				.withContent("content")
+				.withCreatedByPart("errand-123");
+
+			// Act
+			final var result = Mapper.toMessageEntity(conversationEntity, message);
+
+			// Assert
+			assertThat(result.getReadByPart()).hasSize(1);
+			assertThat(result.getReadByPart().getFirst().getPart()).isEqualTo("errand-123");
+			assertThat(result.getReadByPart().getFirst().getReadAt()).isNotNull();
+		}
+	}
+
+	@Test
+	void toMessageEntityWithBlankCreatedByPart() {
+		// Arrange
+		final var dept44Identifier = se.sundsvall.dept44.support.Identifier.create()
+			.withType(PARTY_ID)
+			.withValue("value");
+
+		try (final var mockedStatic = mockStatic(se.sundsvall.dept44.support.Identifier.class)) {
+			mockedStatic.when(se.sundsvall.dept44.support.Identifier::get).thenReturn(dept44Identifier);
+
+			final var conversationEntity = ConversationEntity.create().withId("conversationId");
+			final var message = Message.create()
+				.withContent("content")
+				.withCreatedByPart("   ");
+
+			// Act
+			final var result = Mapper.toMessageEntity(conversationEntity, message);
+
+			// Assert
+			assertThat(result.getReadByPart()).isNull();
 		}
 	}
 
@@ -731,6 +785,176 @@ class MapperTest {
 
 		// Assert
 		assertThat(result).isNull();
+	}
+
+	@Test
+	void toReadByEntityFromIdentifier() {
+		// Arrange
+		final var type = "adAccount";
+		final var value = "joe01doe";
+		final var identifier = Identifier.create().withType(type).withValue(value);
+
+		try (final var mockedTime = mockStatic(OffsetDateTime.class, CALLS_REAL_METHODS)) {
+			mockedTime.when(() -> OffsetDateTime.now(ZoneId.systemDefault())).thenReturn(READ_AT);
+
+			// Act
+			final var result = Mapper.toReadByEntity(identifier);
+
+			// Assert
+			assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
+			assertThat(result.getIdentifier().getType()).isEqualTo(type);
+			assertThat(result.getIdentifier().getValue()).isEqualTo(value);
+			assertThat(result.getReadAt()).isEqualTo(READ_AT);
+		}
+	}
+
+	@Test
+	void toReadByEntityFromIdentifierNull() {
+		// Act
+		final var result = Mapper.toReadByEntity((Identifier) null);
+
+		// Assert
+		assertThat(result).isNull();
+	}
+
+	@Test
+	void toReadByPartEntity() {
+		// Arrange
+		final var part = "errand-123";
+
+		try (final var mockedTime = mockStatic(OffsetDateTime.class, CALLS_REAL_METHODS)) {
+			mockedTime.when(() -> OffsetDateTime.now(ZoneId.systemDefault())).thenReturn(READ_AT);
+
+			// Act
+			final var result = Mapper.toReadByPartEntity(part);
+
+			// Assert
+			assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("id");
+			assertThat(result.getPart()).isEqualTo(part);
+			assertThat(result.getReadAt()).isEqualTo(READ_AT);
+		}
+	}
+
+	@Test
+	void toReadByPartEntityNull() {
+		// Act
+		final var result = Mapper.toReadByPartEntity(null);
+
+		// Assert
+		assertThat(result).isNull();
+	}
+
+	@Test
+	void toReadByPartList() {
+		// Arrange
+		final var part = "errand-123";
+		final var entity = ReadByPartEntity.create().withPart(part).withReadAt(READ_AT);
+
+		// Act
+		final var result = Mapper.toReadByPartList(List.of(entity));
+
+		// Assert
+		assertThat(result).hasSize(1);
+		assertThat(result.getFirst().getPart()).isEqualTo(part);
+		assertThat(result.getFirst().getReadAt()).isEqualTo(READ_AT);
+	}
+
+	@Test
+	void toReadByPartListNull() {
+		// Act
+		final var result = Mapper.toReadByPartList(null);
+
+		// Assert
+		assertThat(result).isEmpty();
+	}
+
+	@Test
+	void toReadByPart() {
+		// Arrange
+		final var part = "errand-123";
+		final var entity = ReadByPartEntity.create().withPart(part).withReadAt(READ_AT);
+
+		// Act
+		final var result = Mapper.toReadByPart(entity);
+
+		// Assert
+		assertThat(result).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(result.getPart()).isEqualTo(part);
+		assertThat(result.getReadAt()).isEqualTo(READ_AT);
+	}
+
+	@Test
+	void toReadByPartNull() {
+		// Act
+		final var result = Mapper.toReadByPart(null);
+
+		// Assert
+		assertThat(result).isNull();
+	}
+
+	@Test
+	void toReadByStatistics() {
+		// Arrange
+		final var readByCounts = List.of(readByCountProjection("adAccount", "joe01doe", 4L));
+		final var readByPartCounts = List.of(readByPartCountProjection("errand-123", 6L));
+
+		// Act
+		final var result = Mapper.toReadByStatistics(13L, readByCounts, readByPartCounts);
+
+		// Assert
+		assertThat(result).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(result.getMessageCount()).isEqualTo(13L);
+		assertThat(result.getReadByCount()).hasSize(1);
+		assertThat(result.getReadByCount().getFirst().getIdentifier().getType()).isEqualTo("adAccount");
+		assertThat(result.getReadByCount().getFirst().getIdentifier().getValue()).isEqualTo("joe01doe");
+		assertThat(result.getReadByCount().getFirst().getCount()).isEqualTo(4L);
+		assertThat(result.getReadByPartCount()).hasSize(1);
+		assertThat(result.getReadByPartCount().getFirst().getPart()).isEqualTo("errand-123");
+		assertThat(result.getReadByPartCount().getFirst().getCount()).isEqualTo(6L);
+	}
+
+	@Test
+	void toReadByStatisticsWithNullLists() {
+		// Act
+		final var result = Mapper.toReadByStatistics(0L, null, null);
+
+		// Assert
+		assertThat(result.getMessageCount()).isZero();
+		assertThat(result.getReadByCount()).isEmpty();
+		assertThat(result.getReadByPartCount()).isEmpty();
+	}
+
+	private static ReadByCountProjection readByCountProjection(final String type, final String value, final long count) {
+		return new ReadByCountProjection() {
+			@Override
+			public String getType() {
+				return type;
+			}
+
+			@Override
+			public String getValue() {
+				return value;
+			}
+
+			@Override
+			public long getCount() {
+				return count;
+			}
+		};
+	}
+
+	private static ReadByPartCountProjection readByPartCountProjection(final String part, final long count) {
+		return new ReadByPartCountProjection() {
+			@Override
+			public String getPart() {
+				return part;
+			}
+
+			@Override
+			public long getCount() {
+				return count;
+			}
+		};
 	}
 
 	@Test
