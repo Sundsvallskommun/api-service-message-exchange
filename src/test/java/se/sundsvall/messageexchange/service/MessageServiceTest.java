@@ -25,6 +25,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.dept44.support.Identifier;
+import se.sundsvall.messageexchange.api.model.MarkAsReadRequest;
 import se.sundsvall.messageexchange.api.model.Message;
 import se.sundsvall.messageexchange.integration.db.AttachmentRepository;
 import se.sundsvall.messageexchange.integration.db.ConversationRepository;
@@ -35,6 +36,7 @@ import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
 import se.sundsvall.messageexchange.integration.db.model.IdentifierEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
+import se.sundsvall.messageexchange.integration.db.model.ReadByPartEntity;
 import se.sundsvall.messageexchange.util.MessageSpecificationBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -166,7 +168,7 @@ class MessageServiceTest {
 			when(messageRepositoryMock.findAll(ArgumentMatchers.<Specification<MessageEntity>>any(), eq(pageable))).thenReturn(messagePage);
 
 			// Act
-			final var result = messageService.getMessages(municipalityId, namespace, conversationId, filter, pageable);
+			final var result = messageService.getMessages(municipalityId, namespace, conversationId, filter, pageable, true);
 
 			// Assert
 			assertThat(result).isNotNull();
@@ -204,7 +206,7 @@ class MessageServiceTest {
 			when(messageRepositoryMock.findAll(ArgumentMatchers.<Specification<MessageEntity>>any(), eq(pageable))).thenReturn(messagePage);
 
 			// Act
-			final var result = messageService.getMessages(municipalityId, namespace, conversationId, filter, pageable);
+			final var result = messageService.getMessages(municipalityId, namespace, conversationId, filter, pageable, true);
 
 			// Assert
 			assertThat(result).isNotNull();
@@ -230,10 +232,171 @@ class MessageServiceTest {
 			.thenReturn(Optional.empty());
 
 		// Act & Assert
-		assertThatThrownBy(() -> messageService.getMessages(municipalityId, namespace, conversationId, filter, pageable))
+		assertThatThrownBy(() -> messageService.getMessages(municipalityId, namespace, conversationId, filter, pageable, true))
 			.isInstanceOf(Problem.class)
 			.hasMessageContaining("Conversation with id conversationId not found")
 			.extracting("status").isEqualTo(NOT_FOUND);
+	}
+
+	@Test
+	void getMessagesWithSetReadByFalse() {
+		// Arrange
+		final var municipalityId = "2281";
+		final var namespace = "namespace";
+		final var conversationId = "conversationId";
+		final var pageable = PageRequest.of(0, 10);
+		final var conversationEntity = new ConversationEntity();
+		final var messageEntity = new MessageEntity().withReadBy(new ArrayList<>(List.of(ReadByEntity.create().withIdentifier(IdentifierEntity.create().withType("partyId").withValue("ad012ad")))));
+		final var messagePage = new PageImpl<>(List.of(messageEntity), pageable, 1);
+		final var filter = MessageSpecificationBuilder.withConversation(conversationEntity);
+
+		when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
+			.thenReturn(Optional.of(conversationEntity));
+		when(messageRepositoryMock.findAll(ArgumentMatchers.<Specification<MessageEntity>>any(), eq(pageable))).thenReturn(messagePage);
+
+		// Act
+		final var result = messageService.getMessages(municipalityId, namespace, conversationId, filter, pageable, false);
+
+		// Assert
+		assertThat(result).isNotNull();
+		assertThat(result.getContent()).hasSize(1);
+		verify(conversationRepositoryMock).findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId);
+		verify(messageRepositoryMock).findAll(ArgumentMatchers.<Specification<MessageEntity>>any(), eq(pageable));
+		verify(messageRepositoryMock, never()).saveAll(any());
+		assertThat(messageEntity.getReadBy()).hasSize(1);
+	}
+
+	@Test
+	void markMessagesAsReadByIdentifier() {
+		// Arrange
+		final var municipalityId = "2281";
+		final var namespace = "namespace";
+		final var conversationId = "conversationId";
+		final var messageId = "messageId";
+		final var conversationEntity = new ConversationEntity();
+		final var messageEntity = new MessageEntity().withReadBy(new ArrayList<>());
+		final var request = MarkAsReadRequest.create()
+			.withMessageIds(List.of(messageId))
+			.withIdentifier(se.sundsvall.messageexchange.api.model.Identifier.create().withType("adAccount").withValue("joe01doe"));
+
+		when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
+			.thenReturn(Optional.of(conversationEntity));
+		when(messageRepositoryMock.findByConversationIdAndIdIn(conversationId, request.getMessageIds())).thenReturn(List.of(messageEntity));
+
+		// Act
+		messageService.markMessagesAsRead(municipalityId, namespace, conversationId, request);
+
+		// Assert
+		verify(conversationRepositoryMock).findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId);
+		verify(messageRepositoryMock).findByConversationIdAndIdIn(conversationId, request.getMessageIds());
+		verify(messageRepositoryMock).saveAll(List.of(messageEntity));
+		assertThat(messageEntity.getReadBy()).hasSize(1)
+			.extracting(rb -> rb.getIdentifier().getType(), rb -> rb.getIdentifier().getValue())
+			.containsExactly(Tuple.tuple("adAccount", "joe01doe"));
+		assertThat(messageEntity.getReadByPart()).isNullOrEmpty();
+	}
+
+	@Test
+	void markMessagesAsReadWhenExistingReadByHasNullType() {
+		// Arrange - an existing readBy entry with a null type must not cause an NPE during dedup
+		final var municipalityId = "2281";
+		final var namespace = "namespace";
+		final var conversationId = "conversationId";
+		final var messageId = "messageId";
+		final var conversationEntity = new ConversationEntity();
+		final var messageEntity = new MessageEntity()
+			.withReadBy(new ArrayList<>(List.of(ReadByEntity.create().withIdentifier(IdentifierEntity.create().withType(null).withValue("joe01doe")))));
+		final var request = MarkAsReadRequest.create()
+			.withMessageIds(List.of(messageId))
+			.withIdentifier(se.sundsvall.messageexchange.api.model.Identifier.create().withType("adAccount").withValue("joe01doe"));
+
+		when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
+			.thenReturn(Optional.of(conversationEntity));
+		when(messageRepositoryMock.findByConversationIdAndIdIn(conversationId, request.getMessageIds())).thenReturn(List.of(messageEntity));
+
+		// Act
+		messageService.markMessagesAsRead(municipalityId, namespace, conversationId, request);
+
+		// Assert - null type differs from "adAccount", so the new identifier is added (no NPE, no false dedup)
+		verify(messageRepositoryMock).saveAll(List.of(messageEntity));
+		assertThat(messageEntity.getReadBy()).hasSize(2)
+			.extracting(rb -> rb.getIdentifier().getType())
+			.containsExactlyInAnyOrder(null, "adAccount");
+	}
+
+	@Test
+	void markMessagesAsReadByPart() {
+		// Arrange
+		final var municipalityId = "2281";
+		final var namespace = "namespace";
+		final var conversationId = "conversationId";
+		final var messageId = "messageId";
+		final var conversationEntity = new ConversationEntity();
+		final var messageEntity = new MessageEntity().withReadByPart(new ArrayList<>());
+		final var request = MarkAsReadRequest.create()
+			.withMessageIds(List.of(messageId))
+			.withPart("errand-123");
+
+		when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
+			.thenReturn(Optional.of(conversationEntity));
+		when(messageRepositoryMock.findByConversationIdAndIdIn(conversationId, request.getMessageIds())).thenReturn(List.of(messageEntity));
+
+		// Act
+		messageService.markMessagesAsRead(municipalityId, namespace, conversationId, request);
+
+		// Assert
+		verify(messageRepositoryMock).saveAll(List.of(messageEntity));
+		assertThat(messageEntity.getReadByPart()).hasSize(1).extracting(ReadByPartEntity::getPart).containsExactly("errand-123");
+		assertThat(messageEntity.getReadBy()).isNullOrEmpty();
+	}
+
+	@Test
+	void markMessagesAsReadByIdentifierAndPartWithDedup() {
+		// Arrange
+		final var municipalityId = "2281";
+		final var namespace = "namespace";
+		final var conversationId = "conversationId";
+		final var messageId = "messageId";
+		final var conversationEntity = new ConversationEntity();
+		final var messageEntity = new MessageEntity()
+			.withReadBy(new ArrayList<>(List.of(ReadByEntity.create().withIdentifier(IdentifierEntity.create().withType("adAccount").withValue("joe01doe")))))
+			.withReadByPart(new ArrayList<>(List.of(ReadByPartEntity.create().withPart("errand-123"))));
+		final var request = MarkAsReadRequest.create()
+			.withMessageIds(List.of(messageId))
+			.withIdentifier(se.sundsvall.messageexchange.api.model.Identifier.create().withType("adAccount").withValue("joe01doe"))
+			.withPart("errand-123");
+
+		when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
+			.thenReturn(Optional.of(conversationEntity));
+		when(messageRepositoryMock.findByConversationIdAndIdIn(conversationId, request.getMessageIds())).thenReturn(List.of(messageEntity));
+
+		// Act
+		messageService.markMessagesAsRead(municipalityId, namespace, conversationId, request);
+
+		// Assert - already present, so no duplicates added
+		verify(messageRepositoryMock).saveAll(List.of(messageEntity));
+		assertThat(messageEntity.getReadBy()).hasSize(1);
+		assertThat(messageEntity.getReadByPart()).hasSize(1);
+	}
+
+	@Test
+	void markMessagesAsReadConversationNotFound() {
+		// Arrange
+		final var municipalityId = "2281";
+		final var namespace = "namespace";
+		final var conversationId = "conversationId";
+		final var request = MarkAsReadRequest.create().withMessageIds(List.of("messageId")).withPart("errand-123");
+
+		when(conversationRepositoryMock.findByNamespaceAndMunicipalityIdAndId(namespace, municipalityId, conversationId))
+			.thenReturn(Optional.empty());
+
+		// Act & Assert
+		assertThatThrownBy(() -> messageService.markMessagesAsRead(municipalityId, namespace, conversationId, request))
+			.isInstanceOf(Problem.class)
+			.hasMessageContaining("Conversation with id conversationId not found")
+			.extracting("status").isEqualTo(NOT_FOUND);
+
+		verify(messageRepositoryMock, never()).saveAll(any());
 	}
 
 	@Test

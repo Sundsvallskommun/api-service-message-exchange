@@ -16,6 +16,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import se.sundsvall.messageexchange.Application;
 import se.sundsvall.messageexchange.api.model.Conversation;
+import se.sundsvall.messageexchange.api.model.ReadByStatistics;
 import se.sundsvall.messageexchange.service.ConversationService;
 
 import static java.util.UUID.randomUUID;
@@ -128,6 +129,38 @@ class ConversationResourceTest {
 			.expectStatus().isOk();
 
 		verify(conversationServiceMock).readConversation(NAMESPACE, MUNICIPALITY_ID, CONVERSATION_ID);
+	}
+
+	@Test
+	void countReadBy() {
+
+		when(conversationServiceMock.countReadBy(NAMESPACE, MUNICIPALITY_ID, CONVERSATION_ID, false)).thenReturn(ReadByStatistics.create().withMessageCount(13L));
+
+		webTestClient.get()
+			.uri(PATH + "/{id}/countReadBy", Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID))
+			.accept(APPLICATION_JSON)
+			.exchange()
+			.expectStatus().isOk()
+			.expectBody()
+			.jsonPath("$.messageCount").isEqualTo(13);
+
+		verify(conversationServiceMock).countReadBy(NAMESPACE, MUNICIPALITY_ID, CONVERSATION_ID, false);
+	}
+
+	@Test
+	void countReadByIncludingSystemMessages() {
+
+		when(conversationServiceMock.countReadBy(NAMESPACE, MUNICIPALITY_ID, CONVERSATION_ID, true)).thenReturn(ReadByStatistics.create().withMessageCount(14L));
+
+		webTestClient.get()
+			.uri(builder -> builder.path(PATH + "/{id}/countReadBy")
+				.queryParam("includeSystemMessages", "true")
+				.build(Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID)))
+			.accept(APPLICATION_JSON)
+			.exchange()
+			.expectStatus().isOk();
+
+		verify(conversationServiceMock).countReadBy(NAMESPACE, MUNICIPALITY_ID, CONVERSATION_ID, true);
 	}
 
 	@Test

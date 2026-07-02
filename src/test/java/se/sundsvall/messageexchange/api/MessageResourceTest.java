@@ -1,5 +1,6 @@
 package se.sundsvall.messageexchange.api;
 
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import se.sundsvall.messageexchange.Application;
+import se.sundsvall.messageexchange.api.model.Identifier;
+import se.sundsvall.messageexchange.api.model.MarkAsReadRequest;
 import se.sundsvall.messageexchange.api.model.Message;
 import se.sundsvall.messageexchange.service.MessageService;
 
@@ -76,8 +79,23 @@ class MessageResourceTest {
 			.exchange()
 			.expectStatus().isOk();
 
-		verify(messageServiceMock).getMessages(eq(MUNICIPALITY_ID), eq(NAMESPACE), eq(CONVERSATION_ID), any(), any());
+		verify(messageServiceMock).getMessages(eq(MUNICIPALITY_ID), eq(NAMESPACE), eq(CONVERSATION_ID), any(), any(), eq(true));
 
+	}
+
+	@Test
+	void getMessagesWithSetReadByFalse() {
+
+		webTestClient.get()
+			.uri(builder -> builder.path(PATH)
+				.queryParam("setReadBy", "false")
+				.build(Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID)))
+			.header(HEADER_NAME, "type=adAccount; joe01doe")
+			.accept(APPLICATION_JSON)
+			.exchange()
+			.expectStatus().isOk();
+
+		verify(messageServiceMock).getMessages(eq(MUNICIPALITY_ID), eq(NAMESPACE), eq(CONVERSATION_ID), any(), any(), eq(false));
 	}
 
 	@Test
@@ -91,7 +109,25 @@ class MessageResourceTest {
 			.exchange()
 			.expectStatus().isOk();
 
-		verify(messageServiceMock).getMessages(eq(MUNICIPALITY_ID), eq(NAMESPACE), eq(CONVERSATION_ID), any(), any());
+		verify(messageServiceMock).getMessages(eq(MUNICIPALITY_ID), eq(NAMESPACE), eq(CONVERSATION_ID), any(), any(), eq(true));
+	}
+
+	@Test
+	void markAsRead() {
+
+		final var request = MarkAsReadRequest.create()
+			.withMessageIds(List.of(MESSAGE_ID))
+			.withIdentifier(Identifier.create().withType("adAccount").withValue("joe01doe"))
+			.withPart("errand-123");
+
+		webTestClient.post()
+			.uri(PATH + "/markAsRead", Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID))
+			.contentType(APPLICATION_JSON)
+			.bodyValue(request)
+			.exchange()
+			.expectStatus().isNoContent();
+
+		verify(messageServiceMock).markMessagesAsRead(MUNICIPALITY_ID, NAMESPACE, CONVERSATION_ID, request);
 	}
 
 	@Test

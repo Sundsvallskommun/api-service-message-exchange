@@ -44,7 +44,9 @@ class MessageTest {
 		final var created = now();
 		final var createdBy = Identifier.create();
 		final var content = "content";
+		final var createdByPart = "errand-123";
 		final var readBy = List.of(ReadBy.create());
+		final var readByPart = List.of(ReadByPart.create());
 		final var attachments = List.of(Attachment.create());
 		final var type = MessageType.USER_CREATED;
 
@@ -56,7 +58,9 @@ class MessageTest {
 			.withCreated(created)
 			.withCreatedBy(createdBy)
 			.withContent(content)
+			.withCreatedByPart(createdByPart)
 			.withReadBy(readBy)
+			.withReadByPart(readByPart)
 			.withAttachments(attachments)
 			.withType(type);
 
@@ -68,7 +72,9 @@ class MessageTest {
 		assertThat(result.getCreated()).isEqualTo(created);
 		assertThat(result.getCreatedBy()).isEqualTo(createdBy);
 		assertThat(result.getContent()).isEqualTo(content);
+		assertThat(result.getCreatedByPart()).isEqualTo(createdByPart);
 		assertThat(result.getReadBy()).isEqualTo(readBy);
+		assertThat(result.getReadByPart()).isEqualTo(readByPart);
 		assertThat(result.getType()).isEqualTo(type);
 
 	}

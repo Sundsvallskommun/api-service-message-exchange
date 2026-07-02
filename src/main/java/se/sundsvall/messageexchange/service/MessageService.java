@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,6 +17,7 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.dept44.support.Identifier;
+import se.sundsvall.messageexchange.api.model.MarkAsReadRequest;
 import se.sundsvall.messageexchange.api.model.Message;
 import se.sundsvall.messageexchange.integration.db.AttachmentRepository;
 import se.sundsvall.messageexchange.integration.db.ConversationRepository;
@@ -25,6 +27,7 @@ import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
 import se.sundsvall.messageexchange.integration.db.model.IdentifierEntity;
 import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 import se.sundsvall.messageexchange.integration.db.model.ReadByEntity;
+import se.sundsvall.messageexchange.integration.db.model.ReadByPartEntity;
 import se.sundsvall.messageexchange.integration.db.model.SequenceEntity;
 import se.sundsvall.messageexchange.service.mapper.AttachmentMapper;
 import se.sundsvall.messageexchange.service.mapper.Mapper;
@@ -77,7 +80,7 @@ public class MessageService {
 		return messageRepository.saveAndFlush(entity).getId();
 	}
 
-	public Page<Message> getMessages(final String municipalityId, final String namespace, final String conversationId, final Specification<MessageEntity> filter, final Pageable pageable) {
+	public Page<Message> getMessages(final String municipalityId, final String namespace, final String conversationId, final Specification<MessageEntity> filter, final Pageable pageable, final boolean setReadBy) {
 
 		final var conversationEntity = findExistingConversation(municipalityId, namespace, conversationId);
 
@@ -85,9 +88,47 @@ public class MessageService {
 		final var matches = messageRepository.findAll(fullFilter, pageable);
 
 		final var messages = Mapper.toMessages(matches.getContent());
-		updateReadBy(matches);
-		messageRepository.saveAll(matches);
+		if (setReadBy) {
+			updateReadBy(matches);
+			messageRepository.saveAll(matches);
+		}
 		return new PageImpl<>(messages, pageable, matches.getTotalElements());
+	}
+
+	public void markMessagesAsRead(final String municipalityId, final String namespace, final String conversationId, final MarkAsReadRequest request) {
+
+		findExistingConversation(municipalityId, namespace, conversationId);
+
+		final var messages = messageRepository.findByConversationIdAndIdIn(conversationId, request.getMessageIds());
+
+		messages.forEach(message -> {
+			ofNullable(request.getIdentifier()).ifPresent(identifier -> message.setReadBy(addReadBy(message, identifier)));
+			ofNullable(request.getPart()).filter(part -> !part.isBlank()).ifPresent(part -> message.setReadByPart(addReadByPart(message, part)));
+		});
+
+		messageRepository.saveAll(messages);
+	}
+
+	private List<ReadByEntity> addReadBy(final MessageEntity message, final se.sundsvall.messageexchange.api.model.Identifier identifier) {
+		final var list = ofNullable(message.getReadBy()).orElseGet(ArrayList::new);
+
+		final var alreadyPresent = list.stream()
+			.map(ReadByEntity::getIdentifier)
+			.anyMatch(existing -> Objects.equals(existing.getType(), identifier.getType()) && Objects.equals(existing.getValue(), identifier.getValue()));
+
+		if (!alreadyPresent) {
+			list.add(Mapper.toReadByEntity(identifier));
+		}
+		return list;
+	}
+
+	private List<ReadByPartEntity> addReadByPart(final MessageEntity message, final String part) {
+		final var list = ofNullable(message.getReadByPart()).orElseGet(ArrayList::new);
+
+		if (list.stream().noneMatch(existing -> part.equals(existing.getPart()))) {
+			list.add(Mapper.toReadByPartEntity(part));
+		}
+		return list;
 	}
 
 	public void deleteMessage(final String municipalityId, final String namespace, final String conversationId, final String messageId) {

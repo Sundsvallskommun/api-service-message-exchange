@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.dept44.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.messageexchange.api.model.Conversation;
+import se.sundsvall.messageexchange.api.model.ReadByStatistics;
 import se.sundsvall.messageexchange.api.validation.ValidNamespace;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
 import se.sundsvall.messageexchange.service.ConversationService;
@@ -81,6 +83,22 @@ class ConversationResource {
 		@Parameter(name = "conversationId", description = "Conversation ID", example = "b82bd8ac-1507-4d9a-958d-369261eecc15") @ValidUuid @PathVariable final String conversationId) {
 
 		return ok(service.readConversation(namespace, municipalityId, conversationId));
+	}
+
+	@GetMapping(path = "/{conversationId}/countReadBy", produces = APPLICATION_JSON_VALUE)
+	@Operation(description = "Get read statistics for a conversation, describing how many messages have been read per identifier and per part.", responses = {
+		@ApiResponse(responseCode = "200", description = "OK - Successful operation", useReturnTypeSchema = true),
+		@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
+	})
+	ResponseEntity<ReadByStatistics> countReadBy(
+		@Parameter(name = "municipalityId", description = "Municipality ID", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
+		@Parameter(name = "namespace", description = "Namespace", example = "MY_NAMESPACE") @ValidNamespace @PathVariable final String namespace,
+		@Parameter(name = "conversationId", description = "Conversation ID", example = "b82bd8ac-1507-4d9a-958d-369261eecc15") @ValidUuid @PathVariable final String conversationId,
+		@Parameter(name = "includeSystemMessages",
+			description = "Whether system generated messages should be included in the statistics. Defaults to false.",
+			example = "false") @RequestParam(name = "includeSystemMessages", defaultValue = "false") final boolean includeSystemMessages) {
+
+		return ok(service.countReadBy(namespace, municipalityId, conversationId, includeSystemMessages));
 	}
 
 	@PostMapping(consumes = APPLICATION_JSON_VALUE, produces = ALL_VALUE)

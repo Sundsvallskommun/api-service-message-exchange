@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
@@ -20,8 +21,10 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +32,7 @@ import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.dept44.problem.violations.ConstraintViolationProblem;
+import se.sundsvall.messageexchange.api.model.MarkAsReadRequest;
 import se.sundsvall.messageexchange.api.model.Message;
 import se.sundsvall.messageexchange.api.validation.ValidMultipartFiles;
 import se.sundsvall.messageexchange.api.validation.ValidNamespace;
@@ -99,9 +103,26 @@ class MessageResource {
 		@Parameter(description = "Syntax description: [spring-filter](https://github.com/turkraft/spring-filter/blob/85730f950a5f8623159cc0eb4d737555f9382bb7/README.md#syntax)",
 			example = "content:'My content' and createdBy.value:'joe01doe' and created>'2023-01-01T00:00:00Z'",
 			schema = @Schema(implementation = String.class)) @Nullable @Filter final Specification<MessageEntity> filter,
+		@Parameter(name = "setReadBy",
+			description = "Whether the request sender should be marked as having read the returned messages. Defaults to true.",
+			example = "true") @RequestParam(name = "setReadBy", defaultValue = "true") final boolean setReadBy,
 		@ParameterObject final Pageable pageable) {
 
-		return ok(service.getMessages(municipalityId, namespace, conversationId, filter, pageable));
+		return ok(service.getMessages(municipalityId, namespace, conversationId, filter, pageable, setReadBy));
+	}
+
+	@PostMapping(path = "/markAsRead", consumes = APPLICATION_JSON_VALUE, produces = ALL_VALUE)
+	@Operation(description = "Mark a list of messages as read by an identifier and/or a part", responses = {
+		@ApiResponse(responseCode = "204", description = "No Content - Successful operation", useReturnTypeSchema = true)
+	})
+	ResponseEntity<Void> markAsRead(
+		@PathVariable @ValidMunicipalityId @Parameter(name = "municipalityId", description = "Municipality ID", example = "2281") final String municipalityId,
+		@PathVariable @ValidNamespace @Parameter(name = "namespace", description = "Namespace", example = "MY_NAMESPACE") final String namespace,
+		@PathVariable @ValidUuid @Parameter(name = "conversationId", description = "Conversation ID", example = "b82bd8ac-1507-4d9a-958d-369261eecc15") final String conversationId,
+		@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Messages to mark as read") @Valid @RequestBody final MarkAsReadRequest request) {
+
+		service.markMessagesAsRead(municipalityId, namespace, conversationId, request);
+		return noContent().build();
 	}
 
 	@DeleteMapping(path = "/{messageId}", produces = ALL_VALUE)

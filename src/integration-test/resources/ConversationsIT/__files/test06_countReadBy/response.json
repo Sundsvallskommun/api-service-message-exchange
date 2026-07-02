@@ -1,0 +1,20 @@
+{
+	"messageCount": 2,
+	"readByCount": [
+		{
+			"identifier": {
+				"type": "user",
+				"value": "user5@example.com"
+			},
+			"count": 1
+		},
+		{
+			"identifier": {
+				"type": "user",
+				"value": "user6@example.com"
+			},
+			"count": 1
+		}
+	],
+	"readByPartCount": []
+}

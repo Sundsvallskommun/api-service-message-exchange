@@ -47,6 +47,7 @@ class MessageEntityTest {
 		final var createdBy = IdentifierEntity.create();
 		final var content = "content";
 		final var readBy = List.of(ReadByEntity.create());
+		final var readByPart = List.of(ReadByPartEntity.create());
 		final var conversation = ConversationEntity.create();
 		final var attachments = List.of(AttachmentEntity.create());
 		final var type = MessageType.SYSTEM_CREATED;
@@ -60,6 +61,7 @@ class MessageEntityTest {
 			.withCreatedBy(createdBy)
 			.withContent(content)
 			.withReadBy(readBy)
+			.withReadByPart(readByPart)
 			.withConversation(conversation)
 			.withAttachments(attachments)
 			.withType(type);
@@ -73,6 +75,7 @@ class MessageEntityTest {
 		assertThat(result.getCreatedBy()).isEqualTo(createdBy);
 		assertThat(result.getContent()).isEqualTo(content);
 		assertThat(result.getReadBy()).isEqualTo(readBy);
+		assertThat(result.getReadByPart()).isEqualTo(readByPart);
 		assertThat(result.getConversation()).isEqualTo(conversation);
 		assertThat(result.getAttachments()).isEqualTo(attachments);
 		assertThat(result.getType()).isEqualTo(type);

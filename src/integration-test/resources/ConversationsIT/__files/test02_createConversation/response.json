@@ -10,6 +10,7 @@
 			},
 			"id": "${json-unit.any-string}",
 			"readBy": [],
+			"readByPart": [],
 			"sequenceNumber": 3,
 			"type": "SYSTEM_CREATED"
 		}

@@ -5,9 +5,9 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "1.2"
+  version: "1.3"
 servers:
-- url: http://localhost:51313
+- url: http://localhost:45109
   description: Generated server url
 tags:
 - name: Message resource
@@ -178,6 +178,15 @@ paths:
         schema:
           type: string
         example: content:'My content' and createdBy.value:'joe01doe' and created>'2023-01-01T00:00:00Z'
+      - name: setReadBy
+        in: query
+        description: Whether the request sender should be marked as having read the
+          returned messages. Defaults to true.
+        required: false
+        schema:
+          type: boolean
+          default: true
+        example: true
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -286,6 +295,64 @@ paths:
       responses:
         "201":
           description: Created - Successful operation
+        "400":
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
+        "404":
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /{municipalityId}/{namespace}/conversations/{conversationId}/messages/markAsRead:
+    post:
+      tags:
+      - Message resource
+      description: Mark a list of messages as read by an identifier and/or a part
+      operationId: markAsRead
+      parameters:
+      - name: municipalityId
+        in: path
+        description: Municipality ID
+        required: true
+        schema:
+          type: string
+        example: 2281
+      - name: namespace
+        in: path
+        description: Namespace
+        required: true
+        schema:
+          type: string
+        example: MY_NAMESPACE
+      - name: conversationId
+        in: path
+        description: Conversation ID
+        required: true
+        schema:
+          type: string
+        example: b82bd8ac-1507-4d9a-958d-369261eecc15
+      requestBody:
+        description: Messages to mark as read
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MarkAsReadRequest"
+        required: true
+      responses:
+        "204":
+          description: No Content - Successful operation
         "400":
           description: Bad request
           content:
@@ -539,6 +606,71 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+  /{municipalityId}/{namespace}/conversations/{conversationId}/countReadBy:
+    get:
+      tags:
+      - Conversation resource
+      description: "Get read statistics for a conversation, describing how many messages\
+        \ have been read per identifier and per part."
+      operationId: countReadBy
+      parameters:
+      - name: municipalityId
+        in: path
+        description: Municipality ID
+        required: true
+        schema:
+          type: string
+        example: 2281
+      - name: namespace
+        in: path
+        description: Namespace
+        required: true
+        schema:
+          type: string
+        example: MY_NAMESPACE
+      - name: conversationId
+        in: path
+        description: Conversation ID
+        required: true
+        schema:
+          type: string
+        example: b82bd8ac-1507-4d9a-958d-369261eecc15
+      - name: includeSystemMessages
+        in: query
+        description: Whether system generated messages should be included in the statistics.
+          Defaults to false.
+        required: false
+        schema:
+          type: boolean
+          default: false
+        example: false
+      responses:
+        "200":
+          description: OK - Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReadByStatistics"
+        "404":
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "400":
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
+        "500":
+          description: Internal Server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
   /api-docs:
     get:
       tags:
@@ -701,16 +833,16 @@ components:
     Problem:
       type: object
       properties:
-        title:
-          type: string
-        detail:
-          type: string
         instance:
           type: string
           format: uri
         type:
           type: string
           format: uri
+        detail:
+          type: string
+        title:
+          type: string
         status:
           type: integer
           format: int32
@@ -729,13 +861,13 @@ components:
             $ref: "#/components/schemas/Violation"
         title:
           type: string
+        instance:
+          type: string
+          format: uri
         detail:
           type: string
         causeAsProblem:
           $ref: "#/components/schemas/ThrowableProblem"
-        instance:
-          type: string
-          format: uri
     ThrowableProblem:
       type: object
       properties:
@@ -838,11 +970,23 @@ components:
           description: The content of the message.
           examples:
           - "Hello, how can I help you?"
+        createdByPart:
+          type: string
+          description: "Optional part that is posting the message. When set, it is\
+            \ added directly to the message's readByPart list."
+          examples:
+          - errand-123
+          writeOnly: true
         readBy:
           type: array
           items:
             $ref: "#/components/schemas/ReadBy"
             description: The list of people who have read the message.
+        readByPart:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReadByPart"
+            description: The list of parts that have read the message.
         attachments:
           type: array
           items:
@@ -871,24 +1015,54 @@ components:
           description: The timestamp when the message was read.
           examples:
           - 2023-01-01T12:00:00
+    ReadByPart:
+      type: object
+      description: "Represents a part that has read a message, including the part\
+        \ identifier and the timestamp of when it was read."
+      properties:
+        part:
+          type: string
+          description: The part that read the message.
+          examples:
+          - errand-123
+        readAt:
+          type: string
+          format: date-time
+          description: The timestamp when the message was read.
+          examples:
+          - 2023-01-01T12:00:00
+    MarkAsReadRequest:
+      type: object
+      description: Request for marking a list of messages as read by an identifier
+        and/or a part.
+      properties:
+        messageIds:
+          type: array
+          items:
+            type: string
+            description: The identifiers of the messages to mark as read.
+            examples:
+            - 7f77f9fd-d01d-4742-974a-714b911e3496
+          minItems: 1
+        identifier:
+          $ref: "#/components/schemas/Identifier"
+          description: The identifier of the person that read the messages. Either
+            this and/or part must be provided.
+        part:
+          type: string
+          description: The part that read the messages. Either this and/or identifier
+            must be provided.
+          examples:
+          - errand-123
+      required:
+      - messageIds
     PageConversation:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
-        sort:
-          $ref: "#/components/schemas/SortObject"
-        first:
-          type: boolean
-        last:
-          type: boolean
-        numberOfElements:
+        totalPages:
           type: integer
           format: int32
         size:
@@ -901,11 +1075,25 @@ components:
         number:
           type: integer
           format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        first:
+          type: boolean
+        last:
+          type: boolean
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        numberOfElements:
+          type: integer
+          format: int32
         empty:
           type: boolean
     PageableObject:
       type: object
       properties:
+        offset:
+          type: integer
+          format: int64
         paged:
           type: boolean
         pageNumber:
@@ -918,36 +1106,22 @@ components:
           $ref: "#/components/schemas/SortObject"
         unpaged:
           type: boolean
-        offset:
-          type: integer
-          format: int64
     SortObject:
       type: object
       properties:
+        empty:
+          type: boolean
         sorted:
           type: boolean
         unsorted:
           type: boolean
-        empty:
-          type: boolean
     PageMessage:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
-        sort:
-          $ref: "#/components/schemas/SortObject"
-        first:
-          type: boolean
-        last:
-          type: boolean
-        numberOfElements:
+        totalPages:
           type: integer
           format: int32
         size:
@@ -960,6 +1134,67 @@ components:
         number:
           type: integer
           format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        first:
+          type: boolean
+        last:
+          type: boolean
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        numberOfElements:
+          type: integer
+          format: int32
         empty:
           type: boolean
+    ReadByCount:
+      type: object
+      description: The number of messages read by a specific identifier within a conversation.
+      properties:
+        identifier:
+          $ref: "#/components/schemas/Identifier"
+          description: The identifier of the person the count refers to.
+        count:
+          type: integer
+          format: int64
+          description: The number of messages read by the identifier.
+          examples:
+          - 4
+    ReadByPartCount:
+      type: object
+      description: The number of messages read by a specific part within a conversation.
+      properties:
+        part:
+          type: string
+          description: The part the count refers to.
+          examples:
+          - errand-123
+        count:
+          type: integer
+          format: int64
+          description: The number of messages read by the part.
+          examples:
+          - 6
+    ReadByStatistics:
+      type: object
+      description: "Read statistics for a conversation, describing how many messages\
+        \ have been read per identifier and per part."
+      properties:
+        messageCount:
+          type: integer
+          format: int64
+          description: The total number of messages the statistics are based on.
+          examples:
+          - 13
+          readOnly: true
+        readByCount:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReadByCount"
+            description: The number of messages read per identifier.
+        readByPartCount:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReadByPartCount"
+            description: The number of messages read per part.
   securitySchemes: {}

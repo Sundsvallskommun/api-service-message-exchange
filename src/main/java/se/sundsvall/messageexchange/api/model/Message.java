@@ -29,8 +29,14 @@ public class Message {
 	@Schema(description = "The content of the message.", examples = "Hello, how can I help you?")
 	private String content;
 
+	@Schema(description = "Optional part that is posting the message. When set, it is added directly to the message's readByPart list.", examples = "errand-123", accessMode = Schema.AccessMode.WRITE_ONLY)
+	private String createdByPart;
+
 	@ArraySchema(schema = @Schema(implementation = ReadBy.class, description = "The list of people who have read the message."))
 	private List<ReadBy> readBy;
+
+	@ArraySchema(schema = @Schema(implementation = ReadByPart.class, description = "The list of parts that have read the message."))
+	private List<ReadByPart> readByPart;
 
 	@ArraySchema(schema = @Schema(implementation = Attachment.class, description = "The list of attachments associated with the message."))
 	private List<Attachment> attachments;
@@ -120,6 +126,19 @@ public class Message {
 		return this;
 	}
 
+	public String getCreatedByPart() {
+		return createdByPart;
+	}
+
+	public void setCreatedByPart(final String createdByPart) {
+		this.createdByPart = createdByPart;
+	}
+
+	public Message withCreatedByPart(final String createdByPart) {
+		this.createdByPart = createdByPart;
+		return this;
+	}
+
 	public List<ReadBy> getReadBy() {
 		return readBy;
 	}
@@ -130,6 +149,19 @@ public class Message {
 
 	public Message withReadBy(final List<ReadBy> readBy) {
 		this.readBy = readBy;
+		return this;
+	}
+
+	public List<ReadByPart> getReadByPart() {
+		return readByPart;
+	}
+
+	public void setReadByPart(final List<ReadByPart> readByPart) {
+		this.readByPart = readByPart;
+	}
+
+	public Message withReadByPart(final List<ReadByPart> readByPart) {
+		this.readByPart = readByPart;
 		return this;
 	}
 
@@ -165,12 +197,13 @@ public class Message {
 			return false;
 		final Message message = (Message) o;
 		return Objects.equals(id, message.id) && Objects.equals(sequenceNumber, message.sequenceNumber) && Objects.equals(inReplyToMessageId, message.inReplyToMessageId) && Objects.equals(created, message.created)
-			&& Objects.equals(createdBy, message.createdBy) && Objects.equals(content, message.content) && Objects.equals(readBy, message.readBy) && Objects.equals(attachments, message.attachments) && Objects.equals(type, message.type);
+			&& Objects.equals(createdBy, message.createdBy) && Objects.equals(content, message.content) && Objects.equals(createdByPart, message.createdByPart) && Objects.equals(readBy, message.readBy) && Objects.equals(readByPart, message.readByPart)
+			&& Objects.equals(attachments, message.attachments) && Objects.equals(type, message.type);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, sequenceNumber, inReplyToMessageId, created, createdBy, content, readBy, attachments, type);
+		return Objects.hash(id, sequenceNumber, inReplyToMessageId, created, createdBy, content, createdByPart, readBy, readByPart, attachments, type);
 	}
 
 	@Override
@@ -182,7 +215,9 @@ public class Message {
 			", created=" + created +
 			", createdBy=" + createdBy +
 			", content='" + content + '\'' +
+			", createdByPart='" + createdByPart + '\'' +
 			", readBy=" + readBy +
+			", readByPart=" + readByPart +
 			", attachments=" + attachments +
 			", type=" + type +
 			'}';

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.messageexchange.api.model.Conversation;
+import se.sundsvall.messageexchange.api.model.ReadByStatistics;
 import se.sundsvall.messageexchange.integration.db.ConversationRepository;
 import se.sundsvall.messageexchange.integration.db.MessageRepository;
 import se.sundsvall.messageexchange.integration.db.model.ConversationEntity;
@@ -21,6 +22,7 @@ import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversation;
 import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversationEntity;
 import static se.sundsvall.messageexchange.service.mapper.Mapper.toConversations;
 import static se.sundsvall.messageexchange.service.mapper.Mapper.toIdentifierEntity;
+import static se.sundsvall.messageexchange.service.mapper.Mapper.toReadByStatistics;
 import static se.sundsvall.messageexchange.service.mapper.Mapper.updateConversationEntity;
 import static se.sundsvall.messageexchange.util.ConversationSpecificationBuilder.withMunicipalityId;
 import static se.sundsvall.messageexchange.util.ConversationSpecificationBuilder.withNamespace;
@@ -74,6 +76,17 @@ public class ConversationService {
 		});
 
 		return toConversation(conversationRepository.save(updateConversationEntity(entity, conversation)));
+	}
+
+	public ReadByStatistics countReadBy(final String namespace, final String municipalityId, final String conversationId, final boolean includeSystemMessages) {
+
+		findExistingConversation(municipalityId, namespace, conversationId);
+
+		final var messageCount = messageRepository.countMessages(conversationId, includeSystemMessages);
+		final var readByCounts = messageRepository.countReadByGroupedByIdentifier(conversationId, includeSystemMessages);
+		final var readByPartCounts = messageRepository.countReadByGroupedByPart(conversationId, includeSystemMessages);
+
+		return toReadByStatistics(messageCount, readByCounts, readByPartCounts);
 	}
 
 	public void deleteConversation(final String namespace, final String municipalityId, final String conversationId) {
