@@ -121,7 +121,7 @@ class MessageResourceTest {
 			.withPart("errand-123");
 
 		webTestClient.post()
-			.uri(PATH + "/markAsRead", Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID))
+			.uri(PATH + "/mark-as-read", Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID))
 			.contentType(APPLICATION_JSON)
 			.bodyValue(request)
 			.exchange()

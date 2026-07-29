@@ -111,7 +111,7 @@ class MessageResource {
 		return ok(service.getMessages(municipalityId, namespace, conversationId, filter, pageable, setReadBy));
 	}
 
-	@PostMapping(path = "/markAsRead", consumes = APPLICATION_JSON_VALUE, produces = ALL_VALUE)
+	@PostMapping(path = "/mark-as-read", consumes = APPLICATION_JSON_VALUE, produces = ALL_VALUE)
 	@Operation(description = "Mark a list of messages as read by an identifier and/or a part", responses = {
 		@ApiResponse(responseCode = "204", description = "No Content - Successful operation", useReturnTypeSchema = true)
 	})

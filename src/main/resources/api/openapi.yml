@@ -315,7 +315,7 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-  /{municipalityId}/{namespace}/conversations/{conversationId}/messages/markAsRead:
+  /{municipalityId}/{namespace}/conversations/{conversationId}/messages/mark-as-read:
     post:
       tags:
       - Message resource

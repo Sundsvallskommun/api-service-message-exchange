@@ -75,7 +75,7 @@ class MessagesIT extends AbstractAppTest {
 	@Test
 	void test05_markAsRead() {
 		setupCall()
-			.withServicePath(PATH + "/markAsRead")
+			.withServicePath(PATH + "/mark-as-read")
 			.withHeader(SENT_BY_HEADER, "joe01doe; type=adAccount")
 			.withHttpMethod(POST)
 			.withRequest(REQUEST_FILE)

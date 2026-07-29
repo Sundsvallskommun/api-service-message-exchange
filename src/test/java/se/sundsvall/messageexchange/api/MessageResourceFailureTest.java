@@ -209,7 +209,7 @@ class MessageResourceFailureTest {
 			.withPart("errand-123");
 
 		final var response = webTestClient.post()
-			.uri(PATH + "/markAsRead", Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID))
+			.uri(PATH + "/mark-as-read", Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID))
 			.contentType(APPLICATION_JSON)
 			.bodyValue(request)
 			.exchange()
@@ -231,7 +231,7 @@ class MessageResourceFailureTest {
 			.withMessageIds(List.of(MESSAGE_ID));
 
 		final var response = webTestClient.post()
-			.uri(PATH + "/markAsRead", Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID))
+			.uri(PATH + "/mark-as-read", Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID))
 			.contentType(APPLICATION_JSON)
 			.bodyValue(request)
 			.exchange()
