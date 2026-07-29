@@ -105,7 +105,7 @@ class ConversationsIT extends AbstractAppTest {
 	@Test
 	void test06_countReadBy() {
 		setupCall()
-			.withServicePath(PATH + "/" + CONVERSATION_ID + "/countReadBy")
+			.withServicePath(PATH + "/" + CONVERSATION_ID + "/count-read-by")
 			.withHttpMethod(GET)
 			.withExpectedResponseStatus(OK)
 			.withExpectedResponseHeader(CONTENT_TYPE, List.of(APPLICATION_JSON_VALUE))

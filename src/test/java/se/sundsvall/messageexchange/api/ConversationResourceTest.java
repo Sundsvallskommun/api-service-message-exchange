@@ -137,7 +137,7 @@ class ConversationResourceTest {
 		when(conversationServiceMock.countReadBy(NAMESPACE, MUNICIPALITY_ID, CONVERSATION_ID, false)).thenReturn(ReadByStatistics.create().withMessageCount(13L));
 
 		webTestClient.get()
-			.uri(PATH + "/{id}/countReadBy", Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID))
+			.uri(PATH + "/{id}/count-read-by", Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID))
 			.accept(APPLICATION_JSON)
 			.exchange()
 			.expectStatus().isOk()
@@ -153,7 +153,7 @@ class ConversationResourceTest {
 		when(conversationServiceMock.countReadBy(NAMESPACE, MUNICIPALITY_ID, CONVERSATION_ID, true)).thenReturn(ReadByStatistics.create().withMessageCount(14L));
 
 		webTestClient.get()
-			.uri(builder -> builder.path(PATH + "/{id}/countReadBy")
+			.uri(builder -> builder.path(PATH + "/{id}/count-read-by")
 				.queryParam("includeSystemMessages", "true")
 				.build(Map.of("municipalityId", MUNICIPALITY_ID, "namespace", NAMESPACE, "id", CONVERSATION_ID)))
 			.accept(APPLICATION_JSON)
