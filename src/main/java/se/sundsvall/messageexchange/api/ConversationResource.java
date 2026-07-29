@@ -85,7 +85,7 @@ class ConversationResource {
 		return ok(service.readConversation(namespace, municipalityId, conversationId));
 	}
 
-	@GetMapping(path = "/{conversationId}/countReadBy", produces = APPLICATION_JSON_VALUE)
+	@GetMapping(path = "/{conversationId}/count-read-by", produces = APPLICATION_JSON_VALUE)
 	@Operation(description = "Get read statistics for a conversation, describing how many messages have been read per identifier and per part.", responses = {
 		@ApiResponse(responseCode = "200", description = "OK - Successful operation", useReturnTypeSchema = true),
 		@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
