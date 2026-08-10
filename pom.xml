@@ -12,7 +12,7 @@
 	<version>3.0</version>
 	<name>api-service-message-exchange</name>
 	<properties>
-		<spring-filter.version>4.0.1</spring-filter.version>
+		<spring-filter.version>4.0.3</spring-filter.version>
 		<tika-core.version>3.3.2</tika-core.version>
 	</properties>
 	<dependencies>
