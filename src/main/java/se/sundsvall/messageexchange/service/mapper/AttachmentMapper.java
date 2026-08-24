@@ -1,6 +1,5 @@
 package se.sundsvall.messageexchange.service.mapper;
 
-import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.DigestInputStream;
@@ -10,7 +9,7 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import org.hibernate.Session;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +30,7 @@ public final class AttachmentMapper {
 
 	private AttachmentMapper() {}
 
-	public static AttachmentEntity toAttachmentEntity(final MultipartFile attachment, final EntityManager entityManager, final MessageEntity messageEntity) {
+	public static AttachmentEntity toAttachmentEntity(final MultipartFile attachment, final MessageEntity messageEntity) {
 		if (anyNull(attachment)) {
 			return null;
 		}
@@ -43,12 +42,11 @@ public final class AttachmentMapper {
 			}
 			final var hash = HexFormat.of().formatHex(digest.digest());
 
-			final Session session = entityManager.unwrap(Session.class);
 			return AttachmentEntity.create()
 				.withMessageEntity(messageEntity)
 				.withFileSize(Math.toIntExact(attachment.getSize()))
 				.withHash(hash)
-				.withAttachmentData(new AttachmentDataEntity().withFile(session.getLobHelper().createBlob(attachment.getInputStream(), attachment.getSize())))
+				.withAttachmentData(new AttachmentDataEntity().withFile(Hibernate.getLobHelper().createBlob(attachment.getInputStream(), attachment.getSize())))
 				.withFileName(attachment.getOriginalFilename())
 				.withMimeType(detectMimeTypeFromStream(attachment.getOriginalFilename(), attachment.getInputStream()));
 		} catch (final IOException | NoSuchAlgorithmException e) {
@@ -76,10 +74,10 @@ public final class AttachmentMapper {
 			.orElse(null);
 	}
 
-	public static List<AttachmentEntity> toAttachmentEntities(final List<MultipartFile> attachments, final EntityManager entityManager, final MessageEntity messageEntity) {
+	public static List<AttachmentEntity> toAttachmentEntities(final List<MultipartFile> attachments, final MessageEntity messageEntity) {
 		return Optional.ofNullable(attachments)
 			.orElse(emptyList()).stream()
-			.map(attachment -> AttachmentMapper.toAttachmentEntity(attachment, entityManager, messageEntity))
+			.map(attachment -> AttachmentMapper.toAttachmentEntity(attachment, messageEntity))
 			.toList();
 	}
 }

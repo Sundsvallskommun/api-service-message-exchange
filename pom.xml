@@ -13,7 +13,7 @@
 	<name>api-service-message-exchange</name>
 	<properties>
 		<spring-filter.version>4.0.6</spring-filter.version>
-		<tika-core.version>3.3.2</tika-core.version>
+		<tika-core.version>4.0.0</tika-core.version>
 	</properties>
 	<dependencies>
 		<dependency>
