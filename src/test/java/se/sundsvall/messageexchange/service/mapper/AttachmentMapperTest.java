@@ -1,16 +1,16 @@
 package se.sundsvall.messageexchange.service.mapper;
 
-import jakarta.persistence.EntityManager;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Blob;
 import java.time.OffsetDateTime;
 import java.util.List;
+import org.hibernate.Hibernate;
 import org.hibernate.LobHelper;
-import org.hibernate.Session;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 import se.sundsvall.dept44.problem.Problem;
@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,13 +39,7 @@ class AttachmentMapperTest {
 	private static final OffsetDateTime CREATED = now().minusWeeks(1);
 
 	@Mock
-	private EntityManager entityManagerMock;
-
-	@Mock
 	private MultipartFile multipartFileMock;
-
-	@Mock
-	private Session sessionMock;
 
 	@Mock
 	private LobHelper lobHelperMock;
@@ -59,23 +54,25 @@ class AttachmentMapperTest {
 		// SHA-256("test") in hex
 		final var expectedHash = "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08";
 
-		when(entityManagerMock.unwrap(Session.class)).thenReturn(sessionMock);
-		when(sessionMock.getLobHelper()).thenReturn(lobHelperMock);
-		when(lobHelperMock.createBlob(any(), anyLong())).thenReturn(blobMock);
 		when(multipartFileMock.getOriginalFilename()).thenReturn(FILE_NAME);
 		when(multipartFileMock.getInputStream())
 			.thenReturn(new ByteArrayInputStream("test".getBytes()))
 			.thenReturn(new ByteArrayInputStream("test".getBytes()))
 			.thenReturn(new ByteArrayInputStream("test".getBytes()));
 
-		final var result = AttachmentMapper.toAttachmentEntity(multipartFileMock, entityManagerMock, entity);
+		try (MockedStatic<Hibernate> hibernateMock = mockStatic(Hibernate.class)) {
+			hibernateMock.when(Hibernate::getLobHelper).thenReturn(lobHelperMock);
+			when(lobHelperMock.createBlob(any(), anyLong())).thenReturn(blobMock);
 
-		assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("id", "created");
-		assertThat(result.getFileName()).isEqualTo(FILE_NAME);
-		assertThat(result.getAttachmentData().getFile()).isSameAs(blobMock);
-		assertThat(result.getMimeType()).isEqualTo("text/plain");
-		assertThat(result.getMessageEntity()).isSameAs(entity);
-		assertThat(result.getHash()).isEqualTo(expectedHash);
+			final var result = AttachmentMapper.toAttachmentEntity(multipartFileMock, entity);
+
+			assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("id", "created");
+			assertThat(result.getFileName()).isEqualTo(FILE_NAME);
+			assertThat(result.getAttachmentData().getFile()).isSameAs(blobMock);
+			assertThat(result.getMimeType()).isEqualTo("text/plain");
+			assertThat(result.getMessageEntity()).isSameAs(entity);
+			assertThat(result.getHash()).isEqualTo(expectedHash);
+		}
 	}
 
 	@Test
@@ -83,7 +80,7 @@ class AttachmentMapperTest {
 
 		when(multipartFileMock.getInputStream()).thenThrow(new IOException("test exception"));
 
-		assertThatThrownBy(() -> AttachmentMapper.toAttachmentEntity(multipartFileMock, entityManagerMock, MessageEntity.create()))
+		assertThatThrownBy(() -> AttachmentMapper.toAttachmentEntity(multipartFileMock, MessageEntity.create()))
 			.isInstanceOf(Problem.class)
 			.hasMessageContaining("Could not read input stream!");
 	}
@@ -91,7 +88,7 @@ class AttachmentMapperTest {
 	@Test
 	void toAttachmentEntityAllNulls() {
 
-		assertThat(AttachmentMapper.toAttachmentEntity(null, null, null)).isNull();
+		assertThat(AttachmentMapper.toAttachmentEntity(null, null)).isNull();
 	}
 
 	@Test

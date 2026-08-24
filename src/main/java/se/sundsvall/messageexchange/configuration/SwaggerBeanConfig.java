@@ -1,10 +1,9 @@
 package se.sundsvall.messageexchange.configuration;
 
 import java.util.ArrayList;
-import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverters;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -12,14 +11,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SwaggerBeanConfig implements WebMvcConfigurer {
 
 	@Override
-	public void extendMessageConverters(final List<HttpMessageConverter<?>> converters) {
-		converters.stream()
-			.filter(JacksonJsonHttpMessageConverter.class::isInstance)
-			.map(JacksonJsonHttpMessageConverter.class::cast)
-			.forEach(converter -> {
-				final var supportedMediaTypes = new ArrayList<>(converter.getSupportedMediaTypes());
+	public void configureMessageConverters(final HttpMessageConverters.ServerBuilder builder) {
+		builder.configureMessageConverters(converter -> {
+			if (converter instanceof final JacksonJsonHttpMessageConverter jacksonConverter) {
+				final var supportedMediaTypes = new ArrayList<>(jacksonConverter.getSupportedMediaTypes());
 				supportedMediaTypes.add(new MediaType("application", "octet-stream"));
-				converter.setSupportedMediaTypes(supportedMediaTypes);
-			});
+				jacksonConverter.setSupportedMediaTypes(supportedMediaTypes);
+			}
+		});
 	}
 }
