@@ -1,6 +1,5 @@
 package se.sundsvall.messageexchange.service;
 
-import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -46,18 +45,15 @@ public class MessageService {
 
 	private final MessageRepository messageRepository;
 	private final ConversationRepository conversationRepository;
-	private final EntityManager entityManager;
 	private final AttachmentRepository attachmentRepository;
 
 	public MessageService(
 		final MessageRepository messageRepository,
 		final ConversationRepository conversationRepository,
-		final EntityManager entityManager,
 		final AttachmentRepository attachmentRepository) {
 
 		this.messageRepository = messageRepository;
 		this.conversationRepository = conversationRepository;
-		this.entityManager = entityManager;
 		this.attachmentRepository = attachmentRepository;
 	}
 
@@ -66,7 +62,7 @@ public class MessageService {
 		final var conversationEntity = findExistingConversation(municipalityId, namespace, conversationId);
 		final var entity = toMessageEntity(conversationEntity, message)
 			.withSequenceNumber(new SequenceEntity());
-		entity.setAttachments(AttachmentMapper.toAttachmentEntities(attachments, entityManager, entity));
+		entity.setAttachments(AttachmentMapper.toAttachmentEntities(attachments, entity));
 
 		if (conversationEntity.getParticipants() == null) {
 			conversationEntity.setParticipants(new ArrayList<>());
