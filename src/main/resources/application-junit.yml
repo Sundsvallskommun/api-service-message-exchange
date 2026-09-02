@@ -4,9 +4,6 @@
 logging:
   level:
     root: INFO
-scheduler:
-  attachment-hash-backfill:
-    cron: "-"
 spring:
   cache:
     type: none
