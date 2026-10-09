@@ -1,5 +1,14 @@
 package se.sundsvall.messageexchange.apptest;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.context.jdbc.Sql;
+import se.sundsvall.dept44.test.AbstractAppTest;
+import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
+import se.sundsvall.messageexchange.Application;
+
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.http.HttpMethod.DELETE;
@@ -11,15 +20,6 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 import static org.springframework.util.MimeTypeUtils.IMAGE_JPEG_VALUE;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
-import org.junit.jupiter.api.Test;
-import org.springframework.test.context.jdbc.Sql;
-import se.sundsvall.dept44.test.AbstractAppTest;
-import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
-import se.sundsvall.messageexchange.Application;
 
 @WireMockAppTestSuite(files = "classpath:/MessagesIT/", classes = Application.class)
 @Sql({
