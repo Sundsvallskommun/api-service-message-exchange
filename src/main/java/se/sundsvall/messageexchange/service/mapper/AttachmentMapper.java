@@ -1,11 +1,6 @@
 package se.sundsvall.messageexchange.service.mapper;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,6 +17,7 @@ import se.sundsvall.messageexchange.integration.db.model.MessageEntity;
 import static java.util.Collections.emptyList;
 import static org.apache.commons.lang3.ObjectUtils.anyNull;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static se.sundsvall.dept44.util.HashUtils.sha256Hex;
 import static se.sundsvall.messageexchange.util.ServiceUtil.detectMimeTypeFromStream;
 
 public final class AttachmentMapper {
@@ -36,11 +32,7 @@ public final class AttachmentMapper {
 		}
 
 		try {
-			final var digest = MessageDigest.getInstance("SHA-256");
-			try (var dis = new DigestInputStream(attachment.getInputStream(), digest)) {
-				dis.transferTo(OutputStream.nullOutputStream());
-			}
-			final var hash = HexFormat.of().formatHex(digest.digest());
+			final var hash = sha256Hex(attachment.getInputStream());
 
 			return AttachmentEntity.create()
 				.withMessageEntity(messageEntity)
@@ -49,7 +41,7 @@ public final class AttachmentMapper {
 				.withAttachmentData(new AttachmentDataEntity().withFile(Hibernate.getLobHelper().createBlob(attachment.getInputStream(), attachment.getSize())))
 				.withFileName(attachment.getOriginalFilename())
 				.withMimeType(detectMimeTypeFromStream(attachment.getOriginalFilename(), attachment.getInputStream()));
-		} catch (final IOException | NoSuchAlgorithmException e) {
+		} catch (final IOException e) {
 			LOGGER.warn("Exception when reading file", e);
 			throw Problem.valueOf(BAD_REQUEST, "Could not read input stream!");
 		}
